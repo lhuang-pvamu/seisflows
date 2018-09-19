@@ -1,0 +1,13 @@
+
+DATA :  ''
+
+MODEL_INIT :  '/home/rmodrak/data/Examples2d/checkers/model_init'
+
+MODEL_TRUE :  '/home/rmodrak/data/Examples2d/checkers/model_true'
+
+PRECOND :  ''
+
+SPECFEM_DATA :  '/home/rmodrak/data/Examples2d/checkers/specfem2d-d745c542/DATA'
+
+SPECFEM_BIN :  '/home/rmodrak/data/Examples2d/checkers/specfem2d-d745c542/bin'
+

@@ -1,0 +1,6 @@
+(dp0
+S'path'
+p1
+S'/home/jakemp/code/examples/marmousi-0-serial/scratch/evalgrad'
+p2
+s.
