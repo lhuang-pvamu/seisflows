@@ -1,2 +1,0 @@
- error reading parameter nrec in Par_file
- Error detected, aborting MPI... proc            0
