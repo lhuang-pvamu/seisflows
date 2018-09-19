@@ -99,6 +99,16 @@ class slurm_sm(custom_import('system', 'base')):
         workflow.checkpoint()
 
         # submit workflow
+        print('sbatch '
+                + '%s ' %  PAR.SLURMARGS
+                + '--job-name=%s '%PAR.TITLE
+                + '--output=%s '%(PATH.WORKDIR +'/'+ 'output.log')
+                + '--cpus-per-task=%d '%PAR.NPROC
+                + '--ntasks=%d '%PAR.NTASK
+                + '--time=%d '%PAR.WALLTIME
+                + '%s ' % join(findpath('seisflows.system'), 'wrappers/submit')
+                + '%s ' % PATH.OUTPUT)
+        
         call('sbatch '
                 + '%s ' %  PAR.SLURMARGS
                 + '--job-name=%s '%PAR.TITLE

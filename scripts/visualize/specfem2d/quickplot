@@ -82,7 +82,6 @@ if __name__ == '__main__':
       Any additional ARGS are simply passed to PLOTGLL.
     """
 
-    exe = 'python -W ignore '+which('plotgll')
 
     if not which('plotgll'):
         raise EnvironmentError( 
@@ -91,6 +90,8 @@ if __name__ == '__main__':
     if not sys.argv[1:]:
         raise IOError(
             "usage: quickplot DIR [ARGS]")
+
+    exe = 'python -W ignore ' + which('plotgll')
 
     dir = parse_args()
     if not exists(dir):
