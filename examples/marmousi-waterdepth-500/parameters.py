@@ -26,7 +26,7 @@ SAVEGRADIENT=1          # save gradient how often
 # PREPROCESSING
 FORMAT='su'
 READER='su_specfem2d'   # data file format
-CHANNELS='xz'           # data channels
+CHANNELS='p'           # data channels
 #NORMALIZE=1             # normalize
 NORMALIZE=0             # normalize
 BANDPASS=0              # bandpass
