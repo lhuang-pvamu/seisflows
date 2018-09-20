@@ -1,7 +1,8 @@
-
+            
 import subprocess
 import sys
 import numpy as np
+import os
 
 from functools import partial
 from glob import glob
@@ -516,6 +517,8 @@ class base(object):
         if not path:
             path = PATH.MODEL_INIT
         if not exists(path):
+            print("path not found: " + path)
+            print(os.getcwd())
             raise Exception
 
         # count slices and grid points
