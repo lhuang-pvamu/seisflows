@@ -41,7 +41,7 @@ force_normal_to_surface         = .false.
 
 
 N_SLS                           = 2                      
-f0_attenuation                  = 5.196152422706633      
+ATTENUATION_f0_REFERENCE        = 5.196152422706633
 READ_VELOCITIES_AT_f0           = .false.
 
 
@@ -226,5 +226,3 @@ NTSTEP_BETWEEN_OUTPUT_ENERGY    = 10
 COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
 
 BROADCAST_SAME_MESH_AND_MODEL   = .true.
-
-f0_attenuation                  = 5.196

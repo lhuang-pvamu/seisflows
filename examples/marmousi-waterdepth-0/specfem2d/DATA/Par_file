@@ -227,6 +227,3 @@ NTSTEP_BETWEEN_OUTPUT_ENERGY    = 10
 COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
 
 BROADCAST_SAME_MESH_AND_MODEL   = .true.
-
-f0_attenuation                  = 5.196
-
