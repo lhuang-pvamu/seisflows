@@ -1,7 +1,7 @@
 
 DATA = ''
 
-MODEL_INIT = './smooth_0150'
+MODEL_INIT = './model_init'
 
 MODEL_TRUE = './model_true'
 
