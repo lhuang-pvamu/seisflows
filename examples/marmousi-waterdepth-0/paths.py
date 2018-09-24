@@ -9,5 +9,5 @@ PRECOND = ''
 
 SPECFEM_DATA = './specfem2d/DATA'
 
-SPECFEM_BIN = './specfem2d/bin'
+SPECFEM_BIN = '../../../specfem2d/bin'
 
