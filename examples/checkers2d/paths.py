@@ -1,13 +1,13 @@
 
 DATA = ''
 
-MODEL_INIT = '/home/jakemp/code/examples/checkers2d/model_init'
+MODEL_INIT = './smooth_0150'
 
-MODEL_TRUE = '/home/jakemp/code/examples/checkers2d/model_true'
+MODEL_TRUE = './model_true'
 
 PRECOND = ''
 
-SPECFEM_DATA = '/home/jakemp/code/examples/checkers2d/specfem2d-d745c542/DATA'
+SPECFEM_DATA = './specfem2d/DATA'
 
-SPECFEM_BIN = '/home/jakemp/code/examples/checkers2d/specfem2d-d745c542/bin'
+SPECFEM_BIN = '../../../specfem2d/bin'
 
