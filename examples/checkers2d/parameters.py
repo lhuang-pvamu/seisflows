@@ -1,7 +1,8 @@
-
+VERBOSE=3
 WORKFLOW='inversion'    # inversion, migration
 SOLVER='specfem2d'      # specfem2d, specfem3d
-SYSTEM='slurm_sm'       # serial, pbs, slurm
+SYSTEM='serial'       # serial, pbs, slurm
+#SYSTEM='slurm_sm'       # serial, pbs, slurm
 OPTIMIZE='LBFGS'        # base, newton
 PREPROCESS='base'       # base
 POSTPROCESS='base'      # base
@@ -46,6 +47,8 @@ F0=0.084                # dominant frequency
 
 
 # SYSTEM
-NTASK=25                # must satisfy 1 <= NTASK <= NSRC
-NPROC=4                 # processors per task
+#NTASK=25                # must satisfy 1 <= NTASK <= NSRC
+NTASK=1                # must satisfy 1 <= NTASK <= NSRC
+NPROC=1                 # processors per task
+#NPROC=4                 # processors per task
 
