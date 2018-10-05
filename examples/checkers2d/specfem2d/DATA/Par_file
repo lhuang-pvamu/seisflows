@@ -174,7 +174,7 @@ BROADCAST_SAME_MESH_AND_MODEL   = .true.
 #leftovers
 ATTENUATION_VISCOELASTIC_SOLID  = .false.        
 add_Bielak_conditions           = .false.        
-freq0                           =  10            
+freq0                           =  6 #10
 p_sv                            = .false.        
 enreg_surf_same_vertical        = .false.         
 NSTEP_BETWEEN_OUTPUT_WAVE_DUMPS = 100            

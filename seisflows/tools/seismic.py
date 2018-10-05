@@ -24,10 +24,10 @@ def call_solver(mpiexec, executable, output='solver.log'):
             shell=True,
             stdout=f)
     except subprocess.CalledProcessError, err:
-        print msg.SolverError % (mpiexec +' '+ executable)
+        print msg.SolverError % (mpiexec +' ('+ os.getcwd() + '/)' + executable)
         sys.exit(-1)
     except OSError:
-        print msg.SolverError % (mpiexec +' '+ executable)
+        print msg.SolverError % (mpiexec +' ('+ os.getcwd() + '/)' + executable)
         sys.exit(-1)
     finally:
         f.close()
@@ -74,8 +74,6 @@ class Writer(object):
         fullfile = join(self.path, filename)
         with open(fullfile, 'a') as f:
             f.write('%e\n' % val)
-
-
 
 
 
@@ -132,7 +130,6 @@ def setpar(key, val, filename='DATA/Par_file', path='.', sep='='):
     # write file
     with open(path +'/'+ filename, 'w') as file:
         file.writelines(lines)
-
 
 
 ### utility functions

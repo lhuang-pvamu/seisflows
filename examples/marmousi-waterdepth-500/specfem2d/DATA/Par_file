@@ -45,7 +45,7 @@ ATTENUATION_f0_REFERENCE        = 5.196152422706633
 READ_VELOCITIES_AT_f0           = .false.
 
 
-seismotype                      = 4              
+seismotype                      = 1              
 USE_TRICK_FOR_BETTER_PRESSURE   = .false.
 NSTEP_BETWEEN_OUTPUT_SEISMOS    = 5000000        
 save_ASCII_seismograms          = .false.         
