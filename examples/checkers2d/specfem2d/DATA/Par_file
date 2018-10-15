@@ -55,7 +55,8 @@ ACOUSTIC_FORCING                = .false.
 
 # receivers
 
-seismotype                      = 1              
+#seismotype                      = 1              
+seismotype                      = 2              
 subsamp_seismos                 = 1
 USE_TRICK_FOR_BETTER_PRESSURE   = .false.
 NSTEP_BETWEEN_OUTPUT_SEISMOS    = 5000000        
@@ -64,22 +65,24 @@ save_ASCII_seismograms          = .false.
 save_binary_seismograms_single  = .true.         
 save_binary_seismograms_double  = .false.        
 SU_FORMAT                       = .true.        
-use_existing_STATIONS           = .false.	#different
-nreceiversets                   = 2 		#different
+use_existing_STATIONS           = .true.	#different
+nreceiversets                   = 1 		#different
+#use_existing_STATIONS           = .false.	#different
+#nreceiversets                   = 2 		#different
 anglerec                        = 0.d0           
 rec_normal_to_surface           = .false.        
-nrec                            = 11             
-xdeb                            = 300.           
-zdeb                            = 2200.          
-xfin                            = 3700.          
-zfin                            = 2200.          
-record_at_surface_same_vertical = .true.         
-nrec                            = 11             
-xdeb                            = 2500.          
-zdeb                            = 2500.          
-xfin                            = 2500.          
-zfin                            = 0.             
-record_at_surface_same_vertical = .false.        
+#nrec                            = 11             
+#xdeb                            = 300.           
+#zdeb                            = 2200.          
+#xfin                            = 3700.          
+#zfin                            = 2200.          
+#record_at_surface_same_vertical = .true.         
+#nrec                            = 11             
+#xdeb                            = 2500.          
+#zdeb                            = 2500.          
+#xfin                            = 2500.          
+#zfin                            = 0.             
+#record_at_surface_same_vertical = .false.        
 
 # adjoint kernel outputs
 

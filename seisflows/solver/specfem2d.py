@@ -95,6 +95,8 @@ class specfem2d(custom_import('solver', 'base')):
 
         call_solver(system.mpiexec(), 'bin/xmeshfem2D')
         call_solver(system.mpiexec(), 'bin/xspecfem2D')
+        
+        #raw_input("observed data calculated")
 
         if PAR.FORMAT in ['SU', 'su']:
             src = glob('OUTPUT_FILES/*.su')
@@ -156,6 +158,8 @@ class specfem2d(custom_import('solver', 'base')):
         call_solver(system.mpiexec(), 'bin/xmeshfem2D')
         call_solver(system.mpiexec(), 'bin/xspecfem2D')
 
+        #raw_input("forward calculation completed")
+
         if PAR.FORMAT in ['SU', 'su']:
             filenames = glob('OUTPUT_FILES/*.su')
             unix.mv(filenames, path)
@@ -177,6 +181,8 @@ class specfem2d(custom_import('solver', 'base')):
 
         call_solver(system.mpiexec(), 'bin/xmeshfem2D')
         call_solver(system.mpiexec(), 'bin/xspecfem2D')
+
+        #raw_input("gradient calculated")
 
 
     ### file transfer utilities

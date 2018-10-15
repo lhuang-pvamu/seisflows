@@ -90,6 +90,7 @@ class base(object):
         for filename in solver.data_filenames:
             obs = self.reader(path+'/'+'traces/obs', filename)
             syn = self.reader(path+'/'+'traces/syn', filename)
+            print "[Preprocessing] prepare_eval_grad"
 
             # process observations
             obs = self.apply_filter(obs)

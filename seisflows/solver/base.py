@@ -139,7 +139,7 @@ class base(object):
         # provided
 
         if PATH.DATA:
-            # copy user supplied data
+            print "copying user supplied data"
             self.initialize_solver_directories()
 
             src = glob(PATH.DATA +'/'+ self.source_name +'/'+ '*')
@@ -147,7 +147,7 @@ class base(object):
             unix.cp(src, dst)
 
         else:
-            # generate data on the fly
+            print "generating data on the fly"
             self.generate_data(
                 model_path=PATH.MODEL_TRUE,
                 model_name='model_true',
@@ -200,7 +200,7 @@ class base(object):
             self.export_residuals(path)
 
 
-    def eval_grad(self, path='', export_traces=False):
+    def eval_grad(self, path='', export_traces=True):
         """ 
           Evaluates gradient by carrying out adjoint simulations.
           (A function evaluation must already have been carried out.)
@@ -271,10 +271,13 @@ class base(object):
               and processor rank, ie dict[parameter][iproc]
         """
         dict = Container()
+        print " [Solver] loading specfem2d model " + path + ": "
         for iproc in range(self.mesh_properties.nproc):
             for key in parameters or self.parameters:
                 dict[key] += self.io.read_slice(
                     path, prefix+key+suffix, iproc)
+                print "  " + str(key) + ": " + str(dict[key])
+                #print dict[key]
         return dict
 
 
@@ -290,6 +293,7 @@ class base(object):
           :input suffix :: optional filename suffix, eg '_kernel'
         """
         unix.mkdir(path)
+        print " [Solver] saving specfem model " + path + ": "
 
         # fill in any missing parameters
         missing_keys = diff(parameters, dict.keys())
@@ -301,6 +305,8 @@ class base(object):
         # write slices to disk
         for iproc in range(self.mesh_properties.nproc):
             for key in parameters:
+                print "  " + str(dict[key][iproc])
+                #print dict[key][iproc]
                 self.io.write_slice(
                     dict[key][iproc], path, prefix+key+suffix, iproc)
 
@@ -499,6 +505,9 @@ class base(object):
     def initialize_adjoint_traces(self):
         """ Puts in place "adjoint traces" expected by SPECFEM
         """
+        #print "filenames in " + self.cwd
+        #for filename in self.data_filenames:
+        #    print filename
         for filename in self.data_filenames:
             # read traces
             d = preprocess.reader(self.cwd +'/'+ 'traces/obs', filename)

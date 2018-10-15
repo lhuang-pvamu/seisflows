@@ -136,6 +136,7 @@ class LBFGS(object):
         self.memory_used = 0
 
         unix.cd(self.path)
+        print "remapping from directory " + self.path
         S = np.memmap('LBFGS/S', mode='r+')
         Y = np.memmap('LBFGS/Y', mode='r+')
         S[:] = 0.

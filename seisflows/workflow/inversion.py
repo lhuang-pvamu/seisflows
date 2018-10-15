@@ -111,20 +111,31 @@ class inversion(base):
         """ Carries out seismic inversion
         """
         optimize.iter = PAR.BEGIN
+        print ''
+        print "main setup"
+        print "-------------------------"
         self.setup()
         print ''
 
         while optimize.iter <= PAR.END:
+            print ''
             print "Starting iteration", optimize.iter
+            print "-------------------------"
             self.initialize()
 
+            print ''
             print "Computing gradient"
+            print "-------------------------"
             self.evaluate_gradient()
 
+            print ''
             print "Computing search direction"
+            print "-------------------------"
             self.compute_direction()
 
+            print ''
             print "Computing step length"
+            print "-------------------------"
             self.line_search()
 
             self.finalize()
@@ -132,6 +143,7 @@ class inversion(base):
 
             optimize.iter += 1
             print ''
+            print "-------------------------"
 
 
     def setup(self):
@@ -142,8 +154,7 @@ class inversion(base):
             postprocess.setup()
             optimize.setup()
 
-        if optimize.iter == 1 or \
-           PATH.LOCAL:
+        if optimize.iter == 1 or PATH.LOCAL:
             if PATH.DATA:
                 print 'Copying data' 
             else:
@@ -155,12 +166,13 @@ class inversion(base):
     def initialize(self):
         """ Prepares for next model update iteration
         """
+        print "[Initialize] write_model: "
         self.write_model(path=PATH.GRAD, suffix='new')
 
-        print 'Generating synthetics'
-        system.run('solver', 'eval_func',
-                   path=PATH.GRAD)
+        print '[Initialize] Generate synthetics (run forward model)'
+        system.run('solver', 'eval_func', path=PATH.GRAD)
 
+        print "[Initialize] write_misfit"
         self.write_misfit(path=PATH.GRAD, suffix='new')
 
 
@@ -181,7 +193,7 @@ class inversion(base):
         optimize.initialize_search()
 
         while True:
-            print " trial step", optimize.line_search.step_count + 1
+            print "\n\t-- Trial step " + str( optimize.line_search.step_count + 1) + " --"
             self.evaluate_function()
             status = optimize.update_search()
 
@@ -206,22 +218,27 @@ class inversion(base):
     def evaluate_function(self):
         """ Performs forward simulation to evaluate objective function
         """
+        print "[evaluate_function] write_modle"
         self.write_model(path=PATH.FUNC, suffix='try')
 
-        system.run('solver', 'eval_func',
-                   path=PATH.FUNC)
+        print "[evaluate_function] run eval_func"
+        system.run('solver', 'eval_func', path=PATH.FUNC)
 
+        print "[evaluate_function] write_misfit"
         self.write_misfit(path=PATH.FUNC, suffix='try')
 
 
     def evaluate_gradient(self):
         """ Performs adjoint simulation to evaluate gradient
         """
+        print "\neval_grad run"
         system.run('solver', 'eval_grad',
                    path=PATH.GRAD,
                    export_traces=divides(optimize.iter, PAR.SAVETRACES))
 
+        print "eval_grad write"
         self.write_gradient(path=PATH.GRAD, suffix='new')
+        print "eval_grad done"
 
 
     def finalize(self):
@@ -266,7 +283,14 @@ class inversion(base):
         """ Writes model in format expected by solver
         """
         src = 'm_'+suffix
+        #print " source = " + src
+        print " write_model " + path + "/" + src
         dst = path +'/'+ 'model'
+        print "  to: " + dst 
+        tmp_split = solver.split(optimize.load(src))
+        for entry in tmp_split:
+            print " " + str(entry) + ": " + str(tmp_split[entry])
+
         solver.save(solver.split(optimize.load(src)), dst)
 
 
@@ -274,6 +298,7 @@ class inversion(base):
         """ Writes gradient in format expected by nonlinear optimization library
         """
         src = join(path, 'gradient')
+        print " writing gradient " + src 
         dst = 'g_'+suffix
         postprocess.write_gradient(path)
         parts = solver.load(src, suffix='_kernel')
@@ -285,7 +310,9 @@ class inversion(base):
         """
         src = glob(path +'/'+ 'residuals/*')
         dst = 'f_'+suffix
+        print " summing residuals from: " + str(src)
         total_misfit = preprocess.sum_residuals(src)
+        print " saving total misfit " + str(total_misfit) + " to " + str(dst)
         optimize.savetxt(dst, total_misfit)
 
 
