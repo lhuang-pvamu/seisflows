@@ -3,14 +3,15 @@ TITLE="checkers"
 WORKFLOW='inversion'    # inversion, migration
 SOLVER='specfem2d'      # specfem2d, specfem3d
 SYSTEM='serial'       # serial, pbs, slurm
+#SYSTEM='multicore'       # serial, pbs, slurm
 #SYSTEM='slurm_sm'       # serial, pbs, slurm
 OPTIMIZE='LBFGS'        # base, newton
 PREPROCESS='base'       # base
 POSTPROCESS='base'      # base
 
 MISFIT='Waveform'
-#MATERIALS='LegacyAcoustic'
-MATERIALS='Elastic'
+MATERIALS='LegacyAcoustic'
+#MATERIALS='Elastic'
 DENSITY='Constant'
 
 
@@ -29,7 +30,7 @@ READER='su_specfem2d'
 #acoustic should be z or p
 #CHANNELS='p'            # data channels
 #try below for elastic
-CHANNELS='xz'            # data channels
+CHANNELS='y'            # data channels
 NORMALIZE=0             # normalize
 BANDPASS=0              # bandpass
 FREQLO=0.               # low frequency corner
@@ -57,6 +58,6 @@ F0=0.084                # dominant frequency
 # SYSTEM
 NTASK=1                # must satisfy 1 <= NTASK <= NSRC
 #NTASK=1                # must satisfy 1 <= NTASK <= NSRC
+#NPROC=1                 # processors per task
 NPROC=1                 # processors per task
-#NPROC=4                 # processors per task
 

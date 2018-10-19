@@ -218,7 +218,7 @@ class inversion(base):
     def evaluate_function(self):
         """ Performs forward simulation to evaluate objective function
         """
-        print "[evaluate_function] write_modle"
+        print "[evaluate_function] write_model"
         self.write_model(path=PATH.FUNC, suffix='try')
 
         print "[evaluate_function] run eval_func"
@@ -284,12 +284,14 @@ class inversion(base):
         """
         src = 'm_'+suffix
         #print " source = " + src
-        print " write_model " + path + "/" + src
+        if PAR.VERBOSE > 1:
+            print " write_model " + path + "/" + src
         dst = path +'/'+ 'model'
-        print "  to: " + dst 
-        tmp_split = solver.split(optimize.load(src))
-        for entry in tmp_split:
-            print " " + str(entry) + ": " + str(tmp_split[entry])
+        if PAR.VERBOSE > 1:
+            print "  to: " + dst 
+            tmp_split = solver.split(optimize.load(src))
+            for entry in tmp_split:
+                print " " + str(entry) + ": " + str(tmp_split[entry])
 
         solver.save(solver.split(optimize.load(src)), dst)
 
@@ -298,7 +300,8 @@ class inversion(base):
         """ Writes gradient in format expected by nonlinear optimization library
         """
         src = join(path, 'gradient')
-        print " writing gradient " + src 
+        if PAR.VERBOSE > 1:
+            print " writing gradient " + src 
         dst = 'g_'+suffix
         postprocess.write_gradient(path)
         parts = solver.load(src, suffix='_kernel')
@@ -310,9 +313,11 @@ class inversion(base):
         """
         src = glob(path +'/'+ 'residuals/*')
         dst = 'f_'+suffix
-        print " summing residuals from: " + str(src)
+        if PAR.VERBOSE > 1:
+            print " summing residuals from: " + str(src)
         total_misfit = preprocess.sum_residuals(src)
-        print " saving total misfit " + str(total_misfit) + " to " + str(dst)
+        if PAR.VERBOSE > 1:
+            print " saving total misfit " + str(total_misfit) + " to " + str(dst)
         optimize.savetxt(dst, total_misfit)
 
 

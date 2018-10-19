@@ -18,7 +18,8 @@ DENSITY='Constant'
 BEGIN=1                 # first iteration
 END=50                  # last iteration
 NREC=500                # number of receivers
-NSRC=32                 # number of sources
+#NSRC=32                 # number of sources
+NSRC=1                 # number of sources
 SAVEGRADIENT=1          # save gradient how often
 
 

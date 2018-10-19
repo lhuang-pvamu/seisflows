@@ -28,7 +28,17 @@ class Struct(dict):
 def call(*args, **kwargs):
     if 'shell' not in kwargs:
         kwargs['shell'] = True
-    subprocess.check_call(*args, **kwargs)
+    print "calling " + str(args) + " + " + str(kwargs)
+    kwargs['stderr'] = subprocess.STDOUT
+    try:
+        subprocess.check_call(*args, **kwargs)
+        #output = subprocess.check_output(*args, **kwargs)
+    except subprocess.CalledProcessError as e:
+        print "subprocess failed: "
+        print e.cmd
+        print e.returncode
+        sys.exit(-1)
+    #subprocess.check_call(*args, **kwargs)
 
 
 def diff(list1, list2):

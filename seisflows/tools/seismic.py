@@ -21,10 +21,12 @@ def call_solver(mpiexec, executable, output='solver.log'):
         f = open(output,'w')
         print "calling " + mpiexec + " " + executable 
         print " from: " + os.getcwd()
+        #raw_input("begin call")
         subprocess.check_call(
             mpiexec +' '+ executable,
             shell=True,
             stdout=f)
+        #raw_input("call complete")
     except subprocess.CalledProcessError, err:
         print msg.SolverError % (mpiexec + ' ' + executable)
         sys.exit(-1)
