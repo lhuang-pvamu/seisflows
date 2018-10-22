@@ -59,22 +59,22 @@ NGNOD                           = 8
 MODEL                           = gll
 
 # path for external tomographic models files
-TOMOGRAPHY_PATH                 = ./DATA
+TOMOGRAPHY_PATH                 = ./DATA/tomo_files/
 # if you are using a SEP model (oil-industry format)
 SEP_MODEL_DIRECTORY             = ./DATA/my_SEP_model/
 
 #-----------------------------------------------------------
-
+#
 # parameters describing the model
 APPROXIMATE_OCEAN_LOAD          = .false.
 TOPOGRAPHY                      = .false.
 ATTENUATION                     = .false.
-FULL_ATTENUATION_SOLID          = .false. #not in new example
 ANISOTROPY                      = .false.
 GRAVITY                         = .false.
 
-# in case of attenuation, reference frequency in Hz at which the velocity values in the velocity model are given (unused otherwise)
-ATTENUATION_f0_REFERENCE        = 18.d0
+# reference frequency for target velocity values in the velocity model
+# set here to a typical value for regional seismology / regional models (dominant period of 3 seconds, i.e. frequency of 1/3 Hz)
+ATTENUATION_f0_REFERENCE        = 0.33333d0
 
 # attenuation period range over which we try to mimic a constant Q factor
 MIN_ATTENUATION_PERIOD          = 999999998.d0
@@ -82,7 +82,7 @@ MAX_ATTENUATION_PERIOD          = 999999999.d0
 # ignore this range and ask the code to compute it automatically instead based on the estimated resolution of the mesh (use this unless you know what you are doing)
 COMPUTE_FREQ_BAND_AUTOMATIC     = .true.
 
-# Olsen's constant for Q_mu = constant * v_s attenuation rule
+# Olsen's constant for Q_mu = constant * V_s attenuation rule
 USE_OLSEN_ATTENUATION           = .false.
 OLSEN_ATTENUATION_RATIO         = 0.05
 
@@ -187,17 +187,23 @@ USE_FORCE_POINT_SOURCE          = .true.
 # to represent a (tilted) FORCESOLUTION force point source or a CMTSOLUTION moment-tensor source.
 USE_RICKER_TIME_FUNCTION        = .true.
 
-# Use an external source time function.
+# use external source time function.
 # if .true. you must add a file with your source time function and the file name
 # path relative to lauching directory at the end of CMTSOLUTION or FORCESOURCE file
 # (with multiple sources, one file per source is required).
-# This file must have a single column containing the amplitude of the source at that time step,
-# and on its first line it must contain the time step used, which must be equal to DT as defined at the beginning of this Par_file (the code will check that).
-# Be sure when this option is .false. to remove the name of stf file in CMTSOLUTION or FORCESOURCE
-USE_EXTERNAL_SOURCE_FILE        = .false.
+# This file must have 2 columns  :
+#     current_time, amplitude
+# The time step **MUST** be the same as used for simulation.
+# be sure when this option is .false. to remove the name of stf file in
+# CMTSOLUTION or FORCESOURCE
+USE_EXTERNAL_SOURCE_FILE            = .false.
 
 # print source time function
 PRINT_SOURCE_TIME_FUNCTION      = .false.
+
+# (for acoustic simulations only) determines source encoding factor +/-1 depending on sign of moment tensor
+# (see e.g. Krebs et al., 2009. Fast full-wavefield seismic inversion using encoded sources, Geophysics, 74 (6), WCC177-WCC188.)
+USE_SOURCE_ENCODING             = .false.
 
 #-----------------------------------------------------------
 #
@@ -268,7 +274,7 @@ NTSTEP_BETWEEN_OUTPUT_ENERGY    = 10
 
 #-----------------------------------------------------------
 #
-# adjoint kernel outputs
+# Adjoint kernel outputs
 #
 #-----------------------------------------------------------
 
@@ -306,16 +312,10 @@ SAVE_MOHO_MESH                  = .false.
 
 COUPLE_WITH_INJECTION_TECHNIQUE = .false.
 INJECTION_TECHNIQUE_TYPE        = 3   # 1 = DSM, 2 = AxiSEM, 3 = FK
-#MESH_A_CHUNK_OF_THE_EARTH       = .false.
+MESH_A_CHUNK_OF_THE_EARTH       = .false.
 TRACTION_PATH                   = ./DATA/AxiSEM_tractions/3/
 FKMODEL_FILE                    = FKmodel
 RECIPROCITY_AND_KH_INTEGRAL     = .false.   # does not work yet
-
-# to couple with an external code (such as DSM, AxiSEM, or FK)
-#COUPLE_WITH_EXTERNAL_CODE       = .false.                               #not in new
-#EXTERNAL_CODE_TYPE              = 1   # 1 = DSM, 2 = AxiSEM, 3 = FK     #not in new
-#TRACTION_PATH                   = ./DATA/DSM_tractions_for_specfem3D/
-MESH_A_CHUNK_OF_THE_EARTH       = .true.
 
 # Dimitri Komatitsch, July 2014, CNRS Marseille, France:
 # added the ability to run several calculations (several earthquakes)
@@ -363,8 +363,6 @@ NUMBER_OF_SIMULTANEOUS_RUNS     = 1
 # directories) in each of the run0001, run0002,... directories, it is sufficient to have one in run0001
 # and the code will broadcast it to the others)
 BROADCAST_SAME_MESH_AND_MODEL   = .false.
-
-#-----------------------------------------------------------
 
 # set to true to use GPUs
 GPU_MODE                        = .false.

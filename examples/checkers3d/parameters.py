@@ -50,6 +50,7 @@ F0=2.5                  # dominant frequency
 # SYSTEM
 NTASK=NSRC              # number of tasks
 NPROC=16                # number of processers
+#NPROC=1                # number of processers
 WALLTIME=10             # walltime
 
-MPIEXEC='mpirun'
+MPIEXEC='mpirun -n 16'
