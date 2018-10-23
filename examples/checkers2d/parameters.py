@@ -56,8 +56,10 @@ F0=0.084                # dominant frequency
 
 
 # SYSTEM
-NTASK=1                # must satisfy 1 <= NTASK <= NSRC
+NTASK=NSRC                # must satisfy 1 <= NTASK <= NSRC
 #NTASK=1                # must satisfy 1 <= NTASK <= NSRC
 #NPROC=1                 # processors per task
-NPROC=1                 # processors per task
+NPROC=8                 # processors per task
+#NPROCMAX=12
 
+MPIEXEC='mpirun'

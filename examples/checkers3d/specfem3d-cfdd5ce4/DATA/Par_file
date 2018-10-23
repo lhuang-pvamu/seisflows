@@ -144,12 +144,12 @@ NT_DUMP_ATTENUATION             = 500
 # MOVIE_TYPE = 1 to show the top surface
 # MOVIE_TYPE = 2 to show all the external faces of the mesh
 CREATE_SHAKEMAP                 = .false.
-MOVIE_SURFACE                   = .false.
+MOVIE_SURFACE                   = .true.
 MOVIE_TYPE                      = 1
 MOVIE_VOLUME                    = .false.
 SAVE_DISPLACEMENT               = .false.
 USE_HIGHRES_FOR_MOVIES          = .false.
-NTSTEP_BETWEEN_FRAMES           = 200
+NTSTEP_BETWEEN_FRAMES           = 40
 HDUR_MOVIE                      = 0.0
 
 # save AVS or OpenDX mesh files to check the mesh
@@ -226,10 +226,12 @@ SAVE_SEISMOGRAMS_PRESSURE       = .false.  # currently implemented in acoustic (
 SAVE_SEISMOGRAMS_IN_ADJOINT_RUN = .false.
 
 # save seismograms in binary or ASCII format (binary is smaller but may not be portable between machines)
-USE_BINARY_FOR_SEISMOGRAMS      = .false.
+#USE_BINARY_FOR_SEISMOGRAMS      = .false. #disabling for visualization
+USE_BINARY_FOR_SEISMOGRAMS      = .true.
 
 # output seismograms in Seismic Unix format (binary with 240-byte-headers)
-SU_FORMAT                       = .true.
+SU_FORMAT                       = .true. #disabling for visualization
+#SU_FORMAT                       = .false.
 
 # output seismograms in ASDF (requires asdf-library)
 ASDF_FORMAT                     = .false.

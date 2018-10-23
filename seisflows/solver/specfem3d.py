@@ -154,6 +154,7 @@ class specfem3d(custom_import('solver', 'base')):
         if self.mesh_properties.nproc != PAR.NPROC:
             if self.taskid == 0:
                 print 'Warning: mesh_properties.nproc != PAR.NPROC'
+                print str(self.mesh_properties.nproc) + " != " + str(PAR.NPROC)
 
         if 'MULTIPLES' in PAR:
             raise NotImplementedError

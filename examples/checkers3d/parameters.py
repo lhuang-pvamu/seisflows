@@ -1,8 +1,8 @@
 
 WORKFLOW='inversion'    # inversion, migration, modeling
 SOLVER='specfem3d'      # specfem2d, specfem3d
-#SYSTEM='tiger_lg'       # serial, pbs, slurm
-SYSTEM='serial'       # serial, pbs, slurm
+#SYSTEM='slurm_sm'       # serial, pbs, slurm
+SYSTEM='serial'         # serial, pbs, slurm
 OPTIMIZE='LBFGS'        # base
 PREPROCESS='base'       # base
 POSTPROCESS='base'      # base
@@ -15,7 +15,7 @@ PRECOND=None
 
 # WORKFLOW
 BEGIN=1                 # first iteration
-END=1                   # last iteration
+END=10                   # last iteration
 NREC=729                # number of receivers
 NSRC=1                  # number of sources
 
@@ -53,4 +53,5 @@ NPROC=16                # number of processers
 #NPROC=1                # number of processers
 WALLTIME=10             # walltime
 
+#MPIEXEC='mpirun'
 MPIEXEC='mpirun -n 16'

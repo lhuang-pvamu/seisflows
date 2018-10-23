@@ -271,12 +271,12 @@ class base(object):
               and processor rank, ie dict[parameter][iproc]
         """
         dict = Container()
-        print " [Solver] loading specfem2d model " + path + ": "
+        print " [Solver] loading specfem model " + path + ": "
         for iproc in range(self.mesh_properties.nproc):
             for key in parameters or self.parameters:
                 dict[key] += self.io.read_slice(
                     path, prefix+key+suffix, iproc)
-                print "  " + str(key) + ": " + str(dict[key])
+                #print "  " + str(key) + ": " + str(dict[key])
                 #print dict[key]
         return dict
 
@@ -305,7 +305,7 @@ class base(object):
         # write slices to disk
         for iproc in range(self.mesh_properties.nproc):
             for key in parameters:
-                print "  " + str(dict[key][iproc])
+                #print "  " + str(dict[key][iproc])
                 #print dict[key][iproc]
                 self.io.write_slice(
                     dict[key][iproc], path, prefix+key+suffix, iproc)
