@@ -7,10 +7,7 @@ NPROC                           = 1
 partitioning_method             = 3              
 PERFORM_CUTHILL_MCKEE           = .false.        
 ngnod                           = 9
-#seisflows reads in nt:
-nt				= 4800
 deltat				= .06
-#seisflows uses the newer versions:
 NSTEP                           = 4800
 DT                              = 0.06
 time_stepping_scheme            = 1
@@ -55,9 +52,7 @@ add_Bielak_conditions_left      = .false.
 ACOUSTIC_FORCING                = .false.        
 
 # receivers
-
 seismotype                      = 1              
-#seismotype                      = 2              
 subsamp_seismos                 = 1
 USE_TRICK_FOR_BETTER_PRESSURE   = .false.
 NSTEP_BETWEEN_OUTPUT_SEISMOS    = 5000000        
@@ -66,7 +61,6 @@ save_ASCII_seismograms          = .false.
 save_binary_seismograms_single  = .true.         
 save_binary_seismograms_double  = .false.        
 SU_FORMAT                       = .true.        
-#SU_FORMAT                       = .true.        
 use_existing_STATIONS           = .true.	#different
 nreceiversets                   = 1 		#different
 #use_existing_STATIONS           = .false.	#different
@@ -144,7 +138,7 @@ nbregions                       = 1
 
 NSTEP_BETWEEN_OUTPUT_INFO       = 100
 output_grid_Gnuplot             = .true.        
-output_grid_ASCII               = .true.        
+output_grid_ASCII               = .false.        
 OUTPUT_ENERGY                   = .false.
 NTSTEP_BETWEEN_OUTPUT_ENERGY    = 10
 COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
@@ -185,3 +179,4 @@ BROADCAST_SAME_MESH_AND_MODEL   = .true.
 #leftovers
 freq0                           = 10             
 #f0_attenuation                  = 5.196          
+nt				= 4800

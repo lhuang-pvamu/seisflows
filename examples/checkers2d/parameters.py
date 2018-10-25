@@ -2,9 +2,9 @@ VERBOSE=3
 TITLE="checkers"
 WORKFLOW='inversion'    # inversion, migration
 SOLVER='specfem2d'      # specfem2d, specfem3d
-SYSTEM='serial'       # serial, pbs, slurm
+#SYSTEM='serial'       # serial, pbs, slurm
 #SYSTEM='multicore'       # serial, pbs, slurm
-#SYSTEM='slurm_sm'       # serial, pbs, slurm
+SYSTEM='slurm_sm'       # serial, pbs, slurm
 OPTIMIZE='LBFGS'        # base, newton
 PREPROCESS='base'       # base
 POSTPROCESS='base'      # base
@@ -19,8 +19,8 @@ DENSITY='Constant'
 BEGIN=1                 # first iteration
 END=5                   # last iteration
 NREC=132                # number of receivers
-#NSRC=25                 # number of sources
-NSRC=1                 # number of sources
+NSRC=25                 # number of sources
+#NSRC=1                 # number of sources
 SAVEGRADIENT=1          # save gradient how often
 
 
