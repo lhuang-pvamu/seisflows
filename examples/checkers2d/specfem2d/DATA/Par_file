@@ -15,11 +15,12 @@ NSTEP                           = 4800
 DT                              = 0.06
 time_stepping_scheme            = 1
 AXISYM                          = .false.
-P_SV                            = .false.
+P_SV                            = .true.
 GPU_MODE                        = .false.
 setup_with_binary_database      = 0
-MODEL                           = default
-SAVE_MODEL                      = default
+#MODEL                           = default
+MODEL                           = binary 
+SAVE_MODEL                      = ascii 
 
 # attenuation
 
@@ -55,8 +56,8 @@ ACOUSTIC_FORCING                = .false.
 
 # receivers
 
-#seismotype                      = 1              
-seismotype                      = 2              
+seismotype                      = 1              
+#seismotype                      = 2              
 subsamp_seismos                 = 1
 USE_TRICK_FOR_BETTER_PRESSURE   = .false.
 NSTEP_BETWEEN_OUTPUT_SEISMOS    = 5000000        
@@ -65,6 +66,7 @@ save_ASCII_seismograms          = .false.
 save_binary_seismograms_single  = .true.         
 save_binary_seismograms_double  = .false.        
 SU_FORMAT                       = .true.        
+#SU_FORMAT                       = .true.        
 use_existing_STATIONS           = .true.	#different
 nreceiversets                   = 1 		#different
 #use_existing_STATIONS           = .false.	#different
@@ -107,6 +109,7 @@ PERIODIC_HORIZ_DIST             = 4000.d0
 # velocity and density models
 
 nbmodels                        = 1
+#1 1 2600.d0 5800.d0 3500.0d0 0 0 9999 9999 0 0 0 0 0 0
 1 1 2600.d0 5800.d0 3500.0d0 0 0 10.d0 10.d0 0 0 0 0 0 0
 TOMOGRAPHY_FILE                 = none
 read_external_mesh              = .false.
@@ -140,8 +143,8 @@ nbregions                       = 1
 # display parameters
 
 NSTEP_BETWEEN_OUTPUT_INFO       = 100
-output_grid_Gnuplot             = .false.        
-output_grid_ASCII               = .false.        
+output_grid_Gnuplot             = .true.        
+output_grid_ASCII               = .true.        
 OUTPUT_ENERGY                   = .false.
 NTSTEP_BETWEEN_OUTPUT_ENERGY    = 10
 COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
@@ -151,7 +154,7 @@ COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
 NSTEP_BETWEEN_OUTPUT_IMAGES     = 100
 cutsnaps                        = 1.
 output_color_image              = .true.
-imagetype_JPEG                  = 2              
+imagetype_JPEG                  = 5
 factor_subsample_image          = 1.0d0          
 USE_CONSTANT_MAX_AMPLITUDE      = .false.        
 CONSTANT_MAX_AMPLITUDE_TO_USE   = 1.17d4         
@@ -159,16 +162,19 @@ POWER_DISPLAY_COLOR             = 0.30d0
 DRAW_SOURCES_AND_RECEIVERS      = .true.         
 DRAW_WATER_IN_BLUE              = .true.         
 USE_SNAPSHOT_NUMBER_IN_FILENAME = .false.        
-output_postscript_snapshot      = .false.
+
+#### for PostScript snapshots ####
+output_postscript_snapshot      = .true.
 imagetype_postscript            = 1              
-meshvect                        = .true.         
-modelvect                       = .false.        
-boundvect                       = .true.         
+meshvect                        = .false.         
+modelvect                       = .true.        
+boundvect                       = .false.         
 interpol                        = .true.         
 pointsdisp                      = 6              
 subsamp_postscript              = 1              
 sizemax_arrows                  = 1.d0           
 US_LETTER                       = .false.        
+
 output_wavefield_dumps          = .false.        
 imagetype_wavefield_dumps       = 1              
 use_binary_for_wavefield_dumps  = .false.        

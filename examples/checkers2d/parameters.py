@@ -30,7 +30,8 @@ READER='su_specfem2d'
 #acoustic should be z or p
 #CHANNELS='p'            # data channels
 #try below for elastic
-CHANNELS='y'            # data channels
+#CHANNELS='y'            # data channels
+CHANNELS='xz'            # data channels
 NORMALIZE=0             # normalize
 BANDPASS=0              # bandpass
 FREQLO=0.               # low frequency corner
@@ -59,7 +60,7 @@ F0=0.084                # dominant frequency
 NTASK=NSRC                # must satisfy 1 <= NTASK <= NSRC
 #NTASK=1                # must satisfy 1 <= NTASK <= NSRC
 #NPROC=1                 # processors per task
-NPROC=8                 # processors per task
+NPROC=1                 # processors per task
 #NPROCMAX=12
 
-MPIEXEC='mpirun'
+#MPIEXEC='mpirun'
