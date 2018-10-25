@@ -6,7 +6,7 @@ To run SeisFlows you'll need a Unix system with Python 2.7, Numpy, Scipy, Obspy 
  
         mkdir ~/packages
         cd ~/packages
-        git clone https://github.com/rmodrak/seisflows.git
+        git clone https://github.com/lhuang-pvamu/seisflows.git
 
 If you prefer a location other than ``~/packages`` , modify the commands above and below accordingly.
 
@@ -63,16 +63,12 @@ If the optimization problems are solved in 60 iterations or fewer, the test was 
 First, download SPECFEM2D from GitHub::
 
         cd ~/packages
-        git clone --recursive --branch devel https://github.com/geodynamics/specfem2d.git specfem2d-d745c542
-        cd specfem2d-d745c542
-        git checkout d745c542
-
-For now, it is important to work with the exact version specified above (``d745c542``). This is necessary because, unlike SPECFEM3D and 3D_GLOBE, SPECFEM2D development is sometimes a bit haphazard, with frequent interface changes.
-
+        git clone https://github.com/geodynamics/specfem2d.git 
+       
 
 Next, configure and compile SPECFEM2D using ifort (preferred) or some other fortran compiler::
 
-        cd ~/packages/specfem2d-d745c542
+        cd ~/packages/specfem2d
         ./configure FC=ifort
         make all
 
@@ -85,9 +81,7 @@ Next, configure and compile SPECFEM2D using ifort (preferred) or some other fort
 
 Download the starting model and other input files required for the waveform inversion checkerboard test.  For simplicity, let's assume the checkerboard working directory will be placed in ``~/tests`` (if you prefer a different location, then modify the following commands accordingly)::
  
-        mkdir ~/tests/
-        cd ~/tests/
-        wget --recursive --no-parent --no-host-directories --cut-dirs=2 --reject "index.html*" http://tigress-web.princeton.edu/~rmodrak/2dAcoustic/
+
 
 
 A directory ``~/tests/checkers`` is now being created.  Among other files, ``parameters.py`` and ``paths.py`` are being downloaded.
