@@ -28,7 +28,7 @@ Q0_poroelastic                  = 1
 freq0_poroelastic               = 10
 UNDO_ATTENUATION_AND_OR_PML     = .false.
 NT_DUMP_ATTENUATION             = 500
-NO_BACKWARD_RECONSTRUCTION       = .false.
+NO_BACKWARD_RECONSTRUCTION      = .false.
 
 # sources
 NSOURCES                        = 1              
@@ -44,9 +44,8 @@ ACOUSTIC_FORCING                = .false.
 seismotype                      = 1              
 subsamp_seismos                 = 1              
 USE_TRICK_FOR_BETTER_PRESSURE   = .false.
-
-USER_T0                         = 0.0d0          
 NSTEP_BETWEEN_OUTPUT_SEISMOS    = 5000000        
+USER_T0                         = 0.0d0          
 save_ASCII_seismograms          = .false.         
 save_binary_seismograms_single  = .true.         
 save_binary_seismograms_double  = .false.        
@@ -61,50 +60,33 @@ zdeb                            = 2990.
 xfin                            = 9150.          
 zfin                            = 2990.          
 record_at_surface_same_vertical = .false.        
+
+# adjoint kernel outputs
 save_ASCII_kernels              = .false.
-NSTEP_BETWEEN_OUTPUT_INFO       = 200            
-NSTEP_BETWEEN_OUTPUT_IMAGES     = 100            
-cutsnaps                        = 1.             
-output_color_image              = .true.         
-imagetype_JPEG                  = 3              
-factor_subsample_image          = 1              
-USE_CONSTANT_MAX_AMPLITUDE      = .false.
-CONSTANT_MAX_AMPLITUDE_TO_USE   = 1.17d4
-POWER_DISPLAY_COLOR             = 0.30d0         
-DRAW_SOURCES_AND_RECEIVERS      = .true.         
-DRAW_WATER_IN_BLUE              = .true.         
-USE_SNAPSHOT_NUMBER_IN_FILENAME = .false.        
-output_postscript_snapshot      = .false.        
-imagetype_postscript            = 1              
-meshvect                        = .true.         
-modelvect                       = .false.        
-boundvect                       = .true.         
-interpol                        = .true.         
-pointsdisp                      = 6              
-subsamp_postscript              = 1              
-sizemax_arrows                  = 1.d0           
-US_LETTER                       = .false.        
-NSTEP_BETWEEN_OUTPUT_WAVE_DUMPS = 100            
-output_wavefield_dumps          = .false.        
-imagetype_wavefield_dumps       = 1              
-use_binary_for_wavefield_dumps  = .false.        
-output_grid_Gnuplot             = .true.        
-output_grid_ASCII               = .false.        
-output_energy                   = .false.        
+NSTEP_BETWEEN_COMPUTE_KERNELS   = 1
+
+# boundary conditions
+PML_BOUNDARY_CONDITIONS         = .false.
+NELEM_PML_THICKNESS             = 3
+ROTATE_PML_ACTIVATE             = .false.
+ROTATE_PML_ANGLE                = 30.
+K_MIN_PML                       = 1.d0
+K_MAX_PML                       = 1.d0
+damping_change_factor_acoustic  = 0.5d0
+damping_change_factor_elastic   = 1.d0
+PML_PARAMETER_ADJUSTMENT        = .false.
+STACEY_ABSORBING_CONDITIONS     = .true.
+ADD_PERIODIC_CONDITIONS         = .false.
+PERIODIC_HORIZ_DIST             = 0.3597d0
+
+# velocity and density models
 nbmodels                        = 1              
 1 1 2.7d3 2.60d3 1.5d3 0 0 9999 9999 0 0 0 0 0 0
 2 1 2.7d3 9.53d3 5.5d3 0 0 9999 9999 0 0 0 0 0 0
 TOMOGRAPHY_FILE                 = ./TOMO.XYZ
 read_external_mesh              = .false.
-PML_BOUNDARY_CONDITIONS         = .false.
-NELEM_PML_THICKNESS             = 3
-ROTATE_PML_ACTIVATE             = .false.
-ROTATE_PML_ANGLE                = 30.
-STACEY_ABSORBING_CONDITIONS     = .true.
-ADD_SPRING_TO_STACEY            = .false.
-ADD_PERIODIC_CONDITIONS         = .false.
-PERIODIC_HORIZ_DIST             = 0.3597d0
-PERIODIC_DETECT_TOL             = 3.3334d-6
+
+# PARAMETERS FOR EXTERNAL MESHING
 mesh_file                       = ./DATA/Mesh_canyon/canyon_mesh_file   
 nodes_coords_file               = ./DATA/Mesh_canyon/canyon_nodes_coords_file   
 materials_file                  = ./DATA/Mesh_canyon/canyon_materials_file   
@@ -123,16 +105,48 @@ absorbleft                      = .true.
 nbregions                       = 1              
 1  90  1 30 1
 
-NUMBER_OF_SIMULTANEOUS_RUNS 	= 1
-NSTEP_BETWEEN_COMPUTE_KERNELS             = 1
-K_MIN_PML                       = 1.d0
-K_MAX_PML                       = 1.d0
-damping_change_factor_acoustic  = 0.5d0
-damping_change_factor_elastic   = 1.d0
-PML_PARAMETER_ADJUSTMENT        = .false.
+
+# display parameters
+NSTEP_BETWEEN_OUTPUT_INFO       = 200            
+output_grid_Gnuplot             = .true.        
+output_grid_ASCII               = .false.        
 OUTPUT_ENERGY                   = .false.
 NTSTEP_BETWEEN_OUTPUT_ENERGY    = 10
 COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
+
+# movies/images/snaphots
+NSTEP_BETWEEN_OUTPUT_IMAGES     = 100            
+cutsnaps                        = 1.             
+#output_color_image              = .true.         
+output_color_image              = .false.         
+imagetype_JPEG                  = 3              
+factor_subsample_image          = 1              
+USE_CONSTANT_MAX_AMPLITUDE      = .false.
+CONSTANT_MAX_AMPLITUDE_TO_USE   = 1.17d4
+POWER_DISPLAY_COLOR             = 0.30d0         
+DRAW_SOURCES_AND_RECEIVERS      = .true.         
+DRAW_WATER_IN_BLUE              = .true.         
+USE_SNAPSHOT_NUMBER_IN_FILENAME = .false.        
+
+#### for PostScript snapshots ####
+output_postscript_snapshot      = .false.        
+imagetype_postscript            = 1              
+meshvect                        = .true.         
+modelvect                       = .false.        
+boundvect                       = .true.         
+interpol                        = .true.         
+pointsdisp                      = 6              
+subsamp_postscript              = 1              
+sizemax_arrows                  = 1.d0           
+US_LETTER                       = .false.        
+
+#### for wavefield dumps ####
+output_wavefield_dumps          = .false.        
+imagetype_wavefield_dumps       = 1              
+use_binary_for_wavefield_dumps  = .false.        
+
+
+NUMBER_OF_SIMULTANEOUS_RUNS 	= 1
 BROADCAST_SAME_MESH_AND_MODEL   = .true.
 
 #-------------------
@@ -144,5 +158,11 @@ BROADCAST_SAME_MESH_AND_MODEL   = .true.
 #Q0                              =  1             
 #freq0                           =  10            
 #p_sv                            = .true.
-#nt                              = 7500           
-#deltat                          = 9.0d-4         
+nt                              = 7500           
+deltat                          = 9.0d-4         
+#NSTEP_BETWEEN_OUTPUT_WAVE_DUMPS = 100            
+#output_energy                   = .false.        
+#ADD_SPRING_TO_STACEY            = .false.
+#PERIODIC_DETECT_TOL             = 3.3334d-6
+
+

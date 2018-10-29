@@ -1,3 +1,4 @@
+VERBOSE=3
 TITLE='marmousi-test'
 WORKFLOW='inversion' # inversion, migration, modeling
 #SOLVER='elastic2d' 
