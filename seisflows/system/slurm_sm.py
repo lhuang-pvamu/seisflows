@@ -104,6 +104,7 @@ class slurm_sm(custom_import('system', 'base')):
                 + '--job-name=%s '%PAR.TITLE
                 + '--output=%s '%(PATH.WORKDIR +'/'+ 'output.log')
                 + '--cpus-per-task=%d '%PAR.NPROC
+                + '--ntasks-per-core=1 '
                 + '--ntasks=%d '%PAR.NTASK
                 + '--time=%d '%PAR.WALLTIME
                 + '%s ' % join(findpath('seisflows.system'), 'wrappers/submit')
@@ -114,6 +115,7 @@ class slurm_sm(custom_import('system', 'base')):
                 + '--job-name=%s '%PAR.TITLE
                 + '--output=%s '%(PATH.WORKDIR +'/'+ 'output.log')
                 + '--cpus-per-task=%d '%PAR.NPROC
+                + '--ntasks-per-core=1 '
                 + '--ntasks=%d '%PAR.NTASK
                 + '--time=%d '%PAR.WALLTIME
                 + '%s ' % join(findpath('seisflows.system'), 'wrappers/submit')
