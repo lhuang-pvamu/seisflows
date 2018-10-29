@@ -147,7 +147,8 @@ class base(object):
             unix.cp(src, dst)
 
         else:
-            print "generating data on the fly"
+            if PAR.VERBOSE > 3:
+                print "generating data on the fly"
             self.generate_data(
                 model_path=PATH.MODEL_TRUE,
                 model_name='model_true',
@@ -271,7 +272,8 @@ class base(object):
               and processor rank, ie dict[parameter][iproc]
         """
         dict = Container()
-        print " [Solver] loading specfem model " + path + ": "
+        if PAR.VERBOSE > 3:
+            print " [Solver] loading specfem model " + path + ": "
         for iproc in range(self.mesh_properties.nproc):
             for key in parameters or self.parameters:
                 dict[key] += self.io.read_slice(
@@ -293,7 +295,8 @@ class base(object):
           :input suffix :: optional filename suffix, eg '_kernel'
         """
         unix.mkdir(path)
-        print " [Solver] saving specfem model " + path + ": "
+        if PAR.VERBOSE > 3:
+            print " [Solver] saving specfem model " + path + ": "
 
         # fill in any missing parameters
         missing_keys = diff(parameters, dict.keys())

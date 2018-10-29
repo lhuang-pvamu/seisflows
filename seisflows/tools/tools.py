@@ -28,7 +28,8 @@ class Struct(dict):
 def call(*args, **kwargs):
     if 'shell' not in kwargs:
         kwargs['shell'] = True
-    print "calling " + str(args) + " + " + str(kwargs)
+    #print "spawning subprocess for: " + str(args) + " + " + str(kwargs)
+    #sys.stdout.flush()
     kwargs['stderr'] = subprocess.STDOUT
     try:
         subprocess.check_call(*args, **kwargs)

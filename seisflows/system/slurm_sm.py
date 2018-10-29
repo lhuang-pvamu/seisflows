@@ -124,6 +124,14 @@ class slurm_sm(custom_import('system', 'base')):
         """ Runs task multiple times in embarrassingly parallel fasion
         """
         self.checkpoint(PATH.OUTPUT, classname, method, args, kwargs)
+        print('srun '
+                + '--wait=0 '
+                + '%s ' % join(findpath('seisflows.system'), 'wrappers/run ')
+                + '%s ' % PATH.OUTPUT
+                + '%s ' % classname
+                + '%s ' % method
+                + '%s ' % PAR.ENVIRONS)
+        sys.stdout.flush()
 
         call('srun '
                 + '--wait=0 '

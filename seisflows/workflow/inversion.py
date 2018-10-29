@@ -166,13 +166,16 @@ class inversion(base):
     def initialize(self):
         """ Prepares for next model update iteration
         """
-        print "[Initialize] write_model: "
+        if PAR.VERBOSE > 3:
+            print "[Initialize] write_model: "
         self.write_model(path=PATH.GRAD, suffix='new')
 
-        print '[Initialize] Generate synthetics (run forward model)'
+        if PAR.VERBOSE > 3:
+            print '[Initialize] Generate synthetics (run forward model)'
         system.run('solver', 'eval_func', path=PATH.GRAD)
 
-        print "[Initialize] write_misfit"
+        if PAR.VERBOSE > 3:
+            print "[Initialize] write_misfit"
         self.write_misfit(path=PATH.GRAD, suffix='new')
 
 
@@ -218,27 +221,33 @@ class inversion(base):
     def evaluate_function(self):
         """ Performs forward simulation to evaluate objective function
         """
-        print "[evaluate_function] write_model"
+        if PAR.VERBOSE > 3:
+            print "[evaluate_function] write_model"
         self.write_model(path=PATH.FUNC, suffix='try')
 
-        print "[evaluate_function] run eval_func"
+        if PAR.VERBOSE > 3:
+            print "[evaluate_function] run eval_func"
         system.run('solver', 'eval_func', path=PATH.FUNC)
 
-        print "[evaluate_function] write_misfit"
+        if PAR.VERBOSE > 3:
+            print "[evaluate_function] write_misfit"
         self.write_misfit(path=PATH.FUNC, suffix='try')
 
 
     def evaluate_gradient(self):
         """ Performs adjoint simulation to evaluate gradient
         """
-        print "\neval_grad run"
+        if PAR.VERBOSE > 3:
+            print "\neval_grad run"
         system.run('solver', 'eval_grad',
                    path=PATH.GRAD,
                    export_traces=divides(optimize.iter, PAR.SAVETRACES))
 
-        print "eval_grad write"
+        if PAR.VERBOSE > 3:
+            print "eval_grad write"
         self.write_gradient(path=PATH.GRAD, suffix='new')
-        print "eval_grad done"
+        if PAR.VERBOSE > 3:
+            print "eval_grad done"
 
 
     def finalize(self):
@@ -284,14 +293,14 @@ class inversion(base):
         """
         src = 'm_'+suffix
         #print " source = " + src
-        if PAR.VERBOSE > 1:
+        if PAR.VERBOSE > 3:
             print " write_model " + path + "/" + src
         dst = path +'/'+ 'model'
-        if PAR.VERBOSE > 1:
+        if PAR.VERBOSE > 3:
             print "  to: " + dst 
             tmp_split = solver.split(optimize.load(src))
             for entry in tmp_split:
-                print " " + str(entry) + ": " + str(tmp_split[entry])
+                print "   " + str(entry) + ": " + str(tmp_split[entry])
 
         solver.save(solver.split(optimize.load(src)), dst)
 
@@ -300,7 +309,7 @@ class inversion(base):
         """ Writes gradient in format expected by nonlinear optimization library
         """
         src = join(path, 'gradient')
-        if PAR.VERBOSE > 1:
+        if PAR.VERBOSE > 3:
             print " writing gradient " + src 
         dst = 'g_'+suffix
         postprocess.write_gradient(path)
@@ -313,10 +322,10 @@ class inversion(base):
         """
         src = glob(path +'/'+ 'residuals/*')
         dst = 'f_'+suffix
-        if PAR.VERBOSE > 1:
+        if PAR.VERBOSE > 3:
             print " summing residuals from: " + str(src)
         total_misfit = preprocess.sum_residuals(src)
-        if PAR.VERBOSE > 1:
+        if PAR.VERBOSE > 3:
             print " saving total misfit " + str(total_misfit) + " to " + str(dst)
         optimize.savetxt(dst, total_misfit)
 

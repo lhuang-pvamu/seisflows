@@ -19,8 +19,8 @@ def call_solver(mpiexec, executable, output='solver.log'):
     """
     try:
         f = open(output,'w')
-        print "calling " + mpiexec + " " + executable 
-        print " from: " + os.getcwd()
+        #print "calling " + mpiexec + " " + executable 
+        #print " from: " + os.getcwd()
         #raw_input("begin call")
         subprocess.check_call(
             mpiexec +' '+ executable,

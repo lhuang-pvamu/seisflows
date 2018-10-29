@@ -279,7 +279,7 @@ class base(object):
 
     def load(self, filename):
         # reads vectors from disk
-        print " [Optimizer] loading vector from " + filename + ":"
+        #print " [Optimizer] loading vector from " + filename + ":"
         vector = loadnpy(PATH.OPTIMIZE+'/'+filename)
         #print "  " + str(vector)
         return vector
@@ -287,13 +287,13 @@ class base(object):
 
     def save(self, filename, array):
         # writes vectors to disk
-        print " [Optimizer] writing vector to " + filename + ":"
+        #print " [Optimizer] writing vector to " + filename + ":"
         #print "  " + str(array)
         savenpy(PATH.OPTIMIZE+'/'+filename, array)
 
     def loadtxt(self, filename):
         # reads scalars from disk
-        print " [Optimizer] loading scalar from " + filename + ":"
+        #print " [Optimizer] loading scalar from " + filename + ":"
         scalar = float(np.loadtxt(PATH.OPTIMIZE+'/'+filename))
         #print "  " + str(scalar)
         return scalar
@@ -301,7 +301,7 @@ class base(object):
 
     def savetxt(self, filename, scalar):
         # writes scalars to disk
-        print " [Optimizer] writing scalar to " + filename + ":"
+        #print " [Optimizer] writing scalar to " + filename + ":"
         #print "  " + str(scalar)
         np.savetxt(PATH.OPTIMIZE+'/'+filename, [scalar], '%11.6e')
 
