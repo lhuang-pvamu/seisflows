@@ -7,8 +7,10 @@ NPROC                           = 1
 partitioning_method             = 3              
 PERFORM_CUTHILL_MCKEE           = .false.        
 ngnod                           = 9
-NSTEP                           = 4800
-DT                              = 0.06
+#NSTEP                           = 4800
+NSTEP                           = 48000
+DT                              = 0.006
+#DT                              = 0.06
 time_stepping_scheme            = 1
 AXISYM                          = .false.
 P_SV                            = .true.
@@ -135,16 +137,16 @@ nbregions                       = 1
 
 # display parameters
 
-NSTEP_BETWEEN_OUTPUT_INFO       = 200
+NSTEP_BETWEEN_OUTPUT_INFO       = 1000
 output_grid_Gnuplot             = .true.        
 output_grid_ASCII               = .false.        
 OUTPUT_ENERGY                   = .false.
-NTSTEP_BETWEEN_OUTPUT_ENERGY    = 100
+NTSTEP_BETWEEN_OUTPUT_ENERGY    = 1000
 COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
 
 # movies/images/snaphots
 
-NSTEP_BETWEEN_OUTPUT_IMAGES     = 100
+NSTEP_BETWEEN_OUTPUT_IMAGES     = 4000
 cutsnaps                        = 1.
 output_color_image              = .true.
 imagetype_JPEG                  = 5
@@ -179,4 +181,5 @@ BROADCAST_SAME_MESH_AND_MODEL   = .true.
 freq0                           = 10             
 #f0_attenuation                  = 5.196          
 nt				= 4800
-deltat				= .06
+#deltat				= .06
+deltat				= .0001
