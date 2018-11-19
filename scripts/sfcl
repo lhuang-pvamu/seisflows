@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+from seisflows.config import loadpy
+import shutil
+import os
+import glob
+
+path_file="paths.py"
+paths = loadpy(path_file)
+
+workdir_path = paths.get('WORKDIR', None)
+scratch_path = paths.get('SCRATCH', None)
+output_path  = paths.get('OUTPUT', None)
+#local_path  = paths.get('LOCAL', None)
+
+output = 'output'
+scratch = 'scratch'
+
+if workdir_path:
+    scratch = workdir_path + "/" + scratch
+    output  = workdir_path + "/" + output
+
+if scratch_path: 
+    scratch = scratch_path
+if output_path:
+    output  = output_path
+
+
+#remove output*
+print "remove  " + output
+#if os.path.exists(output):
+#    shutil.rmtree(output)
+#else:
+#    print "\t" + output + " does not exist"
+for outfile in glob.glob(output + ".*"):
+    os.system("rm -rf " + outfile)
+
+#remove scratch
+print "removing " + scratch
+shutil.rmtree(scratch)
