@@ -23,12 +23,12 @@ def call_solver(mpiexec, executable, output='solver.log'):
         #print "calling " + mpiexec + " " + executable 
         #print " from: " + os.getcwd()
         #raw_input("begin call")
-        t1 = time.time()
+        #t1 = time.time()
         subprocess.check_call(
             mpiexec +' '+ executable,
             shell=True,
             stdout=f)
-        print mpiexec + " " + executable + ":  " + str(time.time()-t1)
+        #print mpiexec + " " + executable + ":  " + str(time.time()-t1)
         sys.stdout.flush()
         #print "call took " + str(time.time()-t1) + " seconds"
         #raw_input("call complete")
