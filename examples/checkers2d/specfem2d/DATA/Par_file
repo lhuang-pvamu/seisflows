@@ -18,7 +18,8 @@ GPU_MODE                        = .false.
 setup_with_binary_database      = 0
 #MODEL                           = default
 MODEL                           = binary 
-SAVE_MODEL                      = ascii 
+#SAVE_MODEL                      = ascii 
+SAVE_MODEL                      = default 
 
 # attenuation
 

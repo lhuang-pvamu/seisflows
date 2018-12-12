@@ -2,7 +2,10 @@
 
 import argparse, os, sys
 
-from seisflows.config import config, loadpy, names, tilde_expand, Dict, Struct
+from os.path import basename, join
+
+from seisflows.tools.tools import Struct, loadobj
+from seisflows.config import config, loadpy, names, tilde_expand, Dict
 from seisflows.tools import unix
 
 

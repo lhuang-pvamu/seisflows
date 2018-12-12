@@ -51,9 +51,9 @@ SCALE=1.                # scaling factor
 
 
 # SOLVER
-NT=7500                 # number of time steps
-DT=9.0e-4               # time step
-F0=6.0                  # dominant frequency
+NT=75000                 # number of time steps
+DT=1.0e-5               # time step
+F0=5.0                  # dominant frequency
 
 
 # SYSTEM

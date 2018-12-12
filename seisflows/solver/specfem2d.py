@@ -97,6 +97,8 @@ class specfem2d(custom_import('solver', 'base')):
         call_solver(system.mpiexec(), 'bin/xmeshfem2D')
         call_solver(system.mpiexec(), 'bin/xspecfem2D')
         
+        #raw_input("data generation completed")
+        
         if PAR.FORMAT in ['SU', 'su']:
             src = glob('OUTPUT_FILES/*.su')
             dst = 'traces/obs'
@@ -177,6 +179,8 @@ class specfem2d(custom_import('solver', 'base')):
         if PAR.FORMAT in ['SU', 'su']:
             files = glob('traces/adj/*.su')
             unix.rename('.su', '.su.adj', files)
+
+        #raw_input("calling gradient")
 
         call_solver(system.mpiexec(), 'bin/xmeshfem2D')
         call_solver(system.mpiexec(), 'bin/xspecfem2D')

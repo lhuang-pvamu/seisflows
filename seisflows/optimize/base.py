@@ -279,16 +279,18 @@ class base(object):
 
     def load(self, filename):
         # reads vectors from disk
-        #print " [Optimizer] loading vector from " + filename + ":"
         vector = loadnpy(PATH.OPTIMIZE+'/'+filename)
-        #print "  " + str(vector)
+        if PAR.VERBOSE > 3:
+            print " [Optimizer] loading vector from " + filename + ":"
+            print "  " + str(vector)
         return vector
         #return loadnpy(PATH.OPTIMIZE+'/'+filename)
 
     def save(self, filename, array):
         # writes vectors to disk
-        #print " [Optimizer] writing vector to " + filename + ":"
-        #print "  " + str(array)
+        if PAR.VERBOSE > 3:
+            print " [Optimizer] writing vector to " + filename + ":"
+            print "  " + str(array)
         savenpy(PATH.OPTIMIZE+'/'+filename, array)
 
     def loadtxt(self, filename):

@@ -23,12 +23,12 @@ def call_solver(mpiexec, executable, output='solver.log'):
         #print "calling " + mpiexec + " " + executable 
         #print " from: " + os.getcwd()
         #raw_input("begin call")
-        #t1 = time.time()
+        t1 = time.time()
         subprocess.check_call(
             mpiexec +' '+ executable,
             shell=True,
             stdout=f)
-        #print mpiexec + " " + executable + ":  " + str(time.time()-t1)
+        print executable + ":  " + str(time.time()-t1)
         sys.stdout.flush()
         #print "call took " + str(time.time()-t1) + " seconds"
         #raw_input("call complete")
@@ -73,8 +73,10 @@ class Writer(object):
     def __init__(self, path='./output.stat'):
         self.path = abspath(path)
         try:
-            os.mkdir(path)
+            if not os.path.exists(path):
+                os.mkdir(path)
         except:
+            print self.path
             raise IOError
 
         self.__call__('step_count', 0)

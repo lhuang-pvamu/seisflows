@@ -31,7 +31,7 @@ if __name__ == '__main__':
     if seis_env:
         taskid = int(seis_env)
 
-    print "task " + str(taskid) + " running " + str(myclass) + "." + str(myfunc) 
+    #print "task " + str(taskid) + " running " + str(myclass) + "." + str(myfunc) 
     #+ " from directory " + str(mypath)
 
     if nargs == 4: 
@@ -53,6 +53,6 @@ if __name__ == '__main__':
     func = getattr(sys.modules['seisflows_'+myclass], myfunc)
     func(**kwargs)
     #print "finished running " + str(myclass) + "." + str(myfunc) 
-    print "task " + str(taskid) + " finished running " + str(myclass) + "." + str(myfunc) 
+    #print "task " + str(taskid) + " finished running " + str(myclass) + "." + str(myfunc) 
     sys.stdout.flush()
 

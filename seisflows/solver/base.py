@@ -130,6 +130,8 @@ class base(object):
           generates seismic data to be inverted or migrated
         """
         # clean up for new inversion
+        print os.getcwd()
+        print self.cwd
         unix.rm(self.cwd)
 
         # As input for an inversion or migration, users can choose between
@@ -346,10 +348,10 @@ class base(object):
         """ Sums individual source contributions. Wrapper over xcombine_sem
             utility.
         """
-        if not exists(input_path):
+        if not os.path.exists(input_path):
             raise Exception
 
-        if not exists(output_path):
+        if not os.path.exists(output_path):
             unix.mkdir(output_path)
 
         unix.cd(self.cwd)
@@ -358,6 +360,9 @@ class base(object):
                 for name in self.source_names])
 
         for name in parameters or self.parameters:
+            if PAR.VERBOSE > 3:
+                print "calling " + PATH.SPECFEM_BIN +'/xcombine_sem ' + name + '_kernel kernel_paths ' + output_path
+                #raw_input("calling combine")
             call_solver(
                 system.mpiexec(),
                 PATH.SPECFEM_BIN +'/'+ 'xcombine_sem '
@@ -423,6 +428,8 @@ class base(object):
 
         src = glob('*_kernel.bin')
         dst = join(path, 'kernels', self.source_name)
+        if PAR.VERBOSE > 3:
+            print " [Solver] moving kernerls from " + str(self.kernel_databases) + " to " + str(dst)
         unix.mkdir(dst)
         unix.mv(src, dst)
 
@@ -562,7 +569,8 @@ class base(object):
             supplied input files
         """
         path = PATH.SPECFEM_DATA
-        if not exists(path):
+        if not os.path.exists(os.path.realpath(path)):
+            print "path missing: " + os.path.realpath(path)
             raise Exception
 
         # apply wildcard rule

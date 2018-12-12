@@ -211,6 +211,8 @@ class inversion(base):
             if PATH.DATA:
                 print 'Copying data' 
             else:
+                if PAR.VERBOSE > 3:
+                    print "Data not present in " + str(PATH.DATA)
                 print 'Generating data' 
 
             system.run('solver', 'setup')

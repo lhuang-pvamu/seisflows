@@ -1,7 +1,6 @@
 
 import os
 import sys
-import time
 
 from os.path import abspath, basename, join
 from seisflows.tools import unix
@@ -12,7 +11,7 @@ PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
 
 
-class pvc_sm(custom_import('system', 'base')):
+class slurm_sm(custom_import('system', 'base')):
     """ An interface through which to submit workflows, run tasks in serial or 
       parallel, and perform other system functions.
 
@@ -105,7 +104,6 @@ class pvc_sm(custom_import('system', 'base')):
                 + '--job-name=%s '%PAR.TITLE
                 + '--output=%s '%(PATH.WORKDIR +'/'+ 'output.log')
                 + '--cpus-per-task=%d '%PAR.NPROC
-                + '--ntasks-per-core=1 '
                 + '--ntasks=%d '%PAR.NTASK
                 + '--time=%d '%PAR.WALLTIME
                 + '%s ' % join(findpath('seisflows.system'), 'wrappers/submit')
@@ -116,7 +114,6 @@ class pvc_sm(custom_import('system', 'base')):
                 + '--job-name=%s '%PAR.TITLE
                 + '--output=%s '%(PATH.WORKDIR +'/'+ 'output.log')
                 + '--cpus-per-task=%d '%PAR.NPROC
-                + '--ntasks-per-core=1 '
                 + '--ntasks=%d '%PAR.NTASK
                 + '--time=%d '%PAR.WALLTIME
                 + '%s ' % join(findpath('seisflows.system'), 'wrappers/submit')
@@ -136,7 +133,6 @@ class pvc_sm(custom_import('system', 'base')):
                 + '%s ' % PAR.ENVIRONS)
         sys.stdout.flush()
 
-        t1 = time.time()
         call('srun '
                 + '--wait=0 '
                 + '%s ' % join(findpath('seisflows.system'), 'wrappers/run ')
@@ -144,15 +140,13 @@ class pvc_sm(custom_import('system', 'base')):
                 + '%s ' % classname
                 + '%s ' % method
                 + '%s ' % PAR.ENVIRONS)
-        print classname + "." + method + ":  " + str(time.time()-t1)
+
 
     def run_single(self, classname, method, *args, **kwargs):
         """ Runs task a single time
         """
         self.checkpoint(PATH.OUTPUT, classname, method, args, kwargs)
 
-
-        t1 = time.time()
         call('srun '
                 + '--wait=0 '
                 + '--ntasks=1 '
@@ -162,7 +156,6 @@ class pvc_sm(custom_import('system', 'base')):
                 + '%s ' % classname
                 + '%s ' % method
                 + '%s ' % PAR.ENVIRONS)
-        print classname + "." + method + ":  " + str(time.time()-t1)
 
 
     def hostlist(self):

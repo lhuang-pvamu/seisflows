@@ -15,7 +15,7 @@ PRECOND=None
 
 # WORKFLOW
 BEGIN=1                 # first iteration
-END=1                   # last iteration
+END=5                   # last iteration
 NREC=729                # number of receivers
 NSRC=1                  # number of sources
 

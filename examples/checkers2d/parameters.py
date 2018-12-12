@@ -17,7 +17,7 @@ DENSITY='Constant'
 
 # WORKFLOW
 BEGIN=1                 # first iteration
-END=10                   # last iteration
+END=5                   # last iteration
 NREC=132                # number of receivers
 NSRC=25                 # number of sources
 #NSRC=12                 # number of sources
@@ -51,9 +51,10 @@ STEPTHRESH=0.1          # step length safeguard
 
 
 # SOLVER
+#NT=4800                 # number of time steps
+#DT=0.06                 # time step
 NT=48000                 # number of time steps
 DT=0.006                 # time step
-#DT=0.06                 # time step
 F0=0.084                # dominant frequency
 
 

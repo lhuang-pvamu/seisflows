@@ -6,7 +6,7 @@ SAVE_FORWARD                    = .true.
 NPROC                           = 1
 partitioning_method             = 3              
 ngnod                           = 9              
-NSTEP                           = 3000
+NSTEP                           = 7500
 DT                              = 1.0e-3
 time_stepping_scheme            = 1   
 AXISYM                          = .false.
@@ -94,6 +94,8 @@ free_surface_file               = ./DATA/Mesh_canyon/canyon_free_surface_file
 absorbing_surface_file          = ./DATA/Mesh_canyon/canyon_absorbing_surface_file   
 CPML_element_file               = Elements_CPML_list  
 tangential_detection_curve_file = ./DATA/courbe_eros_nodes 
+
+# PARAMETERS FOR INTERNAL MESHING
 interfacesfile                  = interfaces.dat
 xmin                            = 0.d0           
 xmax                            = 9200.d0          
@@ -117,8 +119,7 @@ COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
 # movies/images/snaphots
 NSTEP_BETWEEN_OUTPUT_IMAGES     = 100            
 cutsnaps                        = 1.             
-#output_color_image              = .true.         
-output_color_image              = .false.         
+output_color_image              = .true.         
 imagetype_JPEG                  = 3              
 factor_subsample_image          = 1              
 USE_CONSTANT_MAX_AMPLITUDE      = .false.
