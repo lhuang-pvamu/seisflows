@@ -95,7 +95,7 @@ class specfem2d(custom_import('solver', 'base')):
         setpar('SAVE_FORWARD', '.false.')
 
         call_solver(system.mpiexec(), 'bin/xmeshfem2D',output='mesh.log')
-        call_solver(system.mpiexec(), 'bin/xspecfem2D')
+        call_solver(system.mpiexec(), 'bin/xspecfem2D',output='data_generation.log')
         
         #raw_input("data generation completed")
         
@@ -157,7 +157,7 @@ class specfem2d(custom_import('solver', 'base')):
         setpar('SAVE_FORWARD', '.true.')
 
         call_solver(system.mpiexec(), 'bin/xmeshfem2D')
-        call_solver(system.mpiexec(), 'bin/xspecfem2D')
+        call_solver(system.mpiexec(), 'bin/xspecfem2D', output='fwd_solver.log')
 
         #raw_input("forward calculation completed")
 

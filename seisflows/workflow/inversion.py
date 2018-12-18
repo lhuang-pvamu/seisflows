@@ -118,85 +118,49 @@ class inversion(base):
         python_time_start = time.clock()
         time_start = time.time()
         self.setup()
-        time_setup = time.time() - time_start
-        python_time_setup = time.clock() - python_time_start
-        print "setup time: " + str(time_setup) + " (" + str(python_time_setup) + " in python)"
+        print "setup time: " + str(time.time() - time_start)
         print "-------------------------"
         sys.stdout.flush()
 
-        total_time_init = 0
-        total_time_grad = 0
-        total_time_dir = 0
-        total_time_len = 0
         while optimize.iter <= PAR.END:
             time_iter = time.time()
             python_time_iter = time.clock()
-            print ''
-            print "-------------------------"
+            print "\n-------------------------"
             print "Starting iteration", optimize.iter
+            print "-------------------------\n"
             sys.stdout.flush()
-            time_init1 = time.time()
-            python_time_init1 = time.clock()
             self.initialize()
-            time_init2 = time.time() - time_init1
-            python_time_init2 = time.clock() - python_time_init1
-            total_time_init += time_init2 
 
-            print "init time: " + str(time_init2) + " (" + str(python_time_init2) + " in python)"
             print "-------------------------"
             print "Computing gradient"
+            print "-------------------------"
             sys.stdout.flush()
-            time_grad1 = time.time()
-            python_time_grad1 = time.clock()
             self.evaluate_gradient()
-            time_grad2 = time.time() - time_grad1
-            python_time_grad2 = time.clock() - python_time_grad1
-            total_time_grad += time_grad2 
 
-            print "grad time: " + str(time_grad2)  + " (" + str(python_time_grad2) + " in python)"
             print "-------------------------"
             print "Computing search direction"
+            print "-------------------------"
             sys.stdout.flush()
-            time_dir1 = time.time()
-            python_time_dir1 = time.clock()
             self.compute_direction()
-            time_dir2 = time.time() - time_dir1
-            python_time_dir2 = time.clock() - python_time_dir1
-            total_time_dir += time_dir2
 
-            print "Search direction time: " + str(time_dir2)  + " (" + str(python_time_dir2) + " in python)"
             print "-------------------------"
             print "Computing step length"
             print "-------------------------"
             sys.stdout.flush()
-            time_len1 = time.time()
-            python_time_len1 = time.clock()
             self.line_search()
-            time_len2 = time.time() - time_len1
-            python_time_len2 = time.clock() - python_time_len1
-            total_time_len += time_len2
-            print "Step length Time: " + str(time_len2)   + " (" + str(python_time_len2) + " in python)"
-            print "-------------------------"
 
-            f_time = time.time()
             self.finalize()
-            fs_time = time.time() 
             self.clean()
-            s_time = time.time()
-            print "finalize time: " + str(fs_time-f_time)
-            print "clean time: " + str(s_time-fs_time)
             optimize.iter += 1
 
-            time_iter = time.time() - time_iter
-            print "iteration time: " + str(time_iter)
+            print "-------------------------"
+            print "iteration time: " + str(time.time() - time_iter)
+            print "-------------------------\n"
 
-        time_inversion = time.time() - time_start
-        print "inversion time: " + str(time_inversion)
-        print " total init time: " + str(total_time_init)
-        print " total grad time: " + str(total_time_grad)
-        print " total dir time: " + str(total_time_dir)
-        print " total len time: " + str(total_time_len)
+        print "-------------------------"
+        print "inversion time: " + str(time_inversion = time.time() - time_start)
         print "Total time spent in python: " + str( time.clock()-python_time_start )
+        print "-------------------------"
 
 
     def setup(self):
