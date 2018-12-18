@@ -1,4 +1,6 @@
 
+WORKDIR = '/scratch/jakemp/m500-workdir'
+
 DATA = ''
 
 MODEL_INIT = './smooth_0150'
@@ -11,3 +13,4 @@ SPECFEM_DATA = './specfem2d/DATA'
 
 SPECFEM_BIN = '../../../specfem2d/bin'
 
+MASK = "./mask_0010"

@@ -158,7 +158,7 @@ class inversion(base):
             print "-------------------------\n"
 
         print "-------------------------"
-        print "inversion time: " + str(time_inversion = time.time() - time_start)
+        print "inversion time: " + str(time.time() - time_start)
         print "Total time spent in python: " + str( time.clock()-python_time_start )
         print "-------------------------"
 

@@ -6,9 +6,7 @@ SAVE_FORWARD                    = .true.
 NPROC                           = 1
 partitioning_method             = 3              
 ngnod                           = 9              
-#NSTEP                           = 7500
-#DT                              = 1.0e-3
-NSTEP                           = 8000
+NSTEP                           = 6000
 DT                              = 1.0e-3
 time_stepping_scheme            = 1   
 AXISYM                          = .false.
@@ -43,7 +41,7 @@ add_Bielak_conditions_left      = .false.
 ACOUSTIC_FORCING                = .false.
 
 # receivers
-seismotype                      = 1              
+seismotype                      = 4  #For Acoustic
 subsamp_seismos                 = 1              
 USE_TRICK_FOR_BETTER_PRESSURE   = .false.
 NSTEP_BETWEEN_OUTPUT_SEISMOS    = 5000000        
@@ -77,15 +75,15 @@ K_MAX_PML                       = 1.d0
 damping_change_factor_acoustic  = 0.5d0
 damping_change_factor_elastic   = 1.d0
 PML_PARAMETER_ADJUSTMENT        = .false.
-#STACEY_ABSORBING_CONDITIONS     = .true.
-STACEY_ABSORBING_CONDITIONS     = .false.
+STACEY_ABSORBING_CONDITIONS     = .true.
 ADD_PERIODIC_CONDITIONS         = .false.
 PERIODIC_HORIZ_DIST             = 0.3597d0
 
 # velocity and density models
 nbmodels                        = 1              
 #1 1 2.7d3 1.50d3 0.0d3 0 0 9999 9999 0 0 0 0 0 0
-1 1 2.7d3 5.03d3 2.5d3 0 0 9999 9999 0 0 0 0 0 0
+#1 1 2.7d3 5.03d3 2.5d3 0 0 9999 9999 0 0 0 0 0 0
+1 1 2.7d3 5.03d3 0 0 0 9999 9999 0 0 0 0 0 0
 TOMOGRAPHY_FILE                 = ./TOMO.XYZ
 read_external_mesh              = .false.
 
@@ -151,5 +149,5 @@ use_binary_for_wavefield_dumps  = .false.
 NUMBER_OF_SIMULTANEOUS_RUNS     = 1
 BROADCAST_SAME_MESH_AND_MODEL   = .true.
 
-nt = 8000
+nt                              = 6000
 deltat                          = 1.0d-3
