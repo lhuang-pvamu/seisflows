@@ -3,7 +3,8 @@ WORKFLOW='inversion'    # inversion, migration, modeling
 SOLVER='specfem3d'      # specfem2d, specfem3d
 #SYSTEM='slurm_sm'       # serial, pbs, slurm
 SYSTEM='serial'         # serial, pbs, slurm
-OPTIMIZE='LBFGS'        # base
+#OPTIMIZE='LBFGS'        # base
+OPTIMIZE='NLCG'        # base
 PREPROCESS='base'       # base
 POSTPROCESS='base'      # base
 
@@ -37,8 +38,8 @@ SCALE=1.                # scaling factor
 
 # OPTIMIZATION
 STEPMAX=10              # maximum trial steps
-STEPINIT=0.25           # step length safeguard
-STEPFACTOR=0.75
+STEPINIT=0.025           # step length safeguard
+STEPFACTOR=0.075
 
 
 # SOLVER

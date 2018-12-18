@@ -457,6 +457,10 @@ class base(object):
         files += glob('*proc??????_reg1_alpha_kernel.bin')
         files += glob('*proc??????_reg1_alpha[hv]_kernel.bin')
         unix.rename('alpha', 'vp', files)
+        files = []
+        files += glob('*proc??????_c_acoustic_kernel.bin')
+        unix.rename('c_acoustic', 'vp', files)
+
 
         files = []
         files += glob('*proc??????_beta_kernel.bin')

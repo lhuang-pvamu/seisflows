@@ -8,8 +8,8 @@ partitioning_method             = 3
 ngnod                           = 9              
 #NSTEP                           = 7500
 #DT                              = 1.0e-3
-NSTEP                           = 75000
-DT                              = 1.0e-5
+NSTEP                           = 8000
+DT                              = 1.0e-3
 time_stepping_scheme            = 1   
 AXISYM                          = .false.
 P_SV                            = .true.
@@ -77,14 +77,15 @@ K_MAX_PML                       = 1.d0
 damping_change_factor_acoustic  = 0.5d0
 damping_change_factor_elastic   = 1.d0
 PML_PARAMETER_ADJUSTMENT        = .false.
-STACEY_ABSORBING_CONDITIONS     = .true.
+#STACEY_ABSORBING_CONDITIONS     = .true.
+STACEY_ABSORBING_CONDITIONS     = .false.
 ADD_PERIODIC_CONDITIONS         = .false.
 PERIODIC_HORIZ_DIST             = 0.3597d0
 
 # velocity and density models
-nbmodels                        = 2              
-1 1 2.7d3 1.50d3 0.0d3 0 0 9999 9999 0 0 0 0 0 0
-2 1 2.7d3 5.03d3 2.5d3 0 0 9999 9999 0 0 0 0 0 0
+nbmodels                        = 1              
+#1 1 2.7d3 1.50d3 0.0d3 0 0 9999 9999 0 0 0 0 0 0
+1 1 2.7d3 5.03d3 2.5d3 0 0 9999 9999 0 0 0 0 0 0
 TOMOGRAPHY_FILE                 = ./TOMO.XYZ
 read_external_mesh              = .false.
 
@@ -104,12 +105,12 @@ absorbbottom                    = .true.
 absorbright                     = .true.
 absorbtop                       = .true.
 absorbleft                      = .true.
-nbregions                       = 2
-1  90  1 30 2
-1  90 31 35 1
+nbregions                       = 1 
+#1  90  1 30 2
+1  90 1 35 1
 
 # display parameters
-NSTEP_BETWEEN_OUTPUT_INFO       = 200            
+NSTEP_BETWEEN_OUTPUT_INFO       = 2000            
 output_grid_Gnuplot             = .true.        
 output_grid_ASCII               = .false.        
 OUTPUT_ENERGY                   = .false.
@@ -117,9 +118,9 @@ NTSTEP_BETWEEN_OUTPUT_ENERGY    = 10
 COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
 
 # movies/images/snaphots
-NSTEP_BETWEEN_OUTPUT_IMAGES     = 100            
+NSTEP_BETWEEN_OUTPUT_IMAGES     = 1000            
 cutsnaps                        = 1.             
-output_color_image              = .true.         
+output_color_image              = .false.         
 imagetype_JPEG                  = 5              
 factor_subsample_image          = 1              
 USE_CONSTANT_MAX_AMPLITUDE      = .false.
@@ -130,7 +131,7 @@ DRAW_WATER_IN_BLUE              = .true.
 USE_SNAPSHOT_NUMBER_IN_FILENAME = .false.        
 
 #### for PostScript snapshots ####
-output_postscript_snapshot      = .true.        
+output_postscript_snapshot      = .false.        
 imagetype_postscript            = 1              
 meshvect                        = .false.         
 modelvect                       = .true.        
@@ -150,5 +151,5 @@ use_binary_for_wavefield_dumps  = .false.
 NUMBER_OF_SIMULTANEOUS_RUNS     = 1
 BROADCAST_SAME_MESH_AND_MODEL   = .true.
 
-nt = 7500
-deltat                          = 9.0d-4         
+nt = 8000
+deltat                          = 1.0d-3

@@ -1,7 +1,6 @@
 VERBOSE=3
 TITLE='marmousi-test'
 WORKFLOW='inversion' # inversion, migration, modeling
-#SOLVER='elastic2d' 
 SOLVER='specfem2d'   # specfem2d, specfem3d
 #SYSTEM='slurm_sm'    # serial, pbs, slurm
 SYSTEM='serial'    # serial, pbs, slurm
@@ -19,7 +18,8 @@ DENSITY='Constant'
 # WORKFLOW
 BEGIN=1                 # first iteration
 END=50                  # last iteration
-NREC=500                # number of receivers
+#NREC=500                # number of receivers
+NREC=50                # number of receivers
 #NSRC=32                 # number of sources
 NSRC=1                 # number of sources
 SAVEGRADIENT=1          # save gradient how often
@@ -28,7 +28,6 @@ SAVEGRADIENT=1          # save gradient how often
 # PREPROCESSING
 FORMAT='su'
 READER='su_specfem2d'   # data file format
-#CHANNELS='p'           # data channels
 CHANNELS='xz'           # data channels
 #NORMALIZE=1             # normalize
 NORMALIZE=0             # normalize
@@ -51,8 +50,8 @@ SCALE=1.                # scaling factor
 
 
 # SOLVER
-NT=75000                 # number of time steps
-DT=1.0e-5               # time step
+NT=8000                 # number of time steps
+DT=1.0e-3               # time step
 F0=5.0                  # dominant frequency
 
 

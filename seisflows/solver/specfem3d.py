@@ -133,6 +133,7 @@ class specfem3d(custom_import('solver', 'base')):
         unix.rm('SEM')
         unix.ln('traces/adj', 'SEM')
         call_solver(system.mpiexec(), 'bin/xspecfem3D')
+        #raw_input("gradient calculated")
 
 
     ### input file writers
