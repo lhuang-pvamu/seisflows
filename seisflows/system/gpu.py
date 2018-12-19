@@ -60,27 +60,39 @@ class gpu(custom_import('system', 'serial')):
         """
         self.checkpoint(PATH.OUTPUT, classname, method, args, kwargs)
 
-        running_tasks = dict()
+        #running_tasks = dict()
+        gpu0_tasks = dict()
+        gpu1_tasks = dict()
         queued_tasks = range(PAR.NTASK)
 
         # implements "work queue" pattern
-        while queued_tasks or running_tasks:
+        while queued_tasks or gpu0_tasks or gpu1_tasks:
 
             # launch queued tasks
             while len(queued_tasks) > 0 and \
-                  len(running_tasks) < PAR.NTASKMAX:
+                  len(gpu0_tasks) < PAR.NTASKMAX:
                 i = queued_tasks.pop(0)
-                p = self._run_task(classname, method, taskid=i)
-                running_tasks[i] = p
-                sleep(0.1)
+                p = self._run_task(classname, method, taskid=i, gpuid=0)
+                gpu0_tasks[i] = p
+                #sleep(0.1)
+
+            while len(queued_tasks) > 0 and \
+                  len(gpu1_tasks) < PAR.NTASKMAX:
+                i = queued_tasks.pop(0)
+                p = self._run_task(classname, method, taskid=i, gpuid=1)
+                gpu1_tasks[i] = p
+                #sleep(0.1)
 
             # checks status of running tasks
-            for i, p in running_tasks.items():
+            for i, p in gpu0_tasks.items():
                 if p.poll() != None:
-                    running_tasks.pop(i)
+                    gpu0_tasks.pop(i)
+            for i, p in gpu1_tasks.items():
+                if p.poll() != None:
+                    gpu1_tasks.pop(i)
 
-            if running_tasks:
-                sleep(1.)
+            if gpu0_tasks or gpu1_tasks:
+                sleep(.01)
 
         print ''
 
@@ -95,9 +107,10 @@ class gpu(custom_import('system', 'serial')):
 
     ### private methods
 
-    def _run_task(self, classname, method, taskid=0):
+    def _run_task(self, classname, method, taskid=0, gpuid=0):
         env = os.environ.copy().items()
         env += [['SEISFLOWS_TASKID', str(taskid)]]
+        env += [['CUDA_VISIBLE_DEVICES',str(gpuid)]]
         self.progress(taskid)
 
         p = Popen(
@@ -111,7 +124,17 @@ class gpu(custom_import('system', 'serial')):
         return p
 
     def mpiexec(self):
-        return "CUDA_VISIBLE_DEVICES=0,1"
+        cuda_var = os.getenv('CUDA_VISIBLE_DEVICES')
+        if cuda_var:
+            num_str = cuda_var
+        else:
+            num_str="0,1"
+            seis_env = os.getenv('SEISFLOWS_TASKID')
+            if seis_env:
+                taskid = int(seis_env)
+                gpu_num = taskid%2
+                num_str = str(gpu_num)
+        return "CUDA_VISIBLE_DEVICES=" + num_str
 
     def save_kwargs(self, classname, method, kwargs):
         kwargspath = join(PATH.OUTPUT, 'kwargs')
