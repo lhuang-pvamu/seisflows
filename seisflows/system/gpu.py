@@ -1,4 +1,3 @@
-
 import os
 import sys
 import numpy as np
@@ -15,7 +14,7 @@ PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
 
 
-class multicore(custom_import('system', 'serial')):
+class gpu(custom_import('system', 'serial')):
     """ An interface through which to submit workflows, run tasks in serial or 
       parallel, and perform other system functions.
 
@@ -30,7 +29,7 @@ class multicore(custom_import('system', 'serial')):
     def check(self):
         """ Checks parameters and paths
         """
-        super(multicore, self).check()
+        super(gpu, self).check()
 
         # number of tasks
         if 'NTASK' not in PAR:
@@ -110,6 +109,9 @@ class multicore(custom_import('system', 'serial')):
             env=dict(env))
 
         return p
+
+    def mpiexec(self):
+        return "CUDA_VISIBLE_DEVICES=0,1"
 
     def save_kwargs(self, classname, method, kwargs):
         kwargspath = join(PATH.OUTPUT, 'kwargs')

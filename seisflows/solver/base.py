@@ -130,8 +130,8 @@ class base(object):
           generates seismic data to be inverted or migrated
         """
         # clean up for new inversion
-        print os.getcwd()
-        print self.cwd
+        #print os.getcwd()
+        #print self.cwd
         unix.rm(self.cwd)
 
         # As input for an inversion or migration, users can choose between
