@@ -57,8 +57,12 @@ class specfem2d(custom_import('solver', 'base')):
     def check_solver_parameter_files(self):
         """ Checks solver parameters
         """
-        nt = getpar('nt', cast=int)
-        dt = getpar('deltat', cast=float)
+        
+        nt = getpar('NSTEP', cast=int)
+        dt = getpar('DT', cast=float)
+        #nt = getpar('nt', cast=int)
+        #dt = getpar('deltat', cast=float)
+
         f0 = getpar('f0', file='DATA/SOURCE', cast=float)
 
         if nt != PAR.NT:
