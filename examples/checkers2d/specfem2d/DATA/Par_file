@@ -54,7 +54,7 @@ add_Bielak_conditions_left      = .false.
 ACOUSTIC_FORCING                = .false.        
 
 # receivers
-seismotype                      = 4              
+seismotype                      = 1
 subsamp_seismos                 = 1
 USE_TRICK_FOR_BETTER_PRESSURE   = .false.
 NSTEP_BETWEEN_OUTPUT_SEISMOS    = 5000000        
@@ -106,7 +106,7 @@ PERIODIC_HORIZ_DIST             = 4000.d0
 
 nbmodels                        = 1
 #1 1 2600.d0 5800.d0 3500.0d0 0 0 9999 9999 0 0 0 0 0 0
-1 1 2600.d0 5800.d0 0 0 0 10.d0 10.d0 0 0 0 0 0 0
+1 1 2600.d0 5800.d0 3500.0d0 0 10.d0 10.d0 0 0 0 0 0 0
 TOMOGRAPHY_FILE                 = none
 read_external_mesh              = .false.
 

@@ -17,7 +17,7 @@ def Waveform(syn, obs, nt, dt):
     # waveform difference
     # (Tromp et al 2005, eq 9)
     wadj = syn - obs
-    return -wadj
+    return wadj
 
 
 def Envelope(syn, obs, nt, dt, eps=0.05):

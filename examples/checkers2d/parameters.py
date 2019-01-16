@@ -11,8 +11,8 @@ PREPROCESS='base'       # base
 POSTPROCESS='base'      # base
 
 MISFIT='Waveform'
-#MATERIALS='LegacyAcoustic'
-MATERIALS='Acoustic'
+MATERIALS='LegacyAcoustic'
+#MATERIALS='Acoustic'
 #MATERIALS='Elastic'
 DENSITY='Constant'
 
@@ -32,9 +32,9 @@ SAVEGRADIENT=1          # save gradient how often
 FORMAT='su'             # data file format
 READER='su_specfem2d'
 #acoustic should be z or p
-CHANNELS='p'            # data channels
+#CHANNELS='p'            # data channels
 #try below for elastic
-#CHANNELS='y'            # data channels
+CHANNELS='y'            # data channels
 #CHANNELS='xz'            # data channels
 NORMALIZE=0             # normalize
 BANDPASS=0              # bandpass
