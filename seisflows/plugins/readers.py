@@ -12,6 +12,7 @@ def su(path, filename):
     import obspy
     stream = obspy.read(path +'/'+ filename, 
                    format='SU',
+#                   dtype='float64',
                    byteorder='<')
     return stream
 
