@@ -1,5 +1,5 @@
 
-WORKDIR = '/scratch/jakemp/m0-gpu-acoustic-workdir'
+#WORKDIR = '/scratch/jakemp/m0-gpu-acoustic-workdir'
 
 DATA = ''
 
