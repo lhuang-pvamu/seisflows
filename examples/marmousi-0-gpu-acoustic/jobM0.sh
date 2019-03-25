@@ -7,7 +7,6 @@
 #SBATCH -t 24:00:00     # run time (hh:mm:ss)
 
 source ~/seis_vars.sh
-source ~/gpu_vars.sh
 
 sfcl
 date
