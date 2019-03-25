@@ -3,23 +3,23 @@ TITLE="checkers"
 WORKFLOW='inversion'    # inversion, migration
 #WORKFLOW='test_forward'    # inversion, migration
 SOLVER='specfem2d'      # specfem2d, specfem3d
-SYSTEM='serial'       # serial, pbs, slurm
-#SYSTEM='multicore'       # serial, pbs, slurm
+#SYSTEM='serial'       # serial, pbs, slurm
+SYSTEM='multicore'       # serial, pbs, slurm
 #SYSTEM='slurm_sm'       # serial, pbs, slurm
 OPTIMIZE='LBFGS'        # base, newton
 PREPROCESS='base'       # base
 POSTPROCESS='base'      # base
 
 MISFIT='Waveform'
-MATERIALS='LegacyAcoustic'
-#MATERIALS='Acoustic'
+#MATERIALS='LegacyAcoustic'
+MATERIALS='Acoustic'
 #MATERIALS='Elastic'
 DENSITY='Constant'
 
 
 # WORKFLOW
 BEGIN=1                 # first iteration
-END=10                   # last iteration
+END=100                   # last iteration
 NREC=10                # number of receivers
 #NREC=132                # number of receivers
 #NSRC=25                 # number of sources
@@ -32,9 +32,9 @@ SAVEGRADIENT=1          # save gradient how often
 FORMAT='su'             # data file format
 READER='su_specfem2d'
 #acoustic should be z or p
-#CHANNELS='p'            # data channels
+CHANNELS='p'            # data channels
 #try below for elastic
-CHANNELS='y'            # data channels
+#CHANNELS='y'            # data channels
 #CHANNELS='xz'            # data channels
 NORMALIZE=0             # normalize
 BANDPASS=0              # bandpass
