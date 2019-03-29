@@ -1,0 +1,158 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import sys
+import numpy as np
+#import matplotlib.pyplot as plt
+
+from glob import glob
+from os.path import abspath, join
+#from seisflows.tools.graphics import plot_gll
+from seisflows.plugins.solver_io.fortran_binary import _read
+#from seisflows.tools.tools import exists
+
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='converts SPECFEM2D model or kernels to numpy array')
+
+    # required input file arguments
+    parser.add_argument('xcoords',
+        help='x coordinates file')
+
+    parser.add_argument('ycoords',
+        help='y coordinates file')
+
+    parser.add_argument('file',
+        help='database file')
+
+#    # optional formatting arguments
+#    parser.add_argument('--cbar',
+#        dest='cbar',
+#        action='store_true',
+#        help='display colorbar')
+#    parser.set_defaults(cbar=False)
+
+#    parser.add_argument('--cmap',
+#        default='seismic',
+#        help='colormap scheme')
+
+#    parser.add_argument('--cmin', 
+#        type=float,
+#        default=None,
+#        help='colormap min')
+
+#    parser.add_argument('--cmax', 
+#        type=float,
+#        default=None,
+#        help='colormap max')
+
+#    parser.add_argument('--saturation',
+#        type=float,
+#        default=1.,
+#        help='colormap saturation factor')
+
+#    parser.add_argument('--symmetric',
+#        dest='symmetric',
+#        action='store_true',
+#        help='colormap symmetry flag')
+#    parser.set_defaults(symmetric=False)
+
+#    parser.add_argument('--title',
+#        type=str,
+#        default='',
+#        help='title')
+
+    return parser.parse_args()
+
+
+
+if __name__ == '__main__':
+    """ Converts GLL model read from SPECFEM2D Fortran binary file to numpy array
+
+        For usage information: plotgll --help
+    """
+
+    args = parse_args()
+
+    x = _read(args.xcoords)
+    y = _read(args.ycoords)
+    v = _read(args.file)
+
+    minval = min(v)
+    maxval = max(v)
+
+    msg = '\n%s\nmin, max: %f, %f\n'
+    print msg % (args.file, minval, maxval)
+
+    #SSx = (x[25]-x[0])/5.0
+    #SSy = y[5]-y[0]
+    
+    nn = len(x)
+    lx = max(x)-min(x)
+    ly = max(y)-min(y)
+
+    nx = int(np.around(np.sqrt(nn*lx/ly)))
+    ny = int(np.around(np.sqrt(nn*ly/lx)))
+
+    print "Size = " + str(nx) + ", " + str(ny)
+
+    SSx = lx/nx
+    SSy = ly/ny
+
+    for i in range(len(x)):
+        print str(i) + ": " + str(x[i]/SSx) + ", " + str(y[i]/SSy) + ", " + str(v[i])
+
+    # construct structured grid
+    x = np.linspace(x.min(), x.max(), nx)
+    z = np.linspace(z.min(), z.max(), nz)
+    X, Z = np.meshgrid(x, z)
+    grid = stack(X.flatten(), Z.flatten())
+    # interpolate to structured grid
+    V = _interp.griddata(mesh, v, grid, 'linear')
+
+    # workaround edge issues
+    if np.any(np.isnan(V)):
+        W = _interp.griddata(mesh, v, grid, 'nearest')
+        for i in np.where(np.isnan(V)):
+            V[i] = W[i]
+
+    V = np.reshape(V,(nz, nx))
+
+
+#    f, p = plot_gll(x, y, v)
+
+#    plt.axes().set_aspect('equal')
+
+#    # set colormap
+#    if args.cmap:
+#        p.set_cmap(args.cmap)
+
+    # set colormap limits
+#    if args.cmin!=None and \
+#       args.cmax!=None:
+#        assert args.cmin < args.cmax
+#        p.set_clim([args.cmin, args.cmax])
+
+#    if args.symmetric:
+#        maxabs = max(np.abs(p.get_clim()))
+#        clim = np.array([-maxabs, +maxabs])
+#        p.set_clim(clim)
+
+#    # adjust saturation
+#    if args.saturation:
+#        clim = np.array(p.get_clim())
+#        cavg = np.mean(clim)
+#        p.set_clim((clim-cavg)/args.saturation+cavg)
+
+#    # optional colorbar
+#    if args.cbar:
+#        cb = plt.colorbar(orientation='horizontal')
+#        cb.set_label(args.title)
+#    else:
+#        plt.title(args.title)
+
+#    plt.show()
+
