@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+
+import os
+
+def convert_file(file1, file2, file3):
+    os.system("writegll " + file1 + " " + file2 + " " + file3)
+
+def convert_files(output_directory):
+    x_vals = output_directory + "/model_init/proc000000_x.bin"
+    z_vals = output_directory + "/model_init/proc000000_z.bin"
+
+    model_init = output_directory + "/model_init/proc000000_vp.bin"
+    model_true = output_directory + "/model_true/proc000000_vp.bin"
+    gradient_output = output_directory + "/output/gradient_0001/proc000000_vp_kernel.bin"
+    model_output = output_directory + "/output/model_0001/proc000000_vp.bin"
+
+    convert_file(x_vals, z_vals, model_init)
+    convert_file(x_vals, z_vals, model_true)
+    convert_file(x_vals, z_vals, gradient_output)
+    convert_file(x_vals, z_vals, model_output)
+
+root_dir = "/data/seis/VelocityModels_v1/"
+for filename in os.listdir(root_dir):
+    print "converting " + str(root_dir + filename)
+    convert_files(root_dir + filename)
+
