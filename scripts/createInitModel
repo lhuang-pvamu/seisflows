@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import sys
+import numpy as np
+import scipy as sp
+import scipy.ndimage
+
+from glob import glob
+from seisflows.plugins.solver_io.fortran_binary import _read, _write
+from seisflows.tools import array
+
+if __name__ == '__main__':
+    """ Create an initial model based on a true model
+        For usage information: createInitModel.py --help
+     """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('xcoords', help='x coordinates file')
+    parser.add_argument('ycoords', help='y coordinates file')
+    parser.add_argument('true_model', help='true model file')
+    parser.add_argument('init_model', help='init model file')
+    parser.add_argument('--span', type=int, default=50.0, help='span value')
+
+    args = parser.parse_args()
+    x = _read(args.xcoords)
+    y = _read(args.ycoords)
+    mesh = np.array(list(zip(x,y)))
+    true_model = _read(args.true_model)
+    print "model shape: ", true_model.shape
+    #true_model.fill(2000)  # set the initial model as 0
+    # Apply gaussian filter
+    #sigma = [5]
+    #init_model = sp.ndimage.filters.gaussian_filter(true_model, sigma, mode='constant')
+    # will smooth the true model as the initial model later
+    span = args.span
+    print "span: ", span
+    init_model = array.meshsmooth(true_model,mesh,span)
+    _write(init_model, args.init_model)
+
+ 
