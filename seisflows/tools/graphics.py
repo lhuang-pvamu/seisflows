@@ -14,7 +14,7 @@ def plot_gll(x, y, z):
     ry = 1/np.sqrt(1 + r**2)
 
     f = plt.figure(figsize=(10*rx, 10*ry))
-    p = plt.tricontourf(x, y, z, 125)
+    p = plt.tricontourf(x, y, z, 125, extend='both') # Try>> , antialiased=True)
     plt.axis('image')
     return f, p
 
