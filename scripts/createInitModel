@@ -22,6 +22,7 @@ if __name__ == '__main__':
     parser.add_argument('true_model', help='true model file')
     parser.add_argument('init_model', help='init model file')
     parser.add_argument('--span', type=int, default=50.0, help='span value')
+    parser.add_argument('--constant', type=int, help='set a constant value')
 
     args = parser.parse_args()
     x = _read(args.xcoords)
@@ -29,14 +30,17 @@ if __name__ == '__main__':
     mesh = np.array(list(zip(x,y)))
     true_model = _read(args.true_model)
     print "model shape: ", true_model.shape
-    #true_model.fill(2000)  # set the initial model as 0
-    # Apply gaussian filter
-    #sigma = [5]
-    #init_model = sp.ndimage.filters.gaussian_filter(true_model, sigma, mode='constant')
-    # will smooth the true model as the initial model later
-    span = args.span
-    print "span: ", span
-    init_model = array.meshsmooth(true_model,mesh,span)
-    _write(init_model, args.init_model)
+    if  args.constant is not None:
+        true_model.fill(args.constant)  # set the initial model as 0
+        _write(true_model, args.init_model)
+    else: 
+        # Apply gaussian filter
+        #sigma = [5]
+        #init_model = sp.ndimage.filters.gaussian_filter(true_model, sigma, mode='constant')
+        # will smooth the true model as the initial model later
+        span = args.span
+        print "span: ", span
+        init_model = array.meshsmooth(true_model,mesh,span)
+        _write(init_model, args.init_model)
 
  
