@@ -64,7 +64,7 @@ NT=3500                 # number of time steps
 DT=1.0e-3                 # time step
 #NT=48000                 # number of time steps
 #DT=0.006                 # time step
-F0=10.0                # dominant frequency
+F0=5.0                # dominant frequency
 
 
 # SYSTEM
