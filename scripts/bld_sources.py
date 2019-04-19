@@ -38,6 +38,10 @@ Will be written if --nsources option is supplied.')
         type=int, default=0,
         help='Number of sources to create.')
 
+    ap.add_argument('-f','--freq',
+        type=float, 
+        help='Number of sources to create.')
+
     ap.add_argument('-b','--begin',
         type=float, nargs=2, metavar=('xbgn','zbgn'),
         default=[0.,0.],
@@ -63,6 +67,7 @@ class SourceBuilder(object):
         self.nsources = args.nsources
         self.begin = args.begin
         self.end = args.end
+        self.freq = args.freq
 
     def __str__(self):
         str = 'SourceBuilder:\n  From template file: '+self.template \
@@ -107,6 +112,8 @@ class SourceBuilder(object):
               for line in ft:
                 line = re.sub(r'^ *xs *=.*$', 'xs = %f'%x, line)
                 line = re.sub(r'^ *zs *=.*$', 'zs = %f'%z, line)
+                if self.freq is not None:
+                    line = re.sub(r'^ *f0 *=.*$', 'f0 = %.2f'%self.freq, line)
                 print >>fs, line.strip()
           ft.close()
           fs.close()
