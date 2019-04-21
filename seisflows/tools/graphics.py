@@ -106,6 +106,7 @@ def plot_section(stream, ax=None, cmap='seismic', clip=100, title='', x_interval
 
     im = ax.imshow(data, aspect=scale_factor*d_aspect, clim=_cscale(data, clip=clip))
     im.set_cmap(cmap)
+    fig.colorbar(im, ax=ax)
 
     # labels
     ax.set_title(title)

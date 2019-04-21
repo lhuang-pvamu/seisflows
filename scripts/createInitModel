@@ -21,8 +21,8 @@ if __name__ == '__main__':
     parser.add_argument('ycoords', help='y coordinates file')
     parser.add_argument('true_model', help='true model file')
     parser.add_argument('init_model', help='init model file')
-    parser.add_argument('--span', type=int, default=50.0, help='span value')
-    parser.add_argument('--constant', type=int, help='set a constant value')
+    parser.add_argument('-s','--span', type=int, default=50.0, help='span value')
+    parser.add_argument('-c','--constant', type=int, help='set a constant value')
 
     args = parser.parse_args()
     x = _read(args.xcoords)
