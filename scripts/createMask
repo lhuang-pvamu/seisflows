@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import sys
+import numpy as np
+import scipy as sp
+import scipy.ndimage
+
+from glob import glob
+from seisflows.plugins.solver_io.fortran_binary import _read, _write
+from seisflows.tools import array
+
+if __name__ == '__main__':
+    """ Create an initial model based on a true model
+        For usage information: createInitModel.py --help
+     """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('xcoords', help='x coordinates file')
+    parser.add_argument('ycoords', help='y coordinates file')
+    parser.add_argument('mask_model', help='mask model file')
+    parser.add_argument('-d','--distance', type=int, default=0.0, help='enter a distance from the top as the mask area')
+
+    args = parser.parse_args()
+    x = _read(args.xcoords)
+    y = _read(args.ycoords)
+    top = max(y)
+    mesh = np.array(list(zip(x,y)))
+    mask = np.ones(len(x))
+    print "model shape: ", mask.shape
+    for i in range(len(x)): 
+        if y[i] >= top - args.distance:
+            mask[i] = 0
+    _write(mask, args.mask_model)
+
+ 

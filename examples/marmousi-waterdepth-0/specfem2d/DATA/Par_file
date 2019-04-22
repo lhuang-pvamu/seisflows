@@ -41,7 +41,7 @@ add_Bielak_conditions_left      = .false.
 ACOUSTIC_FORCING                = .false.
 
 # receivers
-seismotype                      = 1              
+seismotype                      = 4              
 subsamp_seismos                 = 1              
 USE_TRICK_FOR_BETTER_PRESSURE   = .false.
 NSTEP_BETWEEN_OUTPUT_SEISMOS    = 5000000        
@@ -81,8 +81,9 @@ PERIODIC_HORIZ_DIST             = 0.3597d0
 
 # velocity and density models
 nbmodels                        = 1              
-1 1 2.7d3 2.60d3 1.5d3 0 0 9999 9999 0 0 0 0 0 0
-2 1 2.7d3 9.53d3 5.5d3 0 0 9999 9999 0 0 0 0 0 0
+1 1 2.7d3 2.60d3 0 0 0 9999 9999 0 0 0 0 0 0
+#1 1 2.7d3 2.60d3 1.5d3 0 0 9999 9999 0 0 0 0 0 0
+$2 1 2.7d3 9.53d3 5.5d3 0 0 9999 9999 0 0 0 0 0 0
 TOMOGRAPHY_FILE                 = ./TOMO.XYZ
 read_external_mesh              = .false.
 
@@ -102,7 +103,7 @@ xmax                            = 9200.d0
 nx                              = 90             
 absorbbottom                    = .true.
 absorbright                     = .true.
-absorbtop                       = .true.
+absorbtop                       = .false.
 absorbleft                      = .true.
 nbregions                       = 1              
 1  90  1 30 1

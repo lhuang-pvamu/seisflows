@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 
 from glob import glob
 from os.path import abspath, join
-from seisflows.tools.graphics import plot_gll
 from seisflows.plugins.solver_io.fortran_binary import _read
 from seisflows.tools.tools import exists
 
@@ -87,9 +86,26 @@ if __name__ == '__main__':
     msg = '\n%s\nmin, max: %f, %f\n'
     print msg % (args.file, minval, maxval)
 
-    f, p = plot_gll(x, y, v)
+    vrange = maxval - minval
+    vmag = max(abs(maxval),abs(minval))
+    if vmag==0. :
+        print "skipping zero data."
+        sys.exit()
+    if vrange/vmag < 1.e-6 :
+        print "skipping constant data."
+        sys.exit()
 
-    plt.axes().set_aspect('equal')
+    # set figure size and shape
+    r = (max(x) - min(x))/(max(y) - min(y))
+    rx = r/np.sqrt(1 + r**2)
+    ry = 1/np.sqrt(1 + r**2)
+
+    f = plt.figure(figsize=(10*rx, 10*ry))
+
+    # Filled contours of unstructured GLL mesh
+    p = plt.tricontourf(x, y, v, 125, extend='both') 
+
+    plt.axis('image')
 
     # set colormap
     if args.cmap:

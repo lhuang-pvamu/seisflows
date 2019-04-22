@@ -1,11 +1,10 @@
 VERBOSE=3
-TITLE="checkers"
+TITLE="checkers2d_INV"
 WORKFLOW='inversion'    # inversion, migration
-#WORKFLOW='test_forward'    # inversion, migration
 SOLVER='specfem2d'      # specfem2d, specfem3d
 #SYSTEM='serial'       # serial, pbs, slurm
-SYSTEM='multicore'       # serial, pbs, slurm
-#SYSTEM='slurm_sm'       # serial, pbs, slurm
+#SYSTEM='multicore'       # serial, pbs, slurm
+SYSTEM='slurm_sm'       # serial, pbs, slurm
 OPTIMIZE='LBFGS'        # base, newton
 PREPROCESS='base'       # base
 POSTPROCESS='base'      # base
@@ -52,6 +51,7 @@ SCALE=6.0e6             # scaling factor
 #STEPMAX=10              # maximum trial steps
 STEPCOUNTMAX=10              # maximum trial steps
 STEPTHRESH=0.1          # step length safeguard
+FLIP_SIGN="yes"         # Change sign of gradient to achieve convergence
 
 
 # SOLVER
@@ -66,7 +66,7 @@ F0=0.084                # dominant frequency
 NTASK=NSRC                # must satisfy 1 <= NTASK <= NSRC
 #NTASK=1                # must satisfy 1 <= NTASK <= NSRC
 NPROC=1                 # processors per task
-#NPROCMAX=12
+#NPROCMAX=12             # Max processes per node (? -TEC)
 WALLTIME=500            # walltime
 
 #MPIEXEC='mpirun'
