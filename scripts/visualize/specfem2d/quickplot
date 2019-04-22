@@ -96,7 +96,7 @@ if __name__ == '__main__':
     dir = parse_args()
     if not exists(dir):
         raise IOError(
-            "directory does not exit: %s" % dir)
+            "directory does not exist: %s" % dir)
 
     files = get_data_files(dir)
     cmd = '&&\n\n'.join([get_cmd(exe, dir, file) for file in files])
