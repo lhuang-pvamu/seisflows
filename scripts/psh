@@ -1,0 +1,25 @@
+#!/bin/bash
+usage="psh -- Run shell command in parallel on slave nodes 'computeNNN' \n\
+usage: psh command"
+# Author: Ted Clee   April 2019
+#       Note all stdout from command goes to local stdout
+
+# This list of node numbers came from:
+#     /opt/cscloud/utils/nodes.conf
+plist=(000 001 002 003 004 005 006 007 008     010 011 012 \
+       013 014 015 016 017 018 019 020 021 022 023 024     )
+cmd=$*
+if [ -z "$cmd" ]; then
+    echo -e $usage
+    exit 1
+  fi
+
+# On each node, put hostname and command output into a temporary file $$,
+# then print the file and delete it.
+for node in ${plist[@]}
+do
+    (ssh compute$node \
+    "echo -n \`hostname\`: >\$\$; $cmd &>>\$\$; cat \$\$; rm \$\$") &
+done
+wait
+echo psh DONE
