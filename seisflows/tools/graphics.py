@@ -5,7 +5,7 @@ from scipy.interpolate import interp1d
 
 from obspy.core.stream import Stream
 
-
+''' No longer called from plotgll.py (TEC 4/22/2019)
 def plot_gll(x, y, z):
     """ Plots values on 2D unstructured GLL mesh
     """
@@ -14,10 +14,10 @@ def plot_gll(x, y, z):
     ry = 1/np.sqrt(1 + r**2)
 
     f = plt.figure(figsize=(10*rx, 10*ry))
-    p = plt.tricontourf(x, y, z, 125, extend='both') # Try>> , antialiased=True)
+    p = plt.tricontourf(x, y, z, 125, extend='both') 
     plt.axis('image')
     return f, p
-
+'''
 
 def plot_vector(t, v, xlabel='', ylabel='', title=''):
     """ Plots a vector or time series.
