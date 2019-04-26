@@ -102,9 +102,10 @@ def plot_section(stream, ax=None, cmap='seismic', clip=100, title='', x_interval
     scale_factor = 1.5
 
     if ax is None:
-        fig, ax = plt.subplots(figsize=(fsize, scale_factor*fsize))
+        fig, (ax, ax1) = plt.subplots(2,1,gridspec_kw = {'height_ratios':[8, 1]}, figsize=(fsize, scale_factor*fsize))
 
-    im = ax.imshow(data, aspect=scale_factor*d_aspect, clim=_cscale(data, clip=clip))
+    clim = _cscale(data, clip=clip)
+    im = ax.imshow(data, aspect=scale_factor*d_aspect, clim=clim)
     im.set_cmap(cmap)
     fig.colorbar(im, ax=ax)
 
@@ -124,7 +125,8 @@ def plot_section(stream, ax=None, cmap='seismic', clip=100, title='', x_interval
     ax.set_xticks(xticks)
     ax.set_xticklabels(xtick_labels)
 
-    return ax
+    ax1.hist(np.clip(data, clim[0], clim[1]), bins=30)
+    return ax,ax1
 
 
 def _convert_to_array(stream):
@@ -164,6 +166,7 @@ def _cscale(v, clip=100):
     """ Return limits for colormap.
     """
     perc = clip / 100.
+    print perc , abs(v).max()
     return -perc * abs(v).max(), perc * abs(v).max()
 
 

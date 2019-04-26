@@ -38,12 +38,15 @@ CHANNELS='p'            # data channels
 #try below for elastic
 #CHANNELS='y'            # data channels
 #CHANNELS='xz'            # data channels
+#NORMALIZE='NormalizeTracesL2'             # normalize
 NORMALIZE=0             # normalize
 BANDPASS=0              # bandpass
 FREQLO=0.               # low frequency corner
 FREQHI=0.               # high frequency corner
 MUTECONST=0.75          # mute constant
 MUTESLOPE=1500.         # mute slope
+MUTE='MuteShortOffsets' 
+MUTE_SHORT_OFFSETS_DIST=100
 
 
 # POSTPROCESSING
@@ -60,7 +63,7 @@ STEPTHRESH=0.1          # step length safeguard
 
 
 # SOLVER
-NT=3500                 # number of time steps
+NT=5000                 # number of time steps
 DT=1.0e-3                 # time step
 #NT=48000                 # number of time steps
 #DT=0.006                 # time step
@@ -70,10 +73,11 @@ F0=5.0                # dominant frequency
 # SYSTEM
 NTASK=NSRC                # must satisfy 1 <= NTASK <= NSRC
 #NTASK=1                # must satisfy 1 <= NTASK <= NSRC
-NPROC=2                 # processors per task
+NPROC=1                 # processors per task
 #NPROCMAX=12
 WALLTIME=1500            # walltime
 
 #MPIEXEC='mpirun'
-#SLURMARGS='--ntasks-per-core=1'
 FLIP_SIGN="yes"
+#SLURMARGS='--ntasks-per-core=1'
+SLURMARGS='--exclusive'
