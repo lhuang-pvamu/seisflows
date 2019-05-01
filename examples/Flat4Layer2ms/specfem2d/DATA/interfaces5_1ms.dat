@@ -1,0 +1,24 @@
+# Number of interfaces
+5
+# Points/coordinates for each interface, from bottom
+2
+    0.  -3180.
+10000.  -3180.
+2
+    0.  -2400.
+10000.  -2400.
+2
+    0. -1600.
+10000. -1600.
+2
+    0.  -800.
+10000.  -800.
+2
+    0.   0.
+10000.   0.
+#
+# Spectral elements vertically in each layer, from bottom
+13
+20
+20
+30
