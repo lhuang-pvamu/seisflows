@@ -34,6 +34,13 @@ def parse_args():
         help='display colorbar')
     parser.set_defaults(cbar=False)
 
+    # optional formatting arguments
+    parser.add_argument('--mesh',
+        dest='mesh',
+        action='store_true',
+        help='display mesh')
+    parser.set_defaults(mesh=False)
+
     parser.add_argument('--cmap',
         default='seismic',
         help='colormap scheme')
@@ -99,11 +106,16 @@ if __name__ == '__main__':
     r = (max(x) - min(x))/(max(y) - min(y))
     rx = r/np.sqrt(1 + r**2)
     ry = 1/np.sqrt(1 + r**2)
+    if args.mesh:
+        f = plt.figure()
+        plt.scatter(x,y,c=v)
+        plt.colorbar(orientation='vertical')
+        plt.draw()
 
     f = plt.figure(figsize=(10*rx, 10*ry))
 
     # Filled contours of unstructured GLL mesh
-    p = plt.tricontourf(x, y, v, 125, extend='both') 
+    p = plt.tricontourf(x, y, v, 125, extend='both')
 
     plt.axis('image')
 
