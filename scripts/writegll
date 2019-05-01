@@ -102,10 +102,10 @@ def gll2npy(xcoords, ycoords, filename):
     V = _interp.griddata(mesh, v, grid, 'linear')
 
     # workaround edge issues
-    if np.any(np.isnan(V)):
-        W = _interp.griddata(mesh, v, grid, 'nearest')
-        for i in np.where(np.isnan(V)):
-            V[i] = W[i]
+    #if np.any(np.isnan(V)):
+    #    W = _interp.griddata(mesh, v, grid, 'nearest')
+    #    for i in np.where(np.isnan(V)):
+    #        V[i] = W[i]
 
     V = np.reshape(V,(ny, nx))
     V = np.flip(V,0)

@@ -31,27 +31,26 @@ class specfem2d(custom_import('solver', 'base')):
         parameters += ['vs']
 
 
+    #is this erver called?
     def check(self):
         """ Checks parameters and paths
         """
         super(specfem2d, self).check()
 
-        # check time stepping parameters
-        if 'NT' not in PAR:
-            raise Exception
+        #if 'NT' not in PAR:
+        #    raise Exception
 
-        if 'DT' not in PAR:
-            raise Exception
+        #if 'DT' not in PAR:
+        #    raise Exception
 
-        if 'F0' not in PAR:
-            raise Exception
+        #if 'F0' not in PAR:
+        #    raise Exception
 
-        # check data format
-        if 'FORMAT' not in PAR:
-            raise Exception()
+        #if 'FORMAT' not in PAR:
+        #    raise Exception()
 
-        if PAR.FORMAT != 'su':
-            raise Exception()
+        #if PAR.FORMAT != 'su':
+        #    raise Exception()
 
 
     def check_solver_parameter_files(self):
@@ -60,22 +59,22 @@ class specfem2d(custom_import('solver', 'base')):
         
         nt = getpar('NSTEP', cast=int)
         dt = getpar('DT', cast=float)
-        #nt = getpar('nt', cast=int)
-        #dt = getpar('deltat', cast=float)
-
         f0 = getpar('f0', file='DATA/SOURCE', cast=float)
 
-        if nt != PAR.NT:
-            if self.taskid == 0: print "WARNING: nt != PAR.NT"
-            setpar('nt', PAR.NT)
+        if "NT" in PAR:
+            assert(PAR.NT == nt)
+        else: 
+            PAR.NT = nt
 
-        if dt != PAR.DT:
-            if self.taskid == 0: print "WARNING: dt != PAR.DT"
-            setpar('deltat', PAR.DT)
+        if "DT" in PAR:
+            assert(PAR.DT == dt)
+        else: 
+            PAR.DT = dt
 
-        if f0 != PAR.F0:
-            if self.taskid == 0: print "WARNING: f0 != PAR.F0"
-            setpar('f0', PAR.F0, filename='DATA/SOURCE')
+        if "F0" in PAR:
+            assert(PAR.F0 == f0)
+        else: 
+            PAR.DT = dt
 
         if self.mesh_properties.nproc != PAR.NPROC:
             if self.taskid == 0:
