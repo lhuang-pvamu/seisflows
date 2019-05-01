@@ -5,3 +5,4 @@ doc/_build
 parameters*c
 paths*c
 *.save
+OUTPUT_FILES
