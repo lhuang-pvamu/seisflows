@@ -1,0 +1,117 @@
+#!/usr/bin/env pythonw
+# __author__ = 'Lei Huang'
+
+import argparse
+import os
+import sys
+import numpy as np
+import scipy as sp
+import scipy.ndimage
+import matplotlib.pyplot as plt
+
+from glob import glob
+from seisflows.plugins.solver_io.fortran_binary import _read, _write
+from seisflows.tools import array
+import scipy.interpolate as _interp
+
+
+dist_ratio=[0.0, 0.1726732, 0.5, 0.8273268, 1.0]
+# a spectral element contains 5x5 nodes
+xnodes = 5
+znodes = 5
+
+#  Create a mesh based on the physical distance/depth and the number of spectral elements (xe, ze)
+#
+def QUAD_mesh(XL, ZL, xe, ze):
+    xbin = XL / xe
+    zbin = ZL / ze
+
+    x = np.linspace(0, XL, xe+1)
+    z = np.linspace(0, ZL, ze+1)
+    [X, Z] = np.meshgrid(x, z)
+
+    mx = []
+    mz = []
+    for i in range(0, ze):  # j=1:NPZ
+        for j in range(0, xe):  # i= 1:NPX
+            # print(k,a1)
+            for k in range(0, znodes):
+                for l in range(0, xnodes):
+                    mx.append(X[i, j] + xbin * dist_ratio[l])
+                    mz.append(Z[i, j] + zbin * dist_ratio[k])
+
+    return (mz, mx)
+
+# create a model with number of layers
+def create_layers(XL, ZL, num):
+    model = np.zeros((ZL, XL))
+    layers = np.random.randint(10, ZL, size=num)
+    layers = np.sort(layers)
+    velocities = np.random.randint(1500, 4500, size=num)
+    velocities = np.sort(velocities)[::-1]
+    print layers, velocities
+
+    model.fill(velocities[0]);
+    for i in range(1,num):
+        model[layers[i-1]:layers[i], :] = velocities[i]
+    model[layers[i]:,:] = velocities[num-1]
+    return model
+
+
+if __name__ == '__main__':
+    """ Create an initial model based on a true model
+        For usage information: createInitModel.py --help
+     """
+
+    parser = argparse.ArgumentParser()
+    #parser.add_argument('model', help='model file')
+    parser.add_argument('-x','--Xelements', type=int, help='enter the total number of spectral elemnents in the x axis')
+    parser.add_argument('-z', '--Zelements', type=int,
+                        help='enter the total number of spectral elemnents in the z axis')
+    parser.add_argument('-H', '--Distance', type=int,
+                        help='enter the physical distance in the x axis')
+    parser.add_argument('-d', '--Depth', type=int,
+                        help='enter the physical distance in the z axis (depth)')
+    parser.add_argument('outputdir', help='new output directory')
+
+    args = parser.parse_args()
+    #model = _read(args.model)
+
+    # physical size (x,z)
+    distance = float(args.Distance)
+    depth = float(args.Depth)
+
+    # number of spectral elements (xe, ze)
+    xe = args.Xelements
+    ze = args.Zelements
+
+    # bin size in x an z
+    xbin = distance/xe
+    zbin = depth/ze
+
+    print distance, depth, xe, ze, xbin, zbin
+
+    (z, x)  = QUAD_mesh(distance, depth, xe, ze)
+
+    model = create_layers(int(distance), int(depth), 10)
+    f = plt.figure()
+    plt.imshow(model)
+
+    grid_z, grid_x = np.mgrid[0:depth, 0:distance]
+
+
+    mesh = np.array(list(zip(z,x)))
+    grid = np.array(list(zip(grid_z.flatten(),grid_x.flatten())))
+
+    v = _interp.griddata(grid, model.flatten(), mesh, 'nearest')
+
+    f = plt.figure(figsize=(xe/10, ze/10))
+    plt.scatter(x, z, c=v)
+    plt.colorbar(orientation='vertical')
+    plt.show()
+
+    if not os.path.exists(args.outputdir):
+        os.mkdir(args.outputdir)
+    _write(v, os.path.join(args.outputdir, "vp.bin"))
+    _write(x, os.path.join(args.outputdir, "x.bin"))
+    _write(z, os.path.join(args.outputdir, "z.bin"))

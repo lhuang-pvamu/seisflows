@@ -428,8 +428,8 @@ class base(object):
 
         src = glob('*_kernel.bin')
         dst = join(path, 'kernels', self.source_name)
-        if PAR.VERBOSE > 3:
-            print " [Solver] moving kernerls from " + str(self.kernel_databases) + " to " + str(dst)
+#        if PAR.VERBOSE > 3:
+#            print " [Solver] moving kernels from " + str(self.kernel_databases) + " to " + str(dst)
         unix.mkdir(dst)
         unix.mv(src, dst)
 
