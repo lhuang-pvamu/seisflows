@@ -342,8 +342,8 @@ class inversion(base):
         """
         src = glob(path +'/'+ 'residuals/*')
         dst = 'f_'+suffix
-        if PAR.VERBOSE > 3:
-            print " summing residuals from: " + str(src)
+#        if PAR.VERBOSE > 3:
+#            print " summing residuals from: " + str(src)
         total_misfit = preprocess.sum_residuals(src)
         if PAR.VERBOSE > 3:
             print " saving total misfit " + str(total_misfit) + " to " + str(dst)

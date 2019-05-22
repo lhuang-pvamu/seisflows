@@ -58,7 +58,7 @@ def plot_vector(t, v, xlabel='', ylabel='', title=''):
     plt.show()
 
 
-def plot_section(stream, ax=None, cmap='seismic', clip=100, title='', x_interval=1.0, y_interval=1.0):
+def plot_section(stream, ax=None, cmap='seismic', clip=100, title='', x_interval=1.0, y_interval=1.0, bin=None):
     """  Plots a seismic section from an obspy stream.
 
     Parameters
@@ -125,7 +125,8 @@ def plot_section(stream, ax=None, cmap='seismic', clip=100, title='', x_interval
     ax.set_xticks(xticks)
     ax.set_xticklabels(xtick_labels)
 
-    ax1.hist(np.clip(data, clim[0], clim[1]), bins=30)
+    if bin is not None:
+        ax1.hist(np.clip(data, clim[0], clim[1]), bins=bin)
     return ax,ax1
 
 
@@ -166,7 +167,6 @@ def _cscale(v, clip=100):
     """ Return limits for colormap.
     """
     perc = clip / 100.
-    print perc , abs(v).max()
     return -perc * abs(v).max(), perc * abs(v).max()
 
 

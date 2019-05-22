@@ -158,15 +158,25 @@ class base(object):
 
         # optional step length safeguard
         if PAR.STEPLENMAX:
+          if norm_p > 0. :
             self.line_search.step_len_max = \
                 PAR.STEPLENMAX*norm_m/norm_p
+          else:
+            print "optimize.base: norm_p is zero, will use", \
+                "unnormalized STEPLENMAX = %g"%PAR.STEPLENMAX
+            self.line_search.step_len_max = PAR.STEPLENMAX
 
         # determine initial step length
         alpha, _ = self.line_search.initialize(0.,f,gtg,gtp)
 
         # optional initial step length override
         if PAR.STEPLENINIT and len(self.line_search.step_lens)<=1:
+          if norm_p > 0. :
             alpha = PAR.STEPLENINIT*norm_m/norm_p
+          else:
+            print "optimize.base: norm_p is zero, will use", \
+                "unnormalized STEPLENINIT = %g"%PAR.STEPLENINIT
+            alpha = PAR.STEPLENINIT
 
         # write model corresponding to chosen step length
         self.savetxt('alpha', alpha)
@@ -295,16 +305,15 @@ class base(object):
 
     def loadtxt(self, filename):
         # reads scalars from disk
-        #print " [Optimizer] loading scalar from " + filename + ":"
+#        print " [Optimizer] loading scalar from " + filename + ":"
         scalar = float(np.loadtxt(PATH.OPTIMIZE+'/'+filename))
-        #print "  " + str(scalar)
+#        print "  " + str(scalar)
         return scalar
-        #return float(np.loadtxt(PATH.OPTIMIZE+'/'+filename))
 
     def savetxt(self, filename, scalar):
         # writes scalars to disk
-        #print " [Optimizer] writing scalar to " + filename + ":"
-        #print "  " + str(scalar)
-        np.savetxt(PATH.OPTIMIZE+'/'+filename, [scalar], '%11.6e')
+#        print " [Optimizer] writing scalar to " + filename + ":"
+#        print "  " + str(scalar)
+        np.savetxt(PATH.OPTIMIZE+'/'+filename, [scalar] ) #TEC , '%11.6e')
 
 

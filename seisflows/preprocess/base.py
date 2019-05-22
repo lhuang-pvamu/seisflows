@@ -125,9 +125,9 @@ class base(object):
             residuals.append(self.misfit(syn[ii].data, obs[ii].data, nt, dt))
 
         filename = path+'/'+'residuals'
+
         if exists(filename):
             residuals.extend(list(np.loadtxt(filename)))
-
         np.savetxt(filename, residuals)
 
 
@@ -140,7 +140,9 @@ class base(object):
         """
         total_misfit = 0.
         for filename in files:
-            total_misfit += np.sum(np.loadtxt(filename)**2.)
+            residuals = np.loadtxt(filename)
+            norm = np.sum(residuals**2)
+            total_misfit += norm
         return total_misfit
         
 
@@ -160,8 +162,8 @@ class base(object):
         sign_var = 1
         if 'FLIP_SIGN' in PAR:
             sign_var = -1
-        for ii in range(nn):
-            adj[ii].data = sign_var * self.adjoint(syn[ii].data, obs[ii].data, nt, dt)
+            for ii in range(nn):
+                adj[ii].data = sign_var * self.adjoint(syn[ii].data, obs[ii].data, nt, dt)
 
         self.writer(adj, path, channel)
 
