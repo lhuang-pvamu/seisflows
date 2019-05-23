@@ -5,7 +5,6 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 
 from glob import glob
 from os.path import abspath, join
@@ -101,24 +100,24 @@ if __name__ == '__main__':
     maxval = max(v)
     minval = min(v)
 
-    msg = '\n%s: min, max: %f, %f'
-    print msg % (args.file, minval, maxval)
-
     vrange = maxval - minval
     vmag = max(abs(maxval),abs(minval))
+
+    if args.nozero:
+        minval = min( v[v>vmag*1.e-3] )
+        vmsk = np.ma.array(v,mask=[abs(v)<vmag*1.e-3])
+    else:
+        vmsk = v
+
+    msg = '\n%s data range: (%f, %f)'
+    print msg % (args.file, minval, maxval)
+
     if vmag==0. :
         print "skipping all-zero data."
         sys.exit()
     if vrange/vmag < 1.e-6 :
         print "skipping constant data."
         sys.exit()
-
-    if args.nozero:
-        minval = min( v[v>vmag*1.e-3] )
-        print msg % (args.file, minval, maxval)
-        vmsk = np.ma.array(v,mask=[abs(v)<vmag*1.e-3])
-    else:
-        vmsk = v
 
     # set contour limits and levels
     cmin = minval
@@ -134,6 +133,7 @@ if __name__ == '__main__':
     r = (max(x) - min(x))/(max(y) - min(y))
     rx = r/np.sqrt(1 + r**2)
     ry = 1/np.sqrt(1 + r**2)
+
     if args.mesh:
         f = plt.figure()
         plt.scatter(x,y,c=v)
@@ -145,7 +145,6 @@ if __name__ == '__main__':
     # Filled contours of unstructured GLL mesh
     p = plt.tricontourf(x, y, vmsk, clevs, cmap=args.cmap, extend='both') 
     p.cmap.set_under("white")
-
 
     plt.axis('image')
     plt.title(args.title)
