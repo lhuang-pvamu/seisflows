@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import argparse
+import argparse as ap
 import os
 import sys
 import numpy as np
@@ -11,27 +11,61 @@ from glob import glob
 from seisflows.plugins.solver_io.fortran_binary import _read, _write
 from seisflows.tools import array
 
-if __name__ == '__main__':
-    """ Create an initial model based on a true model
-        For usage information: createInitModel.py --help
-     """
+pgmDesc = 'Make a mask file for spatial weighting of Seisflows inversion'
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('xcoords', help='x coordinates file')
-    parser.add_argument('ycoords', help='y coordinates file')
-    parser.add_argument('mask_model', help='mask model file')
-    parser.add_argument('-d','--distance', type=int, default=0.0, help='enter a distance from the top as the mask area')
+if __name__ == '__main__':
+    """ Make a mask file for spatial weighting of Seisflows inversion
+    """
+    # Set up the run by parsing arguments
+    note = '''NOTE: The output mask file is provided to Seisflows MASK path variable. 
+    The --nodes parameter(s) defines a vertical weight profile w(z) as a list of (z,w) nodes,
+    with weights being linearly interpolated between the given nodes.  First and last nodes 
+    are extended to top and bottom of model by linear extrapolation.
+    '''
+
+    parser = ap.ArgumentParser( description='%(prog)s -- '+pgmDesc, epilog=note )
+    # parser.add_argument('xcoords', help='x coordinates file')
+    parser.add_argument('zcoords', help='z coordinates file')
+    parser.add_argument('mask_model', help='output mask model file')
+    parser.add_argument('-d','--distance', type=float, default=0.0, 
+        help='distance from the top as the mask area (LEGACY parameter, DEPRECATED')
+    parser.add_argument('-n','--node', type=float, nargs=2, metavar=('z','w'), action='append',  
+        help='pair of z and w values for a node, repeat as needed, z in decreasing order.')
 
     args = parser.parse_args()
-    x = _read(args.xcoords)
-    y = _read(args.ycoords)
-    top = max(y)
-    mesh = np.array(list(zip(x,y)))
-    mask = np.ones(len(x))
-    print "model shape: ", mask.shape
-    for i in range(len(x)): 
-        if y[i] >= top - args.distance:
-            mask[i] = 0
-    _write(mask, args.mask_model)
+     
+    # x = _read(args.xcoords)
+    z = _read(args.zcoords)
+    top = max(z)
+    bot = min(z)
+    hgt = top - bot
+    
+    if args.distance != 0. :
+        zn = [top, top-args.distance, top-(args.distance+hgt*1.e-6)]
+        wt = [0., 0., 1.]
+    else:
+      zn = [top]
+      wt = [args.node[0][1]]
+      for nd in args.node:
+        zn.append(nd[0])
+        wt.append(nd[1])
+    zn.append(bot)
+    wt.append(wt[-1])
 
+    # Convert to arrays for calculation
+    znd = np.asarray(zn)
+    wgt = np.asarray(wt)
+    diff = znd[:-1] - znd[1:]
+    print 'Node depths: ',znd
+    print 'Node weights: ',wgt
+    if min(diff) < 0:
+        print 'ERROR: Node depths must be decreasing!'
+        parser.print_help()
+        sys.exit()
+
+    # Interpolate mask(z) for every z mesh point
+    mask = np.interp( z, np.flip(znd), np.flip(wgt) )
+
+    _write(mask, args.mask_model)
+    print 'DONE'
  
