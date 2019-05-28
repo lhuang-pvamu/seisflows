@@ -96,6 +96,7 @@ def gridsmooth(Z, span):
     F = gauss2(X, Y, mu, sigma)
     F = F/np.sum(F)
     W = np.ones(Z.shape)
+    print "gridsmooth: Data shape= ",Z.shape, " Operator shape= ",F.shape
     Z = _signal.convolve2d(Z, F, 'same')
     W = _signal.convolve2d(W, F, 'same')
     Z = Z/W
