@@ -32,14 +32,10 @@ if __name__ == '__main__':
     mesh = np.array(list(zip(x,y)))
     init_model = _read(args.true_model)
     true_model = _read(args.true_model)
-    print "model shape: ", true_model.shape
     if  args.constant is not None:
         init_model.fill(args.constant)  # set the initial model as 0
     else: 
-        # Apply gaussian filter
-        #sigma = [5]
-        #init_model = sp.ndimage.filters.gaussian_filter(true_model, sigma, mode='constant')
-        # will smooth the true model as the initial model later
+        # Apply 2D gaussian filter
         span = args.span
         print "span: ", span
         init_model = array.meshsmooth(init_model,mesh,span)

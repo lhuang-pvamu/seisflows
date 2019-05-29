@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import argparse
 import os
@@ -42,7 +42,7 @@ def parse_args():
     parser.set_defaults(mesh=False)
 
     parser.add_argument('--cmap',
-        default='seismic',
+        default='gist_rainbow',
         help='colormap scheme')
 
     parser.add_argument('--cmin', 
@@ -63,13 +63,19 @@ def parse_args():
     parser.add_argument('--symmetric',
         dest='symmetric',
         action='store_true',
-        help='colormap symmetry flag')
+        help='use symmetric color limits')
     parser.set_defaults(symmetric=False)
+
+    parser.add_argument('--nozero',
+        dest='nozero',
+        action='store_true',
+        help='exclude zero level')
+    parser.set_defaults(nozero=False)
 
     parser.add_argument('--title',
         type=str,
         default='',
-        help='title')
+        help='title for plot, default is filename')
 
     return parser.parse_args()
 
@@ -87,25 +93,47 @@ if __name__ == '__main__':
     y = _read(args.ycoords)
     v = _read(args.file)
 
-    minval = min(v)
-    maxval = max(v)
+    if args.title=='':
+        args.title = args.file
 
-    msg = '\n%s\nmin, max: %f, %f\n'
-    print msg % (args.file, minval, maxval)
+    # Find data range and magnitude
+    maxval = max(v)
+    minval = min(v)
 
     vrange = maxval - minval
     vmag = max(abs(maxval),abs(minval))
+
+    if args.nozero:
+        minval = min( v[v>vmag*1.e-3] )
+        vmsk = np.ma.array(v,mask=[abs(v)<vmag*1.e-3])
+    else:
+        vmsk = v
+
+    msg = '\n%s data range: (%f, %f)'
+    print msg % (args.file, minval, maxval)
+
     if vmag==0. :
-        print "skipping zero data."
+        print "skipping all-zero data."
         sys.exit()
     if vrange/vmag < 1.e-6 :
         print "skipping constant data."
         sys.exit()
 
+    # set contour limits and levels
+    cmin = minval
+    if args.cmin:
+        cmin = args.cmin
+    cmax = maxval
+    if args.cmax:
+        cmax = args.cmax
+    nlev = 125
+    clevs = np.linspace(cmin,cmax,nlev)
+
     # set figure size and shape
     r = (max(x) - min(x))/(max(y) - min(y))
     rx = r/np.sqrt(1 + r**2)
     ry = 1/np.sqrt(1 + r**2)
+
     if args.mesh:
         f = plt.figure(figsize=(10*rx, 10*ry))
         plt.scatter(x,y,c=v)
@@ -115,17 +143,14 @@ if __name__ == '__main__':
     f = plt.figure(figsize=(10*rx, 10*ry))
 
     # Filled contours of unstructured GLL mesh
-    p = plt.tricontourf(x, y, v, 125, extend='both')
+    p = plt.tricontourf(x, y, vmsk, clevs, cmap=args.cmap, extend='both') 
+    p.cmap.set_under("white")
 
     plt.axis('image')
-
-    # set colormap
-    if args.cmap:
-        p.set_cmap(args.cmap)
+    plt.title(args.title)
 
     # set colormap limits
-    if args.cmin!=None and \
-       args.cmax!=None:
+    if args.cmin and args.cmax:
         assert args.cmin < args.cmax
         p.set_clim([args.cmin, args.cmax])
 
@@ -142,10 +167,7 @@ if __name__ == '__main__':
 
     # optional colorbar
     if args.cbar:
-        cb = plt.colorbar(orientation='horizontal')
-        cb.set_label(args.title)
-    else:
-        plt.title(args.title)
+        cb = plt.colorbar(orientation='horizontal', fraction=0.1)
 
     plt.show()
 

@@ -67,6 +67,8 @@ def get_data_files(dir):
     for file in glob(dir+'/'+'proc000000*.bin*'):
         if 'jacobian' in file or \
            'ibool' in file or \
+           'SDs.bin' in file or \
+           'SDp.bin' in file or \
            'x.bin' in file or \
            'z.bin' in file:
             continue

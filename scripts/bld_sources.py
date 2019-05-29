@@ -6,13 +6,9 @@ import sys
 import re
 import numpy as np
 import scipy.interpolate as _interp
-#import matplotlib.pyplot as plt
 
 from glob import glob
 from os.path import abspath, join
-#from seisflows.tools.graphics import plot_gll
-#from seisflows.plugins.solver_io.fortran_binary import _read
-#from seisflows.tools.tools import exists
 
 pgmDesc = 'Builds multiple specFEM2d source files from template file'
 
