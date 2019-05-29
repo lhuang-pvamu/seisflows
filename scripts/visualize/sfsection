@@ -47,6 +47,10 @@ def parse_args():
         default='1.0',
         help='time axis tick spacing [s]')
 
+    parser.add_argument('-hist', '--histogram', 
+        type=int,
+        help='create histogram using the bin number')
+
     return parser.parse_args()
 
 
@@ -69,7 +73,8 @@ if __name__ == "__main__":
         clip=(100-args.clip),
         title=args.title,
         x_interval=args.x_interval,
-        y_interval=args.y_interval)
+        y_interval=args.y_interval,
+        bin = args.histogram)
 
     plt.show()
 

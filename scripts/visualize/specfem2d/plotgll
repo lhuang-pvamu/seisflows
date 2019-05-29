@@ -107,7 +107,7 @@ if __name__ == '__main__':
     rx = r/np.sqrt(1 + r**2)
     ry = 1/np.sqrt(1 + r**2)
     if args.mesh:
-        f = plt.figure()
+        f = plt.figure(figsize=(10*rx, 10*ry))
         plt.scatter(x,y,c=v)
         plt.colorbar(orientation='vertical')
         plt.draw()

@@ -21,18 +21,20 @@ if __name__ == '__main__':
     parser.add_argument('ycoords', help='y coordinates file')
     parser.add_argument('true_model', help='true model file')
     parser.add_argument('init_model', help='init model file')
-    parser.add_argument('-s','--span', type=int, default=50.0, help='span value')
+    parser.add_argument('-s','--span', type=int, default=51, help='span value')
+    parser.add_argument('-k','--keep', type=int, default=100, help='keep the top layer with a distance (default 100)  as the same as the true model')
     parser.add_argument('-c','--constant', type=int, help='set a constant value')
 
     args = parser.parse_args()
     x = _read(args.xcoords)
     y = _read(args.ycoords)
+    top = max(y)
     mesh = np.array(list(zip(x,y)))
+    init_model = _read(args.true_model)
     true_model = _read(args.true_model)
     print "model shape: ", true_model.shape
     if  args.constant is not None:
-        true_model.fill(args.constant)  # set the initial model as 0
-        _write(true_model, args.init_model)
+        init_model.fill(args.constant)  # set the initial model as 0
     else: 
         # Apply gaussian filter
         #sigma = [5]
@@ -40,7 +42,9 @@ if __name__ == '__main__':
         # will smooth the true model as the initial model later
         span = args.span
         print "span: ", span
-        init_model = array.meshsmooth(true_model,mesh,span)
-        _write(init_model, args.init_model)
-
+        init_model = array.meshsmooth(init_model,mesh,span)
+    for i in range(len(init_model)):
+        if y[i] >= top - args.keep:
+           init_model[i] = true_model[i] 
+    _write(init_model, args.init_model)
  
