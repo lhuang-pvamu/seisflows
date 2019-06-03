@@ -23,124 +23,138 @@ znodes = 5
 #  Create a mesh based on the physical distance/depth and the number of spectral elements (xe, ze)
 #
 def QUAD_mesh(XL, ZL, xe, ze):
-	xbin = XL / xe
-	zbin = ZL / ze
+    xbin = XL / xe
+    zbin = ZL / ze
 
-	x = np.linspace(0, XL, xe+1)
-	z = np.linspace(0, ZL, ze+1)
-	[X, Z] = np.meshgrid(x, z)
+    x = np.linspace(0, XL, xe+1)
+    z = np.linspace(0, ZL, ze+1)
+    [X, Z] = np.meshgrid(x, z)
 
-	mx = []
-	mz = []
-	for i in range(0, ze):  # j=1:NPZ
-		for j in range(0, xe):  # i= 1:NPX
-			# print(k,a1)
-			for k in range(0, znodes):
-				for l in range(0, xnodes):
-					mx.append(X[i, j] + xbin * dist_ratio[l])
-					mz.append(Z[i, j] + zbin * dist_ratio[k])
+    mx = []
+    mz = []
+    for i in range(0, ze):  # j=1:NPZ
+        for j in range(0, xe):  # i= 1:NPX
+            # print(k,a1)
+            for k in range(0, znodes):
+                for l in range(0, xnodes):
+                    mx.append(X[i, j] + xbin * dist_ratio[l])
+                    mz.append(Z[i, j] + zbin * dist_ratio[k])
 
-	return (mz, mx)
+    return (mz, mx)
 
 # create a model with number of layers
 def create_layers(XL, ZL, num):
-	model = np.zeros((ZL, XL))
-	layers = np.random.randint(10, ZL, size=num)
-	layers = np.sort(layers)
-	velocities = np.random.randint(1500, 4500, size=num)
-	velocities = np.sort(velocities)[::-1]
-	print layers, velocities
+    model = np.zeros((ZL, XL))
+    layers = np.random.randint(10, ZL, size=num)
+    layers = np.sort(layers)
+    velocities = np.random.randint(1500, 4500, size=num)
+    velocities = np.sort(velocities)[::-1]
+    print layers, velocities
 
-	model.fill(velocities[0]);
-	for i in range(1,num):
-		model[layers[i-1]:layers[i], :] = velocities[i]
-	model[layers[i]:,:] = velocities[num-1]
-	return model
+    model.fill(velocities[0]);
+    for i in range(1,num):
+        model[layers[i-1]:layers[i], :] = velocities[i]
+    model[layers[i]:,:] = velocities[num-1]
+    return model
 
+def load_model(filename):
+    if (os.path.splitext(filename)[1] == '.npy'):
+        model = np.load(filename)
+    else:
+        model = None
+    return model
 
 if __name__ == '__main__':
-	""" Create an initial model based on a true model
-		For usage information: createInitModel.py --help
-	 """
+    """ Create an initial model based on a true model
+        For usage information: createInitModel.py --help
+     """
 
-	parser = argparse.ArgumentParser()
-	#parser.add_argument('model', help='model file')
-	parser.add_argument('-x','--Xelements', type=int, default=200, 
-			help='enter the total number of spectral elemnents in the x axis')
-	parser.add_argument('-z', '--Zelements', type=int, default=100, 
-						help='enter the total number of spectral elemnents in the z axis')
-	parser.add_argument('-H', '--Distance', type=int, default=9200, 
-						help='enter the physical distance in the x axis')
-	parser.add_argument('-d', '--Depth', type=int, default=3000,
-						help='enter the physical distance in the z axis (depth)')
-	parser.add_argument('-f', '--figure', action='store_true', help='show figures of the generated model')
-	parser.add_argument('outputdir', help='new output directory')
+    parser = argparse.ArgumentParser()
+    #parser.add_argument('model', help='model file')
+    parser.add_argument('-x','--Xelements', type=int, default=200, 
+            help='enter the total number of spectral elemnents in the x axis')
+    parser.add_argument('-z', '--Zelements', type=int, default=100, 
+                        help='enter the total number of spectral elemnents in the z axis')
+    parser.add_argument('-H', '--Distance', type=int, default=9200, 
+                        help='enter the physical distance in the x axis')
+    parser.add_argument('-d', '--Depth', type=int, default=3000,
+                        help='enter the physical distance in the z axis (depth)')
+    parser.add_argument('-l', '--load', 
+                        help='load a file (image or npy) and convert it to a gll model')
+    parser.add_argument('-f', '--figure', action='store_true', help='show figures of the generated model')
+    parser.add_argument('outputdir', help='new output directory')
 
-	args = parser.parse_args()
-	#model = _read(args.model)
+    args = parser.parse_args()
+    #model = _read(args.model)
 
-	# physical size (x,z)
-	distance = float(args.Distance)
-	depth = float(args.Depth)
+    # physical size (x,z)
+    distance = float(args.Distance)
+    depth = float(args.Depth)
 
-	# number of spectral elements (xe, ze)
-	xe = args.Xelements
-	ze = args.Zelements
+    # number of spectral elements (xe, ze)
+    xe = args.Xelements
+    ze = args.Zelements
 
-	# bin size in x an z
-	xbin = distance/xe
-	zbin = depth/ze
+    # bin size in x an z
+    xbin = distance/xe
+    zbin = depth/ze
 
-	print distance, depth, xe, ze, xbin, zbin
+    print distance, depth, xe, ze, xbin, zbin
 
-	(z, x)  = QUAD_mesh(distance, depth, xe, ze)
+    (z, x)  = QUAD_mesh(distance, depth, xe, ze)
 
-	model = create_layers(int(distance/10), int(depth/10), 10)
-	if args.figure:
-		f = plt.figure()
-		plt.imshow(model)
+    if args.load is None:
+        model = create_layers(int(distance/10), int(depth/10), 10)
+        grid_z, grid_x = np.mgrid[0:depth:10, 0:distance:10]
+    else: 
+        model = load_model(args.load)
+        print model.shape
+        s1 = depth/model.shape[0]
+        s2 = distance/model.shape[1]
+        grid_z, grid_x = np.mgrid[depth:0:-s1, distance:0:-s2]
 
-	grid_z, grid_x = np.mgrid[0:depth:10, 0:distance:10]
+    if args.figure:
+        f = plt.figure()
+        plt.imshow(model)
 
+    mesh = np.array(list(zip(z,x)))
+    grid = np.array(list(zip(grid_z.flatten(),grid_x.flatten())))
+    #print mesh
+    #print grid
 
-	mesh = np.array(list(zip(z,x)))
-	grid = np.array(list(zip(grid_z.flatten(),grid_x.flatten())))
-	#print mesh
-	#print grid
+    v = _interp.griddata(grid, model.flatten(), mesh, 'nearest')
 
-	v = _interp.griddata(grid, model.flatten(), mesh, 'nearest')
+    if args.figure:
+        f = plt.figure(figsize=(xe/20, ze/20))
+        plt.scatter(x, z, c=v)
+        plt.colorbar(orientation='vertical')
+        plt.show()
 
-	if args.figure:
-		f = plt.figure(figsize=(xe/20, ze/20))
-		plt.scatter(x, z, c=v)
-		plt.colorbar(orientation='vertical')
-		plt.show()
+    if not os.path.exists(args.outputdir):
+        os.mkdir(args.outputdir)
 
-	if not os.path.exists(args.outputdir):
-		os.mkdir(args.outputdir)
+    mesh = np.array(list(zip(x,z)))
+    init_model = array.meshsmooth(v,mesh,51)
 
-	mesh = np.array(list(zip(x,z)))
-	init_model = array.meshsmooth(v,mesh,51)
+    model_dir = os.path.join(args.outputdir, "model_true")
+    print "model dir: ", model_dir
+    if not os.path.exists(model_dir):
+        os.mkdir(model_dir)
+    _write(v, os.path.join(model_dir, "proc000000_vp.bin"))
+    _write(x, os.path.join(model_dir, "proc000000_x.bin"))
+    _write(z, os.path.join(model_dir, "proc000000_z.bin"))
+    v.fill(0)
+    _write(v, os.path.join(model_dir, "proc000000_vs.bin"))
+    v.fill(2500)
+    _write(v, os.path.join(model_dir, "proc000000_rho.bin"))
 
-	model_dir = os.path.join(args.outputdir, "model_true")
-	print "model dir: ", model_dir
-	if not os.path.exists(model_dir):
-		os.mkdir(model_dir)
-	_write(v, os.path.join(model_dir, "proc000000_vp.bin"))
-	_write(x, os.path.join(model_dir, "proc000000_x.bin"))
-	_write(z, os.path.join(model_dir, "proc000000_z.bin"))
-	v.fill(0)
-	_write(v, os.path.join(model_dir, "proc000000_vs.bin"))
-	v.fill(2500)
-	_write(v, os.path.join(model_dir, "proc000000_rho.bin"))
-
-	model_dir = os.path.join(args.outputdir, "model_init")
-	if not os.path.exists(model_dir):
-		os.mkdir(model_dir)
-	_write(init_model, os.path.join(model_dir, "proc000000_vp.bin"))
-	_write(x, os.path.join(model_dir, "proc000000_x.bin"))
-	_write(z, os.path.join(model_dir, "proc000000_z.bin"))
-	v.fill(0)
-	_write(v, os.path.join(model_dir, "proc000000_vs.bin"))
-	v.fill(2500)
-	_write(v, os.path.join(model_dir, "proc000000_rho.bin"))
+    model_dir = os.path.join(args.outputdir, "model_init")
+    if not os.path.exists(model_dir):
+        os.mkdir(model_dir)
+    _write(init_model, os.path.join(model_dir, "proc000000_vp.bin"))
+    _write(x, os.path.join(model_dir, "proc000000_x.bin"))
+    _write(z, os.path.join(model_dir, "proc000000_z.bin"))
+    v.fill(0)
+    _write(v, os.path.join(model_dir, "proc000000_vs.bin"))
+    v.fill(2500)
+    _write(v, os.path.join(model_dir, "proc000000_rho.bin"))
