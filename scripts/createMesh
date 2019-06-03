@@ -1,4 +1,4 @@
-#!/usr/bin/env pythonw
+#!/usr/bin/env python
 # __author__ = 'Lei Huang'
 
 import argparse
@@ -57,6 +57,12 @@ def create_layers(XL, ZL, num):
     model[layers[i]:,:] = velocities[num-1]
     return model
 
+def load_model(filename):
+    if (os.path.splitext(filename)[1] == '.npy'):
+        model = np.load(filename)
+    else:
+        model = None
+    return model
 
 if __name__ == '__main__':
     """ Create an initial model based on a true model
@@ -65,13 +71,17 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     #parser.add_argument('model', help='model file')
-    parser.add_argument('-x','--Xelements', type=int, help='enter the total number of spectral elemnents in the x axis')
-    parser.add_argument('-z', '--Zelements', type=int,
+    parser.add_argument('-x','--Xelements', type=int, default=200, 
+            help='enter the total number of spectral elemnents in the x axis')
+    parser.add_argument('-z', '--Zelements', type=int, default=100, 
                         help='enter the total number of spectral elemnents in the z axis')
-    parser.add_argument('-H', '--Distance', type=int,
+    parser.add_argument('-H', '--Distance', type=int, default=9200, 
                         help='enter the physical distance in the x axis')
-    parser.add_argument('-d', '--Depth', type=int,
+    parser.add_argument('-d', '--Depth', type=int, default=3000,
                         help='enter the physical distance in the z axis (depth)')
+    parser.add_argument('-l', '--load', 
+                        help='load a file (image or npy) and convert it to a gll model')
+    parser.add_argument('-f', '--figure', action='store_true', help='show figures of the generated model')
     parser.add_argument('outputdir', help='new output directory')
 
     args = parser.parse_args()
@@ -93,25 +103,58 @@ if __name__ == '__main__':
 
     (z, x)  = QUAD_mesh(distance, depth, xe, ze)
 
-    model = create_layers(int(distance), int(depth), 10)
-    f = plt.figure()
-    plt.imshow(model)
+    if args.load is None:
+        model = create_layers(int(distance/10), int(depth/10), 10)
+        grid_z, grid_x = np.mgrid[0:depth:10, 0:distance:10]
+    else: 
+        model = load_model(args.load)
+        print model.shape
+        s1 = depth/model.shape[0]
+        s2 = distance/model.shape[1]
+        grid_z, grid_x = np.mgrid[depth:0:-s1, distance:0:-s2]
 
-    grid_z, grid_x = np.mgrid[0:depth, 0:distance]
-
+    if args.figure:
+        f = plt.figure()
+        plt.imshow(model)
 
     mesh = np.array(list(zip(z,x)))
     grid = np.array(list(zip(grid_z.flatten(),grid_x.flatten())))
+    #print mesh
+    #print grid
 
     v = _interp.griddata(grid, model.flatten(), mesh, 'nearest')
 
-    f = plt.figure(figsize=(xe/10, ze/10))
-    plt.scatter(x, z, c=v)
-    plt.colorbar(orientation='vertical')
-    plt.show()
+    if args.figure:
+        f = plt.figure(figsize=(xe/20, ze/20))
+        plt.scatter(x, z, c=v)
+        plt.colorbar(orientation='vertical')
+        plt.show()
 
     if not os.path.exists(args.outputdir):
         os.mkdir(args.outputdir)
-    _write(v, os.path.join(args.outputdir, "vp.bin"))
-    _write(x, os.path.join(args.outputdir, "x.bin"))
-    _write(z, os.path.join(args.outputdir, "z.bin"))
+
+    mesh = np.array(list(zip(x,z)))
+    init_model = array.meshsmooth(v,mesh,51)
+
+    model_dir = os.path.join(args.outputdir, "model_true")
+    print "model dir: ", model_dir
+    if not os.path.exists(model_dir):
+        os.mkdir(model_dir)
+    _write(v, os.path.join(model_dir, "proc000000_vp.bin"))
+    _write(x, os.path.join(model_dir, "proc000000_x.bin"))
+    _write(z, os.path.join(model_dir, "proc000000_z.bin"))
+    v.fill(0)
+    _write(v, os.path.join(model_dir, "proc000000_vs.bin"))
+    v.fill(2500)
+    _write(v, os.path.join(model_dir, "proc000000_rho.bin"))
+
+    model_dir = os.path.join(args.outputdir, "model_init")
+    if not os.path.exists(model_dir):
+        os.mkdir(model_dir)
+    _write(init_model, os.path.join(model_dir, "proc000000_vp.bin"))
+    _write(x, os.path.join(model_dir, "proc000000_x.bin"))
+    _write(z, os.path.join(model_dir, "proc000000_z.bin"))
+    v.fill(0)
+    _write(v, os.path.join(model_dir, "proc000000_vs.bin"))
+    v.fill(2500)
+    _write(v, os.path.join(model_dir, "proc000000_rho.bin"))

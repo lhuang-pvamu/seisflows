@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 import os
+import glob2
+import argparse
+from seisflows.tools.writegll import gll2npy
 
 def convert_file(file1, file2, file3):
     os.system("writegll " + file1 + " " + file2 + " " + file3)
@@ -19,8 +22,35 @@ def convert_files(output_directory):
     convert_file(x_vals, z_vals, gradient_output)
     convert_file(x_vals, z_vals, model_output)
 
-root_dir = "/data/seis/VelocityModels_v1/"
-for filename in os.listdir(root_dir):
-    print "converting " + str(root_dir + filename)
-    convert_files(root_dir + filename)
+
+if __name__ == '__main__':
+	""" Create npy files for a given directory containing gll models
+		For usage information: createInitModel.py --help
+	 """
+
+	parser = argparse.ArgumentParser()
+	#parser.add_argument('model', help='model file')
+	parser.add_argument('-d','--directory', 
+			help='enter the directory of input models')
+	parser.add_argument('-r', '--remove', action='store_true', help='remove existing npy files')
+
+	args = parser.parse_args()
+
+	root_dir = args.directory
+	if args.remove:
+		existing_files = glob2.glob(root_dir+'/**/*.npy')
+		for filename in existing_files:
+			os.remove(filename)
+	all_files = glob2.glob(root_dir+'/**/*.bin')
+	#for filename in os.listdir(root_dir):
+	for filename in all_files:
+		if("0000_x" in filename or "0000_z" in filename): #skip coordinate files
+			continue
+		if("0000_vs" in filename or "0000_rho" in filename): #skip vs and rho files
+			continue
+		print "converting " + str(filename)
+		head,tail=os.path.split(filename)
+		x_coord = head+"/../model_true/proc000000_x.bin"
+		z_coord = head+"/../model_true/proc000000_z.bin"
+		gll2npy(x_coord, z_coord, filename)
 
