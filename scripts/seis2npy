@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+# __author__ = 'Ted Clee'
+
+import argparse
+import os
+
+from obspy import read
+import numpy as np
+
+pgmDesc = 'Convert 2D seismic profile from SEGY or SU format to Numpy npy format'
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='%(prog)s -- '+pgmDesc)
+
+    # input file arguments
+    parser.add_argument('file',
+        help='filename/data source')
+
+    parser.add_argument('-f', '--format',
+        help='data format')
+
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+
+    args = parse_args()
+
+    # Manage the filenames
+    fbase = os.path.basename(args.file)
+    fbase, fext = os.path.splitext(fbase)
+    ofile = fbase+'.npy'
+
+    if args.format:
+        infmt = '.'+args.format
+    else:
+        infmt = fext
+
+    # Read the seismic profile traces
+    if infmt in ['.SU', '.su']:
+        stream = read(args.file, format='SU', byteorder='<')
+    else:
+        stream = read(args.file, format='SEGY')
+
+    # Create and fill the array
+    nx = len(stream)
+    nz = len(stream[0])
+    arr = np.zeros((nz,nx),dtype=float,order='F')
+    for itr in range(nx):
+        arr[:,itr] = stream[itr].data[:]
+
+    # Output array to file
+    # print arr
+
+    print 'Writing %d X %d Numpy array:'%(nz,nx), ofile
+    np.save(ofile,arr)
+
+
