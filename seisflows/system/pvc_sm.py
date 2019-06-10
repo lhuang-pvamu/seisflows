@@ -50,6 +50,10 @@ class pvc_sm(custom_import('system', 'base')):
         if 'NPROC' not in PAR:
             raise ParameterError(PAR, 'NPROC')
 
+        # number of tasks per node
+        if 'CORES_PER_NODE' not in PAR:
+            setattr(PAR, 'CORES_PER_NODE', 12)
+
         # how to invoke executables
         if 'MPIEXEC' not in PAR:
             setattr(PAR, 'MPIEXEC', '')
@@ -99,13 +103,18 @@ class pvc_sm(custom_import('system', 'base')):
 
         workflow.checkpoint()
 
+        TASKS_PER_NODE = PAR.CORES_PER_NODE / PAR.NPROC
+        #OMP_NT = os.getenv('OMP_NUM_THREADS')
+        os.environ['OMP_NUM_THREADS'] = str(PAR.NPROC)
+
         # submit workflow
         print('sbatch '
                 + '%s ' %  PAR.SLURMARGS
+                + '--exclusive ' 
                 + '--job-name=%s '%PAR.TITLE
                 + '--output=%s '%(PATH.WORKDIR +'/'+ 'output.log')
                 + '--cpus-per-task=%d '%PAR.NPROC
-                + '--ntasks-per-core=1 '
+                + '--ntasks-per-node=%d '%TASKS_PER_NODE
                 + '--ntasks=%d '%PAR.NTASK
                 + '--time=%d '%PAR.WALLTIME
                 + '%s ' % join(findpath('seisflows.system'), 'wrappers/submit')
@@ -113,10 +122,11 @@ class pvc_sm(custom_import('system', 'base')):
         
         call('sbatch '
                 + '%s ' %  PAR.SLURMARGS
+                + '--exclusive ' 
                 + '--job-name=%s '%PAR.TITLE
                 + '--output=%s '%(PATH.WORKDIR +'/'+ 'output.log')
                 + '--cpus-per-task=%d '%PAR.NPROC
-                + '--ntasks-per-core=1 '
+                + '--ntasks-per-node=%d '%TASKS_PER_NODE
                 + '--ntasks=%d '%PAR.NTASK
                 + '--time=%d '%PAR.WALLTIME
                 + '%s ' % join(findpath('seisflows.system'), 'wrappers/submit')
