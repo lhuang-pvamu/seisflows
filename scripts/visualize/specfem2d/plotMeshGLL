@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+# __author__ = 'Ted Clee'
+
+import argparse
+import os
+#import sys
+import numpy as np
+import matplotlib.pyplot as plt
+
+#from glob import glob
+#from os.path import abspath, join
+from seisflows.plugins.solver_io.fortran_binary import _read
+
+pgmDesc = 'Plot the points of an unstructured 2D GLL mesh'
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='%(prog)s -- '+pgmDesc)
+
+    # required input file arguments
+    parser.add_argument('xcoords',
+        help='x coordinates file')
+
+    parser.add_argument('zcoords',
+        help='z coordinates file')
+
+    # optional formatting arguments
+    parser.add_argument('-l','--line',
+        dest='line',
+        action='store_true',
+        help='draw a line between sequential points')
+    parser.set_defaults(mesh=False)
+
+    parser.add_argument('-t','--title',
+        type=str,
+        default='GLL mesh points',
+        help='title for plot')
+
+    return parser.parse_args()
+
+if __name__ == '__main__':
+    """ Plot the points of an unstructured 2D GLL mesh
+    """
+    args = parse_args()
+
+    x = _read(args.xcoords)
+    z = _read(args.zcoords)
+    print 'X len:',len(x)
+    nv = len(x)
+
+    # set figure size and shape
+    r = (max(x) - min(x))/(max(z) - min(z))
+    rx = r/np.sqrt(1 + r**2)
+    rz = 1/np.sqrt(1 + r**2)
+
+    fmt = 'b+'
+    if args.line:
+        fmt = 'b+-'
+
+    f = plt.figure(figsize=(10*rx, 10*rz))
+    plt.plot(x,z,fmt)
+    plt.title(args.title)
+    plt.draw()
+
+    plt.show()
+

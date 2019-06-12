@@ -1,0 +1,354 @@
+#!/usr/bin/env python
+# __author__ = 'Ted Clee'
+
+import argparse
+import os
+import sys
+import numpy as np
+import scipy as sp
+import scipy.ndimage
+import matplotlib.pyplot as plt
+
+from glob import glob
+from seisflows.plugins.solver_io.fortran_binary import _read, _write
+from seisflows.tools import array
+import scipy.interpolate as _interp
+
+
+pgmDesc = 'Unstructured 2D mesh for specFEM2d simulation, adapted for improved sampling density'
+
+def parseArgs():
+   
+    # Set up the run by parsing arguments
+    note = '''NOTE: The output GLL mesh is tuned for use with given frequency and velocity grid. 
+    Gridded input property files must have same dimensions. 
+    Currently, only "npy" input format is supported.
+    '''
+    ap = argparse.ArgumentParser( description='%(prog)s -- '+pgmDesc, epilog=note )
+
+    ap.add_argument( 'outputdir', 
+        help='directory for new mesh model files.')
+    
+    ap.add_argument('-X','--xdim', type=float,
+        help='Horizontal dimension of model (meters).')
+    
+    ap.add_argument('-Z','--zdim', type=float,
+        help='Vertical dimension of model (meters).')
+
+    ap.add_argument('-f','--freq', type=float, 
+        help='Maximum source frequency (hz).')
+
+    ap.add_argument('-e','--elemSize', type=float,
+        help='Nominal element size (m); default determined from minimum wavelength.')
+
+    ap.add_argument('-p','--pVel',
+        help='File (image or npy format) containing grid of P-velocity values (m/sec).')
+
+    ap.add_argument('-s','--sVel',
+        help='File (image or npy format) containing S-velocity values (for elastic propagation). NOT IMPLEMENTED')
+
+    ap.add_argument('-d','--density', default='2500.',
+        help='File (or constant value in kg/m3) specifying density values. DENSITY FILE NOT IMPLEMENTED')
+
+    ap.add_argument('-m','--meshPlot', action='store_true',
+        help='Show plots of the generated model.')
+
+    return ap.parse_args()
+
+# a spectral element contains 5x5 GLL nodes
+NGLLX = 5
+NGLLZ = 5
+
+class QuadMesh(object):
+    ''' Unstructured 2D quadrilateral spectral element mesh
+    '''
+    Xdim = None 	# Mesh X-dimension, meters
+    Zdim = None 	# Mesh Z-dimension, meters
+    freq = None 	# Maximum frequency resolved, Hz
+    Nex = None 		# Number of spectral elements in X direction
+    Nez = None 		# Number of spectral elements in Z direction
+    Nelt = None 	# Number of spectral elements (Nex X Nez)
+    Xm = None 		# X-coordinates of element vertices
+    Zm = None 		# Z-coordinates of element vertices
+
+    def __init__(self, freq):
+      self.freq = freq
+
+    def rectMesh(self, Xdim, Zdim, Nex, Nez):
+      ''' Create a rectangular spectral element mesh (without GLL points)
+      '''
+      self.Xdim = Xdim
+      self.Zdim = Zdim
+      self.Nex = Nex
+      self.Nez = Nez
+      x = np.linspace(0., Xdim, Nex+1)
+      z = np.linspace(-Zdim, 0., Nez+1)
+      [self.Xm,self.Zm] = np.meshgrid(x, z)
+      return (self.Zm,self.Xm)
+
+    def gllMesh(self):
+        ''' Fill in the (Zm,Xm) mesh with GLL points
+        '''
+        GLLcoefs=[0.0, 0.1726732, 0.5, 0.8273268, 1.0]
+
+        Ngll = (self.Nex*NGLLX)*(self.Nez*NGLLZ)
+
+        mgx = np.zeros(Ngll)
+        mgz = np.zeros(Ngll)
+        # Set GLL point coordinates within each spectral element
+        j = 0  # index thru GLL points
+        for k in range(0, self.Nez):  
+          for i in range(0, self.Nex): 
+            x1 = self.Xm[k,i]
+            x2 = self.Xm[k,i+1]
+            x3 = self.Xm[k+1,i+1]
+            x4 = self.Xm[k+1,i]
+            z1 = self.Zm[k,i]
+            z2 = self.Zm[k,i+1]
+            z3 = self.Zm[k+1,i+1]
+            z4 = self.Zm[k+1,i]
+            for kg in range(0, NGLLZ):
+                xb = x1 + GLLcoefs[kg]*(x4-x1)
+                xe = x2 + GLLcoefs[kg]*(x3-x2)
+                zb = z1 + GLLcoefs[kg]*(z4-z1)
+                ze = z2 + GLLcoefs[kg]*(z3-z2)
+                for ig in range(0, NGLLX):
+                    mgx[j] = xb + GLLcoefs[ig]*(xe-xb)
+                    mgz[j] = zb + GLLcoefs[ig]*(ze-zb)
+                    j += 1
+        return (mgz, mgx)
+
+    def drawQuads(self):
+      ''' Draw the quadrilateral outline of each spectral element
+      '''
+      for i in range(0,self.Nex):
+        for k in range(0,self.Nez):
+          x = (self.Xm[k+1,i],self.Xm[k+1,i+1],self.Xm[k,i+1],self.Xm[k,i],self.Xm[k+1,i])
+          z = (self.Zm[k+1,i],self.Zm[k+1,i+1],self.Zm[k,i+1],self.Zm[k,i],self.Zm[k+1,i])
+          plt.plot(x,z,'b')
+
+    def meshDerivZ(self, vals):
+      ''' Vertical derivative of values at each mesh vertex
+      '''
+      dv = np.zeros( vals.shape )
+      dv[1:,:] = np.diff(vals,axis=0)
+      dv[0, :] = dv[1,:]
+      dz = np.zeros( vals.shape )
+      dz[1:,:] = -np.diff(self.Zm,axis=0)
+      dz[0, :] = dz[1,:]
+
+      return np.divide(dv,dz)
+
+    def samplingDensityZ(self, Vp):
+      ''' Vertical sampling density at each mesh vertex
+      '''
+      dz = np.zeros( Vp.shape )
+      dz[1:,:] = -np.diff(self.Zm,axis=0)
+      dz[0, :] = dz[1,:]
+
+      return NGLLZ/self.freq * np.divide(Vp, dz)
+
+    def adjustZ(self, Vp):
+      ''' Adjust mesh Z-coordinates, 
+          fining near velocity contrast, preserving sampling density
+      '''
+      sdMin = 5.5
+      sdIn = self.samplingDensityZ( Vp )
+      dVp = self.meshDerivZ( Vp )
+      for i in range(0,Nex+1):
+        # Stretch each Z-column
+        dzIn = np.zeros(Nez+1)
+        dzIn[1:] = -np.diff(self.Zm[:,i])
+        dVabs = np.abs(dVp[:,i])
+        dVmean = np.mean( dVabs )
+        dVmax = np.max( dVabs )
+        strContrast = 1. - (dVabs-dVmean) / dVmax
+        strSampDens = sdIn[:,i] / sdMin
+        stretch = np.clip( 0.5*(strSampDens + strContrast), 0.5, 2.0)
+        stretch[0] = 1.
+        dzStr = np.multiply(dzIn, stretch)
+        totStr = np.sum( dzStr )
+        adjStr = totStr / (self.Zm[0,i]-self.Zm[-1,i])
+        dzStr = dzStr / adjStr
+        Znew = self.Zm[0,i] - np.cumsum(dzStr)
+        self.Zm[:-1,i] = Znew[:-1]
+        '''
+        print 'dzIn:',dzIn
+        print 'strContrast:',strContrast
+        print 'strSampDens: ',strSampDens
+        print 'stretch: ',stretch
+        print 'dzStr:',dzStr, ' sum=',np.sum( dzStr )
+        print 'Znew: ',Znew
+        '''
+    
+# end class QuadMesh
+
+#  Create a mesh based on the physical distance/depth and the number of spectral elements (xe, ze)
+#
+
+if __name__ == '__main__':
+    """ Unstructured 2D mesh for specFEM2d simulation, adapted for improved sampling density
+    """
+
+    args = parseArgs()
+    X = args.xdim
+    Z = args.zdim
+
+    # Read velocity file(s) 
+    Vpgrid = np.load(args.pVel)
+    nzg = Vpgrid.shape[0]
+    nxg = Vpgrid.shape[1]
+    dzg = Z / (nzg-1)
+    dxg = X / (nxg-1)
+    '''
+    # Test subset: some gridpoints each side of center
+    wid = 300
+    X = dxg * wid
+    xctr = nxg/2 + 1
+    Vpgnew = Vpgrid[:,xctr-wid/2:xctr+1+wid/2]
+    Vpgrid = Vpgnew
+    nzg = Vpgrid.shape[0]
+    nxg = Vpgrid.shape[1]
+    dzg = Z / (nzg-1)
+    dxg = X / (nxg-1)
+    '''
+    print 'Vpgrid shape (nzg X nxg): %d X %d, size: %g X %g meters, cells (dzg X dxg): %g X %g'% \
+        (nzg,nxg, Z,X, dzg,dxg)
+    xg = np.linspace(0,X,nxg)
+    zg = np.linspace(0,-Z,nzg)
+    grid_x, grid_z = np.meshgrid( xg, zg )
+
+    # Set element size from (assumed) slowest velocity, across top of model
+    Vptop = np.mean(Vpgrid[0][:])
+    SDpmin = 5.5
+    elsize = NGLLX * Vptop / (args.freq * SDpmin)
+
+    # number of spectral elements (xe, ze)
+    Nex = int(round(X / elsize))
+    Nez = int(round(Z / elsize))
+
+    # element size in x and z
+    elx = X / Nex
+    elz = Z / Nez
+    print 'Rectangular mesh for Freq= %g hz, Vptop= %g m/s: elements %d X %d, elz= %g, elx= %g'% \
+        (args.freq, Vptop, Nez, Nex, elz,elx)
+
+    # Smooth gridded velocities to match mesh resolution
+    gwin = elz / dzg
+    print 'Gaussian smoother sigma=',gwin
+    Vpsmooth = sp.ndimage.gaussian_filter(Vpgrid, gwin, mode='nearest')
+
+    # Show the gridded velocities
+    if args.meshPlot:
+        f = plt.figure()
+        plt.imshow(Vpgrid, extent=[0.,X, -Z, 0.])
+        plt.colorbar(orientation='vertical')
+        plt.title('Vpgrid')
+
+        f = plt.figure()
+        plt.imshow(Vpsmooth, extent=[0.,X, -Z, 0.])
+        plt.colorbar(orientation='vertical')
+        plt.title('Vpsmooth')
+        #plt.show()
+
+    # Set up the quadrilateral mesher    
+    qm = QuadMesh(args.freq)
+
+    (zmesh, xmesh) = qm.rectMesh(X, Z, Nex, Nez)
+
+    vmesh = _interp.interpn( (np.flipud(zg),xg), np.flipud(Vpsmooth), (zmesh,xmesh), method='linear' )
+
+    dVp = qm.meshDerivZ(vmesh)
+    SDmesh = qm.samplingDensityZ( vmesh)
+
+    if args.meshPlot:
+        print 'Generating unadjusted plots ...'
+        
+        f = plt.figure(figsize=(Nex/10, Nez/10))
+        qm.drawQuads()
+        plt.title('Uniform spectral elements')
+        plt.axis('image')
+        
+        f = plt.figure(figsize=(Nex/10, Nez/10))
+        plt.tricontourf(xmesh.flatten(), zmesh.flatten(), vmesh.flatten(), 125, extend='both')
+        plt.title('Uniform Vpmesh')
+        plt.colorbar(orientation='vertical')
+        plt.axis('image')
+        '''
+        f = plt.figure(figsize=(Nex/10, Nez/10))
+        plt.tricontourf(xmesh.flatten(), zmesh.flatten(), dVp.flatten(), 125, extend='both')
+        plt.colorbar(orientation='vertical')
+        plt.title('Uniform dV/dZ')
+        plt.axis('image')
+        '''
+        f = plt.figure(figsize=(Nex/10, Nez/10))
+        plt.tricontourf(xmesh.flatten(), zmesh.flatten(), SDmesh.flatten(), 125, extend='both')
+        plt.colorbar(orientation='vertical')
+        plt.title('Unadjusted Sampling Density')
+        plt.axis('image')
+ 
+    # Adjust the mesh
+    qm.adjustZ(vmesh)
+
+    vmesh = _interp.interpn( (np.flipud(zg),xg), np.flipud(Vpsmooth), (qm.Zm,xmesh), method='linear' )
+
+    dVp = qm.meshDerivZ(vmesh)
+    SDmesh = qm.samplingDensityZ( vmesh )
+
+    if args.meshPlot:
+        print 'Generating adjusted plots ...'
+        
+        f = plt.figure(figsize=(Nex/10, Nez/10))
+        qm.drawQuads()
+        plt.title('Adjusted spectral elements')
+        plt.axis('image')
+        
+        f = plt.figure(figsize=(Nex/10, Nez/10))
+        plt.tricontourf(xmesh.flatten(), zmesh.flatten(), vmesh.flatten(), 125, extend='both')
+        plt.title('Adjusted Vpmesh')
+        plt.colorbar(orientation='vertical')
+        plt.axis('image')
+        '''
+        f = plt.figure(figsize=(Nex/10, Nez/10))
+        plt.tricontourf(xmesh.flatten(), zmesh.flatten(), dVp.flatten(), 125, extend='both')
+        plt.colorbar(orientation='vertical')
+        plt.title('Adjusted dV/dZ')
+        plt.axis('image')
+        '''
+        f = plt.figure(figsize=(Nex/10, Nez/10))
+        plt.tricontourf(xmesh.flatten(), zmesh.flatten(), SDmesh.flatten(), 125, extend='both')
+        plt.colorbar(orientation='vertical')
+        plt.title('Adjusted sampling Density')
+        plt.axis('image')
+ 
+        plt.show()
+
+    # Re-smooth gridded velocities to match finer GLL mesh resolution
+    gwin = elz / (NGLLX * dzg)
+    print 'GLL mesh Gaussian smoother sigma=',gwin
+    if gwin > 1.0 :
+        Vpsmooth = sp.ndimage.gaussian_filter(Vpgrid, gwin, mode='nearest')
+    else:
+        Vpsmooth = Vpgrid
+ 
+    # Interpolate the GLL mesh
+    (zmesh, xmesh) = qm.gllMesh()
+
+    vmesh = _interp.interpn( (np.flipud(zg),xg), np.flipud(Vpsmooth), (zmesh,xmesh), method='linear' )
+
+    # Write the adjusted model
+    model_dir = args.outputdir
+    if not os.path.exists(model_dir):
+        os.mkdir(model_dir)
+
+    print "Directory for adjusted model files: ", model_dir
+    _write(vmesh, os.path.join(model_dir, "proc000000_vp.bin"))
+    _write(xmesh, os.path.join(model_dir, "proc000000_x.bin"))
+    _write(zmesh, os.path.join(model_dir, "proc000000_z.bin"))
+    # Dummy Vs and density
+    vmesh.fill(0.)
+    _write(vmesh, os.path.join(model_dir, "proc000000_vs.bin"))
+    vmesh.fill(args.density)
+    _write(vmesh, os.path.join(model_dir, "proc000000_rho.bin"))
+
+
