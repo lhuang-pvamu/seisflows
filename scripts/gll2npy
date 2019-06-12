@@ -5,93 +5,58 @@ import os
 import sys
 import numpy as np
 import scipy.interpolate as _interp
-#import matplotlib.pyplot as plt
 
-from glob import glob
 from os.path import abspath, join
-#from seisflows.tools.graphics import plot_gll
 from seisflows.plugins.solver_io.fortran_binary import _read
-#from seisflows.tools.tools import exists
 
-
+pgmDesc = 'Convert values on unstructured 2D GLL mesh file to .npy numpy array file'
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='converts SPECFEM2D model or kernels to numpy array')
+        description='%(prog)s -- '+pgmDesc)
 
     # required input file arguments
     parser.add_argument('xcoords',
         help='x coordinates file')
 
-    parser.add_argument('ycoords',
-        help='y coordinates file')
+    parser.add_argument('zcoords',
+        help='z coordinates file')
 
-    parser.add_argument('file',
-        help='database file')
+    parser.add_argument('values',
+        help='values file, GLL format')
 
-#    # optional formatting arguments
-#    parser.add_argument('--cbar',
-#        dest='cbar',
-#        action='store_true',
-#        help='display colorbar')
-#    parser.set_defaults(cbar=False)
-
-#    parser.add_argument('--cmap',
-#        default='seismic',
-#        help='colormap scheme')
-
-#    parser.add_argument('--cmin', 
-#        type=float,
-#        default=None,
-#        help='colormap min')
-
-#    parser.add_argument('--cmax', 
-#        type=float,
-#        default=None,
-#        help='colormap max')
-
-#    parser.add_argument('--saturation',
-#        type=float,
-#        default=1.,
-#        help='colormap saturation factor')
-
-#    parser.add_argument('--symmetric',
-#        dest='symmetric',
-#        action='store_true',
-#        help='colormap symmetry flag')
-#    parser.set_defaults(symmetric=False)
-
-#    parser.add_argument('--title',
-#        type=str,
-#        default='',
-#        help='title')
+    # optional formatting arguments
+    parser.add_argument('-d','--dxz',
+        dest='dxz', type=float,
+        help='grid cell size (m); default taken from model dimensions')
 
     return parser.parse_args()
 
-def gll2npy(xcoords, ycoords, filename):
+def gll2npy(args):
 
-    x = _read(xcoords)
-    y = _read(ycoords)
-    v = _read(filename)
+    x = _read(args.xcoords)
+    y = _read(args.zcoords)
+    v = _read(args.values)
 
     minval = min(v)
     maxval = max(v)
 
     mesh = np.array(list(zip(x,y)))
-    msg = '\n%s\nmin, max: %f, %f\n'
-    print msg % (filename, minval, maxval)
-
-    #SSx = (x[25]-x[0])/5.0
-    #SSy = y[5]-y[0]
+    msg = '\n%s\nmin, max: %g, %g\n'
+    print msg % (args.values, minval, maxval)
     
     nn = len(x)
     lx = max(x)-min(x)
     ly = max(y)-min(y)
 
-    nx = int(np.around(np.sqrt(nn*lx/ly)))
-    ny = int(np.around(np.sqrt(nn*ly/lx)))
+    if args.dxz:
+        nx = 1 + int(np.around( lx/args.dxz ))
+        ny = 1 + int(np.around( ly/args.dxz ))
+    else:
+        nx = 1 + int(np.around(np.sqrt(nn*lx/ly)))
+        ny = 1 + int(np.around(np.sqrt(nn*ly/lx)))
 
-    print "Size = " + str(nx) + ", " + str(ny)
+    print "Output array (x,z) size: %d X %d "%(nx,ny) 
 
     # construct structured grid
     x2 = np.linspace(x.min(), x.max(), nx)
@@ -110,15 +75,14 @@ def gll2npy(xcoords, ycoords, filename):
     V = np.reshape(V,(ny, nx))
     V = np.flip(V,0)
 
-    new_name = filename+ ".npy"
-    np.save(new_name, V)
+    fbase = os.path.basename(args.values)
+    fbase, fext = os.path.splitext(fbase)
+    ofile = fbase+'.npy'
+
+    np.save(ofile, V)
 
 if __name__ == '__main__':
-    """ Converts GLL model read from SPECFEM2D Fortran binary file to numpy array
-
-        For usage information: writegll --help
+    """ Convert values on unstructured 2D GLL mesh file to .npy numpy array file
     """
+    gll2npy( parse_args() )
 
-    args = parse_args()
-
-    gll2npy(args.xcoords, args.ycoords, args.file)

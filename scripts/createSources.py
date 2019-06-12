@@ -37,7 +37,7 @@ Will be written if --nsources option is supplied.')
 
     ap.add_argument('-f','--freq',
         type=float, 
-        help='Number of sources to create.')
+        help='Peak frequency f0 (Hz) of source waveform.')
 
     ap.add_argument('-b','--begin',
         type=float, nargs=2, metavar=('xbgn','zbgn'),

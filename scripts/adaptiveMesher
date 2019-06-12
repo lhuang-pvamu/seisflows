@@ -183,9 +183,6 @@ class QuadMesh(object):
     
 # end class QuadMesh
 
-#  Create a mesh based on the physical distance/depth and the number of spectral elements (xe, ze)
-#
-
 if __name__ == '__main__':
     """ Unstructured 2D mesh for specFEM2d simulation, adapted for improved sampling density
     """
@@ -221,7 +218,10 @@ if __name__ == '__main__':
     # Set element size from (assumed) slowest velocity, across top of model
     Vptop = np.mean(Vpgrid[0][:])
     SDpmin = 5.5
-    elsize = NGLLX * Vptop / (args.freq * SDpmin)
+    if args.elemSize:
+        elsize = args.elemSize
+    else:
+        elsize = NGLLX * Vptop / (args.freq * SDpmin)
 
     # number of spectral elements (xe, ze)
     Nex = int(round(X / elsize))
