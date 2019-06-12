@@ -3,12 +3,8 @@
 
 import argparse
 import os
-#import sys
 import numpy as np
 import matplotlib.pyplot as plt
-
-#from glob import glob
-#from os.path import abspath, join
 from seisflows.plugins.solver_io.fortran_binary import _read
 
 pgmDesc = 'Plot the points of an unstructured 2D GLL mesh'
