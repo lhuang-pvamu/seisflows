@@ -12,35 +12,81 @@ from seisflows.plugins.solver_io.fortran_binary import _read, _write
 from seisflows.tools import array
 
 if __name__ == '__main__':
-    """ Create an initial model based on a true model
-        For usage information: createInitModel.py --help
-     """
-
-    parser = argparse.ArgumentParser()
+    """ Create an initial model, optionally based on a true model
+    """
+    pgmDesc='Create an initial model, optionally based on a true model'
+    note = '''NOTE: The output model file is to be placed in the directory given by the Seisflows
+    MODEL_INIT path variable.  
+    The --nodes parameter(s) defines a vertical profile val(z) as a list of (z,val) nodes,
+    with values being linearly interpolated between the given nodes.  First and last nodes 
+    are extended to top and bottom of model by constant extrapolation.
+    '''
+    parser = argparse.ArgumentParser(description='%(prog)s -- '+pgmDesc, epilog=note)
     parser.add_argument('xcoords', help='x coordinates file')
-    parser.add_argument('ycoords', help='y coordinates file')
+    parser.add_argument('zcoords', help='z coordinates file')
     parser.add_argument('true_model', help='true model file')
-    parser.add_argument('init_model', help='init model file')
-    parser.add_argument('-s','--span', type=int, default=51, help='span value')
-    parser.add_argument('-k','--keep', type=int, default=100, help='keep the top layer with a distance (default 100)  as the same as the true model')
+    parser.add_argument('init_model', help='output init model file')
+    parser.add_argument('-s','--span', type=int, help='span value (Gaussian sigma)')
+    parser.add_argument('-k','--keep', type=int, default=100, help='keep the top layer with a distance (default 100) as the same as the true model')
     parser.add_argument('-c','--constant', type=int, help='set a constant value')
+    parser.add_argument('-n','--node', type=float, nargs=2, metavar=('z','v'), action='append',  
+        help='pair of z and model values for a node, repeat as needed, z in decreasing order.')
+
 
     args = parser.parse_args()
     x = _read(args.xcoords)
-    y = _read(args.ycoords)
+    y = _read(args.zcoords)
+
     top = max(y)
+    bot = min(y)
     mesh = np.array(list(zip(x,y)))
     init_model = _read(args.true_model)
     true_model = _read(args.true_model)
-    if  args.constant is not None:
-        init_model.fill(args.constant)  # set the initial model as 0
-    else: 
-        # Apply 2D gaussian filter
-        span = args.span
-        print "span: ", span
-        init_model = array.meshsmooth(init_model,mesh,span)
-    for i in range(len(init_model)):
+
+    # Choose model construction option
+    if args.constant:
+      # set the initial model as a constant value
+      print "Constant fill = ",args.constant
+      init_model.fill(args.constant)
+    elif args.span: 
+      # Apply 2D gaussian filter
+      span = args.span
+      print "Gauss span: ", span
+      init_model = array.meshsmooth(init_model,mesh,span)
+    elif args.node:
+      # Construct Z-profile using node pairs
+      zn = [top]
+      val = [args.node[0][1]]
+      for nd in args.node:
+          zn.append(nd[0])
+          val.append(nd[1])
+      zn.append(bot)
+      val.append(val[-1])
+
+      # Convert to arrays for calculation
+      znd = np.asarray(zn)
+      vals = np.asarray(val)
+      diff = znd[:-1] - znd[1:]
+      print 'Node depths: ',znd
+      print 'Node values: ',vals
+      if min(diff) < 0:
+        print 'ERROR: Node depths must be decreasing!'
+        parser.print_help()
+        sys.exit()
+
+      # Interpolate val(z) for every z mesh point
+      init_model = np.interp( y, np.flip(znd), np.flip(vals) )
+    else:
+      print 'ERROR: No option selected!'
+      sys.exit()
+
+    # Apply "keep" zone at top
+    if args.keep > 0:
+      print "Preserving to depth ",args.keep
+      for i in range(len(init_model)):
         if y[i] >= top - args.keep:
            init_model[i] = true_model[i] 
+
     _write(init_model, args.init_model)
+
  

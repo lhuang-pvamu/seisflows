@@ -6,3 +6,9 @@ parameters*c
 paths*c
 *.save
 OUTPUT_FILES
+SOURCE_*
+examples/Marmousi2/AGLmodel
+xmeshfem2d
+xspecfem2d
+stdout*
+
