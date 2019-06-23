@@ -50,6 +50,9 @@ def parseArgs():
     ap.add_argument('-d','--density', default='2500.',
         help='File (or constant value in kg/m3) specifying density values. DENSITY FILE NOT IMPLEMENTED')
 
+    ap.add_argument('-r','--rect', action='store_true',
+        help='Output only rectangular, unadjusted mesh.')
+
     ap.add_argument('-m','--meshPlot', action='store_true',
         help='Show plots of the generated model.')
 
@@ -288,14 +291,15 @@ if __name__ == '__main__':
         plt.axis('image')
  
     # Adjust the mesh
-    qm.adjustZ(vmesh)
+    if not args.rect:
+      qm.adjustZ(vmesh)
 
-    vmesh = _interp.interpn( (np.flipud(zg),xg), np.flipud(Vpsmooth), (qm.Zm,xmesh), method='linear' )
+      vmesh = _interp.interpn( (np.flipud(zg),xg), np.flipud(Vpsmooth), (qm.Zm,xmesh), method='linear' )
 
-    dVp = qm.meshDerivZ(vmesh)
-    SDmesh = qm.samplingDensityZ( vmesh )
+      dVp = qm.meshDerivZ(vmesh)
+      SDmesh = qm.samplingDensityZ( vmesh )
 
-    if args.meshPlot:
+      if args.meshPlot:
         print 'Generating adjusted plots ...'
         
         f = plt.figure(figsize=(Nex/10, Nez/10))

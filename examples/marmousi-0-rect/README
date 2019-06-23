@@ -1,0 +1,22 @@
+marmousi-0-rect/ 
+
+Seisflows setup for Marmousi case with rectangular 92 X 30 mesh
+
+SUPPLIED MODEL:
+
+The "classic" Marmousi 2D acoustic case study has (X,Z) dimensions 9200 X 3000 m
+ 
+The 'model_true' Vp velocity model supplied with Seisflows is in GLL format, 
+and includes a thin water layer on top (about 17 m, close to zero). 
+The mesh consists of 90 X 30 spectral elements, each rectangular in shape and
+sampled by 5 X 5 GLL gridpoints.
+
+The gll2npy script was used to generate a 455 X 148 grid of Vp values with
+grid spacing of 20 m, forming a basis for subsequent model generation.
+
+The adaptiveMesher utility was used to make a new mesh of 92 X 30 spectral 
+elements, with both true and smoothed (span=51) initial models.
+The new mesh was constructed to have rectangular elements.
+
+Survey to be used for inversion has 91 shots spaced 100 m and 
+receivers spaced 25 meters across the entire model.

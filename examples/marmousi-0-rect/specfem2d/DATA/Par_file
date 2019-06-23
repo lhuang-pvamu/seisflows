@@ -1,5 +1,5 @@
 # simulation input parameters
-title                           = marmousi-quad
+title                           = marmousi-rect
 SIMULATION_TYPE                 = 1   
 NOISE_TOMOGRAPHY                = 0   
 SAVE_FORWARD                    = .true.   

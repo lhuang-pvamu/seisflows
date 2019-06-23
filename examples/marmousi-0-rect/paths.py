@@ -1,4 +1,4 @@
-CASE = 'marmousi-0-quad'
+CASE = 'marmousi-0-rect'
 
 SF_TOP = '/home/teclee/DAC/FWI/SpecFEM/seisflows/'
 
@@ -16,9 +16,9 @@ DATA = ''
 
 MODEL_INIT = './model_smooth51'
 
-MODEL_TRUE = './model_adj'
+MODEL_TRUE = './model_true'
 
-MASK = './mask_17m'
+MASK = ''
 
 PRECOND = ''
 
