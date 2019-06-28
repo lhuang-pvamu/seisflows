@@ -1,6 +1,5 @@
-TITLE='marmousi-quad'
+TITLE='marmousi-rect'
 WORKFLOW='inversion' # inversion, migration, modeling
-#SOLVER='elastic2d' 
 SOLVER='specfem2d'   # specfem2d, specfem3d
 #SYSTEM='serial'    # serial, pbs, slurm
 SYSTEM='slurm_sm'    # serial, pbs, slurm
@@ -20,7 +19,7 @@ DENSITY='Constant'
 # WORKFLOW
 BEGIN=1                 # first iteration
 END=40                  # last iteration
-NREC=367                # number of receivers
+NREC=369                # number of receivers
 NSRC=91                 # number of sources
 #NSRC=1                 # number of sources
 SAVEGRADIENT=5          # save gradient how often

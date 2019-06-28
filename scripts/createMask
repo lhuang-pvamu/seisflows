@@ -41,9 +41,9 @@ if __name__ == '__main__':
     bot = min(z)
     hgt = top - bot
     
-    if args.distance != 0. :
+    if args.depth != 0. :
       # Mask defined by a single depth only
-      zn = [top, top-args.distance, top-(args.distance+hgt*1.e-6)]
+      zn = [top, top-args.depth, top-(args.depth+hgt*1.e-6)]
       wt = [0., 0., 1.]
     else:
       # Mask is a set of nodes
