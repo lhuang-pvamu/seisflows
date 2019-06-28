@@ -38,8 +38,14 @@ def parseArgs():
     ap.add_argument('-f','--freq', type=float, 
         help='Maximum source frequency (hz).')
 
+    ap.add_argument('-l','--limitStretch', type=float, default=2.,
+        help='Maximum element stretch factor (default is 2., 1.=> no stretch).')
+
     ap.add_argument('-e','--elemSize', type=float,
         help='Nominal element size (m); default determined from minimum wavelength.')
+
+    ap.add_argument('-b','--boundaryElements', type=int, default=0,
+        help='Thickness (elements) of absorbing boundary layers on sides and bottom.')
 
     ap.add_argument('-p','--pVel',
         help='File (image or npy format) containing grid of P-velocity values (m/sec).')
@@ -47,17 +53,30 @@ def parseArgs():
     ap.add_argument('-s','--sVel',
         help='File (image or npy format) containing S-velocity values (for elastic propagation). NOT IMPLEMENTED')
 
-    ap.add_argument('-d','--density', default='2500.',
-        help='File (or constant value in kg/m3) specifying density values. DENSITY FILE NOT IMPLEMENTED')
+    ap.add_argument('-d','--density', 
+        help='File (or constant value in kg/m3) specifying density values.')
 
     ap.add_argument('-m','--meshPlot', action='store_true',
         help='Show plots of the generated model.')
 
     return ap.parse_args()
 
-# a spectral element contains 5x5 GLL nodes
-NGLLX = 5
-NGLLZ = 5
+# GLL mesh indexing functions (in QuadMesh class)
+# Calculations in spectral elements are made at points defined by Gauss-Lobatto-Legendre
+# (GLL) coefficients. The SpecFEM2D program handles these points in a GLL-mesh array with 
+# a specific arrangement of elements in the mesh and of GLL points within each element.
+# The spectral elements are defined by quadrilaterals given by their 4 (z,x) vertices. 
+
+# We treat 2D meshed models with a free surface on top and constrained boundaries at the 
+# ends and bottom.  We also deal with a padded version of the model that has a number of 
+# elements that form a PML (perfectly matched layer) absorbing boundary at these edges.
+
+# The following specialized functions provide linearized indexing into the GLL mesh arrays
+# for the model and padded meshes, allowing mapping from one mesh to the other for points 
+# with given (z,x) coordinates given by (k,i) indices.
+
+NGx = 5; NGz = 5 	# Number of GLL nodes within an element in each direction
+NG = NGx * NGz 		# Number of GLL nodes in one element, stored in x-fastest order
 
 class QuadMesh(object):
     ''' Unstructured 2D quadrilateral spectral element mesh
@@ -65,17 +84,28 @@ class QuadMesh(object):
     Xdim = None 	# Mesh X-dimension, meters
     Zdim = None 	# Mesh Z-dimension, meters
     freq = None 	# Maximum frequency resolved, Hz
+    limit = None 	# Maximum vertical element stretch factor
     Nex = None 		# Number of spectral elements in X direction
     Nez = None 		# Number of spectral elements in Z direction
     Nelt = None 	# Number of spectral elements (Nex X Nez)
-    Xm = None 		# X-coordinates of element vertices
-    Zm = None 		# Z-coordinates of element vertices
+    Xm = None 		# X-coordinates of model mesh element vertices
+    Zm = None 		# Z-coordinates of model mesh element vertices
+#   ('P' indicates including PML boundaries)
+    nPML = None 	# Thickness (number of elements) of PML absorbing boundary
+    NPex = None 	# Mesh X-elements count, including absorbing boundaries at each end
+    NPez = None 	# Mesh Z-elements count, including absorbing layer at bottom
+    XPm = None 		# X-coordinates of PML-extended mesh element vertices
+    ZPm = None 		# Z-coordinates of PML-extended mesh element vertices
 
-    def __init__(self, freq):
+    def __init__(self, freq, limit, boundaryElements=0):
       self.freq = freq
+      self.limit = limit
+      self.nPML = boundaryElements
+      print "QuadMesh setup: frequency %g Hz, stretch limit %g, %d PML boundary elements"%\
+          (freq,limit,boundaryElements)
 
     def rectMesh(self, Xdim, Zdim, Nex, Nez):
-      ''' Create a rectangular spectral element mesh (without GLL points)
+      ''' Create a rectangular spectral element mesh (without interior GLL points)
       '''
       self.Xdim = Xdim
       self.Zdim = Zdim
@@ -84,35 +114,53 @@ class QuadMesh(object):
       x = np.linspace(0., Xdim, Nex+1)
       z = np.linspace(-Zdim, 0., Nez+1)
       [self.Xm,self.Zm] = np.meshgrid(x, z)
+
+      self.NPex = Nex + 2 * self.nPML
+      self.NPez = Nez + self.nPML
+      xP = np.linspace( -self.nPML*(Xdim/Nex), Xdim + self.nPML*(Xdim/Nex), self.NPex+1)
+      zP = np.linspace( -Zdim - self.nPML*(Zdim/Nez), 0., self.NPez+1)
+      [self.XPm,self.ZPm] = np.meshgrid(xP, zP)
+
       return (self.Zm,self.Xm)
 
-    def gllMesh(self):
-        ''' Fill in the (Zm,Xm) mesh with GLL points
+    def gllMesh(self,pad=False):
+        ''' Fill in the (optionally padded) (Z,X) mesh with GLL points
         '''
         GLLcoefs=[0.0, 0.1726732, 0.5, 0.8273268, 1.0]
 
-        Ngll = (self.Nex*NGLLX)*(self.Nez*NGLLZ)
+        if pad:
+            Ngll = (self.NPex*NGx)*(self.NPez*NGz)
+            nex = self.NPex
+            nez = self.NPez
+            mx = self.XPm
+            mz = self.ZPm
+        else:
+            Ngll = (self.Nex*NGx)*(self.Nez*NGz)
+            nex = self.Nex
+            nez = self.Nez
+            mx = self.Xm
+            mz = self.Zm
 
         mgx = np.zeros(Ngll)
         mgz = np.zeros(Ngll)
         # Set GLL point coordinates within each spectral element
         j = 0  # index thru GLL points
-        for k in range(0, self.Nez):  
-          for i in range(0, self.Nex): 
-            x1 = self.Xm[k,i]
-            x2 = self.Xm[k,i+1]
-            x3 = self.Xm[k+1,i+1]
-            x4 = self.Xm[k+1,i]
-            z1 = self.Zm[k,i]
-            z2 = self.Zm[k,i+1]
-            z3 = self.Zm[k+1,i+1]
-            z4 = self.Zm[k+1,i]
-            for kg in range(0, NGLLZ):
+        for k in range(0, nez):  
+          for i in range(0, nex): 
+            x1 = mx[k,i]
+            x2 = mx[k,i+1]
+            x3 = mx[k+1,i+1]
+            x4 = mx[k+1,i]
+            z1 = mz[k,i]
+            z2 = mz[k,i+1]
+            z3 = mz[k+1,i+1]
+            z4 = mz[k+1,i]
+            for kg in range(0, NGz):
                 xb = x1 + GLLcoefs[kg]*(x4-x1)
                 xe = x2 + GLLcoefs[kg]*(x3-x2)
                 zb = z1 + GLLcoefs[kg]*(z4-z1)
                 ze = z2 + GLLcoefs[kg]*(z3-z2)
-                for ig in range(0, NGLLX):
+                for ig in range(0, NGx):
                     mgx[j] = xb + GLLcoefs[ig]*(xe-xb)
                     mgz[j] = zb + GLLcoefs[ig]*(ze-zb)
                     j += 1
@@ -143,28 +191,30 @@ class QuadMesh(object):
       ''' Vertical sampling density at each mesh vertex
       '''
       dz = np.zeros( Vp.shape )
-      dz[1:,:] = -np.diff(self.Zm,axis=0)
+      dz[1:,:] = np.diff(self.Zm,axis=0)
       dz[0, :] = dz[1,:]
 
-      return NGLLZ/self.freq * np.divide(Vp, dz)
+      return NGz/self.freq * np.divide(Vp, dz)
 
     def adjustZ(self, Vp):
       ''' Adjust mesh Z-coordinates, 
           fining near velocity contrast, preserving sampling density
       '''
       sdMin = 5.5
+      fac1 = self.limit
+      fac2 = 1./fac1
       sdIn = self.samplingDensityZ( Vp )
       dVp = self.meshDerivZ( Vp )
-      for i in range(0,Nex+1):
+      for i in range(0,self.Nex+1):
         # Stretch each Z-column
-        dzIn = np.zeros(Nez+1)
+        dzIn = np.zeros(self.Nez+1)
         dzIn[1:] = -np.diff(self.Zm[:,i])
         dVabs = np.abs(dVp[:,i])
         dVmean = np.mean( dVabs )
         dVmax = np.max( dVabs )
         strContrast = 1. - (dVabs-dVmean) / dVmax
         strSampDens = sdIn[:,i] / sdMin
-        stretch = np.clip( 0.5*(strSampDens + strContrast), 0.5, 2.0)
+        stretch = np.clip( 0.5*(strSampDens + strContrast), fac2, fac1)
         stretch[0] = 1.
         dzStr = np.multiply(dzIn, stretch)
         totStr = np.sum( dzStr )
@@ -172,6 +222,15 @@ class QuadMesh(object):
         dzStr = dzStr / adjStr
         Znew = self.Zm[0,i] - np.cumsum(dzStr)
         self.Zm[:-1,i] = Znew[:-1]
+        self.ZPm[self.nPML:-1,i+self.nPML] = Znew[:-1] 	# Apply stretch in padded array also
+
+        # Extend adjusted z-values to left and right ends
+        if i==0:
+          for ib in range(0,self.nPML):
+            self.ZPm[self.nPML:-1,ib] = Znew[:-1]
+        if i==self.Nex:
+          for ib in range(1,self.nPML+1):
+            self.ZPm[self.nPML:-1,-ib] = Znew[:-1]
         '''
         print 'dzIn:',dzIn
         print 'strContrast:',strContrast
@@ -180,6 +239,147 @@ class QuadMesh(object):
         print 'dzStr:',dzStr, ' sum=',np.sum( dzStr )
         print 'Znew: ',Znew
         '''
+       
+    def padMesh(self,valmesh):
+        ''' Extend GLL model edge values into PML boundary by constant extrapolation
+        '''
+        # valmesh has property values on model mesh
+        Nb = self.nPML
+        if Nb == 0 :
+            return np.copy(valmesh)
+
+        # Make a padded mesh
+        (zgm, xgm) = qm.gllMesh(pad=True)
+
+        # Make an extended array and fill interior with input values
+        emesh = np.empty_like(xgm)
+        # Copy all points in model GLL mesh into padded mesh
+        for km in range(0,self.Nez):
+          kp = km + Nb
+          for im in range(0,self.Nex):
+            mel = self.mb(km,im)
+            ip = im + Nb
+            pel = self.pb(kp,ip)
+            for kg in range(0,NGz):
+              for ig in range(0,NGx):
+                lg = self.lg(kg,ig)
+                emesh[pel+lg] = valmesh[mel+lg]
+
+        # Extend left end
+        imEdge = 0
+        igEdge = 0
+        # Loop through boundary k-values
+        for km in range(0,self.Nez):
+          mel = self.mb(km,imEdge)
+          kp = km + Nb
+          for kg in range(0,NGz):
+            valEdge = valmesh[mel + self.lg(kg,igEdge)]
+            for ip in range(0,Nb):
+              pel = self.pb(kp,ip)
+              for ig in range(0,NGx):
+                lg = self.lg(kg,ig)
+                emesh[pel+lg] = valEdge
+
+        # Extend right end
+        imEdge = self.Nex-1
+        igEdge = NGx-1
+        # Loop through boundary k-values
+        for km in range(0,self.Nez):
+          mel = self.mb(km,imEdge)
+          kp = km + Nb
+          for kg in range(0,NGz):
+            valEdge = valmesh[mel + self.lg(kg,igEdge)]
+            for ip in range(0,Nb):
+              pel = self.pb(kp,ip+Nb+self.Nex)
+              for ig in range(0,NGx):
+                lg = self.lg(kg,ig)
+                emesh[pel+lg] = valEdge
+
+        # Extend bottom
+        kpEdge = Nb
+        kgEdge = 0
+        # Loop through boundary i-values of padded mesh
+        for ip in range(0,self.NPex):
+          vel = self.pb(kpEdge,ip)
+          for ig in range(0,NGx):
+            valEdge = emesh[vel+self.lg(kgEdge,ig)]
+            for kp in range(0,Nb):
+              pel = self.pb(kp,ip)
+              for kg in range(0,NGz):
+                lg = self.lg(kg,ig)
+                emesh[pel+lg] = valEdge
+
+        return emesh
+
+    def mb(self,km,im):
+      ''' Linearized (1D) index of base point of spectral element (km,im) in MODEL mesh
+      '''
+      return (km*self.Nex + im) * NG
+
+    def pb(self,kp,ip):
+      ''' Linearized (1D) index of base point of spectral element (kp,ip) in PADDED mesh
+      '''
+      return (kp*self.NPex + ip) * NG
+
+    def lg(self,kg,ig):
+      ''' Linearized (1D) index of a GLL point (kg,ig) within a spectral element,
+          relative to the base point of the element. 
+      '''
+      return kg*NGx + ig
+    
+    def modelWrite(self, model_dir, rhoMesh,vmesh,vsmesh=None):
+        ''' Write 5 mesh/model files, after padding for PML boundaries
+        '''
+        print "QuadMesh padded model elements %d X %d"% (self.NPez,self.NPex)
+ 
+        (zPmesh, xPmesh) = self.gllMesh(pad=True)
+        _write(xPmesh, os.path.join(model_dir, "proc000000_x.bin"))
+        _write(zPmesh, os.path.join(model_dir, "proc000000_z.bin"))
+
+        zmin=np.min(zPmesh); zmax=np.max(zPmesh)
+        xmin=np.min(xPmesh); xmax=np.max(xPmesh)
+        print "QuadMesh padded model extents Z: (%g, %g),  X: (%g, %g)"% \
+            ( zmin,zmax, xmin,xmax )
+
+        _write(self.padMesh(rhoMesh), os.path.join(model_dir, "proc000000_rho.bin"))
+        _write(self.padMesh(vmesh), os.path.join(model_dir, "proc000000_vp.bin"))
+        
+        if vsmesh:
+            vsPmesh = self.padMesh(vsmesh)
+        else:
+            vsPmesh = np.zeros_like(xPmesh)
+        _write(vsPmesh, os.path.join(model_dir, "proc000000_vs.bin"))
+
+        # Write an "interfaces" file for SpecFEM2D internal mesh generation
+        elSz = (xmax-xmin) / self.NPex
+        intFile = open( os.path.join(model_dir,"FlatTopBotInterfaces.txt"),"w")
+        intFile.write( "\
+# Top and bottom interfaces used for a SpecFEM2D binary GLL mesh model. \n\
+# This file defines interfaces for a single-layer 'internal mesh' model. \n\
+# Model dimensions are (NZ X NX) = (%d X %d) spectral elements. \n\
+# The model includes %d PML absorbing boundary layers at ends and bottom.\n\
+# Nominal element size is %g meters.\n\
+# Please ensure your Par_file parameters are consistent with these dimensions.\n\
+# NOTE: This file was generated by the adaptiveMesher utility. \n\
+#   \n\
+# number of interfaces:\n\
+  2 \n\
+#   \n\
+# For each interface, we give the number of points and then x,z for each point. \n\
+#   \n\
+# interface 1 (bottom of the mesh): \n\
+  2 \n\
+ %10g %10g \n\
+ %10g %10g \n\
+# interface 2 (top surface): \n\
+  2 \n\
+ %10g %10g \n\
+ %10g %10g \n\
+#   \n\
+# for the one layer, the number of spectral elements in the vertical direction: \n\
+ %d  \n###\n" %\
+(self.NPez,self.NPex, self.nPML, elSz, xmin,zmin, xmax,zmin, xmin,zmax, xmax,zmax, self.NPez) )
+        intFile.close()
     
 # end class QuadMesh
 
@@ -235,7 +435,7 @@ if __name__ == '__main__':
 
     # Smooth gridded velocities to match mesh resolution
     gwin = elz / dzg
-    print 'Gaussian smoother sigma=',gwin
+    print 'Quad mesh Gaussian smoother sigma=',gwin
     Vpsmooth = sp.ndimage.gaussian_filter(Vpgrid, gwin, mode='nearest')
 
     # Show the gridded velocities
@@ -252,14 +452,14 @@ if __name__ == '__main__':
         #plt.show()
 
     # Set up the quadrilateral mesher    
-    qm = QuadMesh(args.freq)
+    qm = QuadMesh(args.freq, args.limitStretch, args.boundaryElements)
 
     (zmesh, xmesh) = qm.rectMesh(X, Z, Nex, Nez)
 
     vmesh = _interp.interpn( (np.flipud(zg),xg), np.flipud(Vpsmooth), (zmesh,xmesh), method='linear' )
 
     dVp = qm.meshDerivZ(vmesh)
-    SDmesh = qm.samplingDensityZ( vmesh)
+    SDmesh = qm.samplingDensityZ(vmesh)
 
     if args.meshPlot:
         print 'Generating unadjusted plots ...'
@@ -274,13 +474,13 @@ if __name__ == '__main__':
         plt.title('Uniform Vpmesh')
         plt.colorbar(orientation='vertical')
         plt.axis('image')
-        '''
+        
         f = plt.figure(figsize=(Nex/10, Nez/10))
         plt.tricontourf(xmesh.flatten(), zmesh.flatten(), dVp.flatten(), 125, extend='both')
         plt.colorbar(orientation='vertical')
         plt.title('Uniform dV/dZ')
         plt.axis('image')
-        '''
+        
         f = plt.figure(figsize=(Nex/10, Nez/10))
         plt.tricontourf(xmesh.flatten(), zmesh.flatten(), SDmesh.flatten(), 125, extend='both')
         plt.colorbar(orientation='vertical')
@@ -308,13 +508,13 @@ if __name__ == '__main__':
         plt.title('Adjusted Vpmesh')
         plt.colorbar(orientation='vertical')
         plt.axis('image')
-        '''
+        
         f = plt.figure(figsize=(Nex/10, Nez/10))
         plt.tricontourf(xmesh.flatten(), zmesh.flatten(), dVp.flatten(), 125, extend='both')
         plt.colorbar(orientation='vertical')
         plt.title('Adjusted dV/dZ')
         plt.axis('image')
-        '''
+        
         f = plt.figure(figsize=(Nex/10, Nez/10))
         plt.tricontourf(xmesh.flatten(), zmesh.flatten(), SDmesh.flatten(), 125, extend='both')
         plt.colorbar(orientation='vertical')
@@ -324,7 +524,7 @@ if __name__ == '__main__':
         plt.show()
 
     # Re-smooth gridded velocities to match finer GLL mesh resolution
-    gwin = elz / (NGLLX * dzg)
+    gwin = elz / (NGx * dzg)
     print 'GLL mesh Gaussian smoother sigma=',gwin
     if gwin > 1.0 :
         Vpsmooth = sp.ndimage.gaussian_filter(Vpgrid, gwin, mode='nearest')
@@ -336,19 +536,33 @@ if __name__ == '__main__':
 
     vmesh = _interp.interpn( (np.flipud(zg),xg), np.flipud(Vpsmooth), (zmesh,xmesh), method='linear' )
 
+    # Set the density from supplied value or filename
+    try:
+        rhoVal = float(args.density)
+    except ValueError:
+        rhoVal = None
+
+    if rhoVal:
+        # Make mesh of constant values
+        rhoMesh = np.copy(vmesh)
+        rhoMesh.fill(rhoVal)
+    else:
+        # Read, smooth, and interpolate the supplied density file
+        rhoGrid = np.load(args.density)
+        if gwin > 1.0 :
+          rhoSmooth = sp.ndimage.gaussian_filter(rhoGrid, gwin, mode='nearest')
+        else:
+          rhoSmooth = rhoGrid
+        rhoMesh = _interp.interpn( (np.flipud(zg),xg), np.flipud(rhoSmooth), (zmesh,xmesh), method='linear' )
+
     # Write the adjusted model
     model_dir = args.outputdir
     if not os.path.exists(model_dir):
         os.mkdir(model_dir)
 
     print "Directory for adjusted model files: ", model_dir
-    _write(vmesh, os.path.join(model_dir, "proc000000_vp.bin"))
-    _write(xmesh, os.path.join(model_dir, "proc000000_x.bin"))
-    _write(zmesh, os.path.join(model_dir, "proc000000_z.bin"))
-    # Dummy Vs and density
-    vmesh.fill(0.)
-    _write(vmesh, os.path.join(model_dir, "proc000000_vs.bin"))
-    vmesh.fill(args.density)
-    _write(vmesh, os.path.join(model_dir, "proc000000_rho.bin"))
+    vsmesh=None
+    qm.modelWrite(model_dir, rhoMesh,vmesh,vsmesh)
+
 
 

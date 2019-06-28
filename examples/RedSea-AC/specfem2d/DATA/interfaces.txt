@@ -1,0 +1,58 @@
+# Red Sea model (KAUST) -- Approximate interfaces used for initial model
+#
+# number of interfaces
+   6
+#
+# for each interface below, we give the number of points and then x,z for each point
+#
+# interface 1 (bottom of the mesh)
+ 2
+       0 -3500
+   11800 -3500
+# interface 2 (top basement)
+ 8
+     0 -2600
+  1200 -2650
+  2000 -2300
+  5000 -2400
+  5500 -2600
+  8400 -2800
+ 10500 -2000
+ 11800 -2000
+# interface 3 (top carbonate)
+ 6
+    0 -2000
+ 1500 -2000
+ 2000 -1800
+ 8500 -2400
+10500 -1600
+11800 -1500
+# interface 4 (top salt)
+ 5
+    0 -1700
+ 4000 -1300
+ 7000 -1900
+ 8500 -1900
+11800 -1000
+# interface 5 (top clastics)
+ 2
+    0 -600
+11800 -600
+# interface 6 (top surface)
+ 2
+     0 0
+ 11800 0
+#
+# for each layer, we give the number of spectral elements in the vertical direction
+#
+# basement
+ 16
+# carbonates
+ 8
+# salt
+ 8
+# clastics
+12
+# overburden
+ 6
+
