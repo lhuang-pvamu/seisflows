@@ -6,6 +6,7 @@ import time
 
 from os.path import abspath, basename, join
 from subprocess import check_output
+from subprocess import CalledProcessError
 from seisflows.tools import msg
 from seisflows.tools import unix
 from seisflows.tools.tools import call, findpath, saveobj, timestamp
@@ -248,15 +249,19 @@ class slurm_lg(custom_import('system', 'base')):
     def job_status(self, job):
         """ Queries completion status of a single job
         """
-        stdout = check_output(
-            'sacct -n -o jobid,state -j '+ job.split('_')[0],
-            shell=True)
-
         state = ''
-        lines = stdout.strip().split('\n')
-        for line in lines:
-            if line.split()[0]==job:
-                state = line.split()[1]
+        try:
+            stdout = check_output(
+                'sacct -n -o JobIdRaw,State -j '+ job.split('_')[0],
+                shell=True)
+
+            lines = stdout.strip().split('\n')
+            for line in lines:
+                if line.split()[0]==job:
+                    state = line.split()[1]
+        except CalledProcessError:
+            print("")
+
         return state
 
 
