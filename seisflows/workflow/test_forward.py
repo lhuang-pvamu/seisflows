@@ -1,7 +1,7 @@
 
 import sys
 
-from seisflows.config import ParameterError
+from seisflows.config import ParameterError, intro, parpt
 from seisflows.workflow.base import base
 
 
@@ -19,13 +19,16 @@ class test_forward(base):
     def check(self):
         """ Checks parameters and paths
         """
+        intro(__name__, self.__doc__)
 
         # check paths
-        if 'SCRATCH' not in PATH:
-            raise Exception
-
         if 'LOCAL' not in PATH:
             setattr(PATH, 'LOCAL', None)
+
+        parpt(PATH, ['LOCAL','SCRATCH','MODEL','OUTPUT'])
+
+        if 'SCRATCH' not in PATH:
+            raise Exception
 
         if 'MODEL' not in PATH:
             raise Exception

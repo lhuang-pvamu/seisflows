@@ -8,7 +8,7 @@ from functools import partial
 from glob import glob
 from importlib import import_module
 from os.path import basename, join
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import, intro, parpt
 from seisflows.plugins import solver_io
 from seisflows.tools import msg, unix
 from seisflows.tools.seismic import Container, call_solver
@@ -25,6 +25,7 @@ preprocess = sys.modules['seisflows_preprocess']
 
 
 class base(object):
+    " Base class for SPECFEM solver simulations "
     """ Provides an interface through which solver simulations can be set up
       and run and a parent class for SPECFEM2D, SPECFEM3D and SPECFEM3D_GLOBE 
       subclasses
@@ -42,7 +43,7 @@ class base(object):
         providing an alternative interface through which to interact with the 
         solver
 
-     steup, generate_data, generate_model
+     setup, generate_data, generate_model
         One-time operations performed at beginning of an inversion or 
         migration
 
@@ -71,6 +72,7 @@ class base(object):
     assert 'MATERIALS' in PAR
     assert 'DENSITY' in PAR
 
+    source_prefix = ''
     parameters = []
     if PAR.MATERIALS == 'Elastic':
         parameters += ['vp']
@@ -85,10 +87,7 @@ class base(object):
     def check(self):
         """ Checks parameters and paths
         """
-        # number of processors per simulation
-        if 'NPROC' not in PAR:
-            raise ParameterError(PAR, 'NPROC')
-
+        intro(__name__, base.__doc__)
 
         # format used by SPECFEM for reading and writing models
         # (currently, SPECFEM offers both 'fortran_binary' and 'adios')
@@ -97,9 +96,6 @@ class base(object):
 
 
         # solver scratch paths
-        if 'SCRATCH' not in PATH:
-            raise ParameterError(PATH, 'SCRATCH')
-
         if 'LOCAL' not in PATH:
             setattr(PATH, 'LOCAL', None)
 
@@ -109,6 +105,9 @@ class base(object):
             else:
                 setattr(PATH, 'SOLVER', join(PATH.SCRATCH, 'solver'))
 
+        parpt(PAR, ['MATERIALS','DENSITY','NPROC','SOLVERIO'])
+        parpt(PATH, ['SOLVER','SPECFEM_BIN','SPECFEM_DATA'])
+
         # solver input paths
         if 'SPECFEM_BIN' not in PATH:
             raise ParameterError(PATH, 'SPECFEM_BIN')
@@ -116,12 +115,18 @@ class base(object):
         if 'SPECFEM_DATA' not in PATH:
             raise ParameterError(PATH, 'SPECFEM_DATA')
 
+        if 'SCRATCH' not in PATH:
+            raise ParameterError(PATH, 'SCRATCH')
+
         # assertions
         assert self.parameters != []
         assert hasattr(solver_io, PAR.SOLVERIO)
         assert hasattr(self.io, 'read_slice')
         assert hasattr(self.io, 'write_slice')
 
+        # number of processors per simulation
+        if 'NPROC' not in PAR:
+            raise ParameterError(PAR, 'NPROC')
 
     def setup(self):
         """ 

@@ -4,7 +4,7 @@ import numpy as np
 
 from seisflows.tools import unix
 from seisflows.tools.tools import exists
-from seisflows.config import custom_import, ParameterError
+from seisflows.config import custom_import, ParameterError, intro, parpt
 from seisflows.workflow.base import base
 
 PAR = sys.modules['seisflows_parameters']
@@ -23,10 +23,14 @@ class test_postprocess(base):
     def check(self):
         """ Checks parameters and paths
         """
+        intro(__name__, self.__doc__)
+
         migration.check()
 
         if 'INPUT' not in PATH:
             setattr(PATH, 'INPUT', None)
+
+        parpt(PATH, ['INPUT'])
 
 
     def main(self):

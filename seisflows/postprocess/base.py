@@ -5,7 +5,7 @@ import numpy as np
 from os.path import join
 from seisflows.tools import unix
 from seisflows.tools.tools import exists
-from seisflows.config import ParameterError
+from seisflows.config import ParameterError, intro, parpt
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -22,11 +22,17 @@ class base(object):
     def check(self):
         """ Checks parameters and paths
         """
+        intro(__name__, base.__doc__)
+
         if 'SMOOTH' not in PAR:
             setattr(PAR, 'SMOOTH', 0.)
 
         if 'MASK' not in PATH:
             setattr(PATH, 'MASK', None)
+
+        # report
+        parpt(PAR, ['SMOOTH'])
+        parpt(PATH, ['MASK'])
 
         if PATH.MASK:
             assert exists(PATH.MASK)

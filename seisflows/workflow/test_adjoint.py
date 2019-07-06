@@ -6,7 +6,7 @@ from glob import glob
 from os.path import basename, join
 from seisflows.tools import unix
 from seisflows.tools.tools import exists
-from seisflows.config import ParameterError
+from seisflows.config import ParameterError, intro, parpt
 from seisflows.workflow.base import base
 
 
@@ -46,13 +46,25 @@ class test_adjoint(base):
     def check(self):
         """ Checks parameters and paths
         """
+        intro(__name__, self.__doc__)
 
         # check paths
-        if 'SCRATCH' not in PATH:
-            raise ParameterError(PATH, 'SCRATCH')
-
         if 'LOCAL' not in PATH:
             setattr(PATH, 'LOCAL', None)
+
+        # check input
+        if 'DATA' not in PATH:
+            setattr(PATH, 'DATA', None)
+
+        parpt(PAR, ['NSRC'])
+        parpt(PATH, ['SCRATCH','LOCAL','OUTPUT','SOLVER','DATA','MODEL_TRUE','MODEL_INIT'])
+
+        # assertions
+        if PAR.NSRC != 1:
+            raise ParameterError(PAR, 'NSRC')
+
+        if 'SCRATCH' not in PATH:
+            raise ParameterError(PATH, 'SCRATCH')
 
         if 'OUTPUT' not in PATH:
             raise ParameterError(PATH, 'OUTPUT')
@@ -60,20 +72,11 @@ class test_adjoint(base):
         if 'SOLVER' not in PATH:
             raise ParameterError(PATH, 'SOLVER')
 
-        # check input
-        if 'DATA' not in PATH:
-            setattr(PATH, 'DATA', None)
-
-        if not exists(PATH.DATA):
-            assert 'MODEL_TRUE' in PATH
-
         if 'MODEL_INIT' not in PATH:
             raise ParameterError(PATH, 'MODEL_INIT')
 
-
-        # assertions
-        if PAR.NSRC != 1:
-            raise ParameterError(PAR, 'NSRC')
+        if not exists(PATH.DATA):
+            assert 'MODEL_TRUE' in PATH
 
 
     def main(self):

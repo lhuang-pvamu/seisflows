@@ -12,7 +12,7 @@ from seisflows.tools import msg
 from seisflows.tools import unix
 from seisflows.tools.seismic import call_solver
 from seisflows.tools.tools import exists
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import, intro,parpt
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -30,12 +30,11 @@ class specfem2d(custom_import('solver', 'base')):
         parameters = []
         parameters += ['vs']
 
-
-    #is this erver called?
     def check(self):
         """ Checks parameters and paths
         """
         super(specfem2d, self).check()
+        intro(__name__, specfem2d.__doc__)
 
         #if 'NT' not in PAR:
         #    raise Exception
@@ -51,6 +50,8 @@ class specfem2d(custom_import('solver', 'base')):
 
         #if PAR.FORMAT != 'su':
         #    raise Exception()
+
+        parpt(PAR, ['NT','DT','F0','FORMAT'])
 
 
     def check_solver_parameter_files(self):

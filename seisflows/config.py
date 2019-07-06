@@ -27,15 +27,22 @@ names += ['postprocess']
 names += ['optimize']
 names += ['workflow']
 
+# Shadow parameters dictionary for usage checking   
+PARCH = {}
 
 def config():
-    """ Instantiates SeisFlows objects and makes them globally accessible by
-      registering them in sys.modules
-   """
+    """ Instantiates and registers SeisFlows objects in sys.modules
+    """
+    intro(__name__, config.__doc__)
     # parameters and paths must already be loaded
     # (normally this is done by sfsubmit)
     assert 'seisflows_parameters' in sys.modules
     assert 'seisflows_paths' in sys.modules
+
+    # Flag all parameters as unused
+    PAR = sys.modules['seisflows_parameters']
+    for par in PAR:
+        PARCH[par] = False
 
     # check if objects already exist on disk
     if exists(_output()):
@@ -43,20 +50,53 @@ def config():
         sys.exit()
 
     # instantiate and register objects
+    print '\nconfig: checking parameters and paths settings for each module...'
+    NAMES = []
     for name in names:
-        sys.modules['seisflows_'+name] = custom_import(name)()
+        NAMES += [name.upper()]
+    parpt(PAR, NAMES)
+
+    for name in names:
+        imp = custom_import(name)
+        print "Imported module:",imp.__module__
+        sys.modules['seisflows_'+name] = imp()
 
     # error checking
     for name in names:
         sys.modules['seisflows_'+name].check()
 
-    if not hasattr(sys.modules['seisflows_parameters'], 'workflow'.upper()):
+    if not hasattr(sys.modules['seisflows_parameters'], 'WORKFLOW'):
         print msg.MissingParameter_Worfklow
         sys.exit(-1)
 
-    if not hasattr(sys.modules['seisflows_parameters'], 'system'.upper()):
+    if not hasattr(sys.modules['seisflows_parameters'], 'SYSTEM'):
         print msg.MissingParameter_System
         sys.exit(-1)
+
+    # Report unused (unreported) parameters
+    print '\nNOTE: Parameters listed below were included in your parameters file,\n',\
+        '      but were not reported by any module.check() function.\n',\
+        '      If any of your parameters appears here unexpectedly, please check\n',\
+        '      spelling, or ensure that some check() function references it.'
+    for par in PARCH:
+        if not PARCH[par]:
+            print '         ', par
+
+    print 'config: checks completed.\n'
+
+def intro(name,desc='Undocumented'):
+    ' Prints name and description for a class or function'
+    print '\n'+name+':\n    ',desc
+
+def parpt(dict,keys): 
+    ''' Report selected key values from a path/parameter dictionary '''
+    print ''
+    for key in keys:
+        val = 'Absent'
+        if key in dict:  
+            val=dict[key]
+            PARCH[key] = True
+        print '    ',key,' \t =  ',val
 
 
 def save():
@@ -196,14 +236,14 @@ def tilde_expand(mydict):
 def _par(key):
     return sys.modules['seisflows_parameters'][key.upper()]
 
-def _path(key):
-    return sys.modules['seisflows_paths'][key.upper()]
-
 def _try(key):
     try:
         return _par(key)
     except KeyError:
         return None
+
+def _path(key):
+    return sys.modules['seisflows_paths'][key.upper()]
 
 def _output():
     try:

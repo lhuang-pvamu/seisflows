@@ -12,7 +12,7 @@ from seisflows.plugins.io import loadbypar, copybin, loadbin, savebin
 from seisflows.tools import unix
 from seisflows.tools.seismic import call_solver
 from seisflows.tools.tools import Struct, exists
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import,intro,parpt
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -44,8 +44,12 @@ class specfem3d_globe(custom_import('solver', 'base')):
         """
         super(specfem3d_globe, self).check()
 
+        intro(__name__, specfem3d_globe.__doc__)
+
         if 'CHANNELS' not in PAR:
             setattr(PAR, 'CHANNELS', 'ENZ')
+
+        parpt(PAR, ['CHANNELS','FORMAT'])
 
         # check data format
         if 'FORMAT' not in PAR:

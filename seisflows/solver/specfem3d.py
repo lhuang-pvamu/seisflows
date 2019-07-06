@@ -12,7 +12,7 @@ from seisflows.tools.seismic import getpar, setpar
 from seisflows.tools import unix
 from seisflows.tools.seismic import call_solver
 from seisflows.tools.tools import exists
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import, intro,parpt
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -31,6 +31,10 @@ class specfem3d(custom_import('solver', 'base')):
         """ Checks parameters and paths
         """
         super(specfem3d, self).check()
+
+        intro(__name__, specfem3d.__doc__)
+
+        parpt(PAR, ['NT','DT','F0','FORMAT'])
 
         # check time stepping parameters
         if 'NT' not in PAR:

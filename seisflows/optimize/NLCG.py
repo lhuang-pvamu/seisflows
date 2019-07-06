@@ -2,7 +2,7 @@
 import sys
 import numpy as np
 
-from seisflows.config import custom_import, ParameterError
+from seisflows.config import custom_import, ParameterError, intro,parpt
 from seisflows.plugins import optimize
 
 PAR = sys.modules['seisflows_parameters']
@@ -16,10 +16,6 @@ class NLCG(custom_import('optimize', 'base')):
     def check(self):
         """ Checks parameters, paths, and dependencies
         """
-        # line search algorithm
-        if 'LINESEARCH' not in PAR:
-            setattr(PAR, 'LINESEARCH', 'Bracket')
-
         # NLCG periodic restart interval
         if 'NLCGMAX' not in PAR:
             setattr(PAR, 'NLCGMAX', np.inf)
@@ -29,6 +25,10 @@ class NLCG(custom_import('optimize', 'base')):
             setattr(PAR, 'NLCGTHRESH', np.inf)
 
         super(NLCG, self).check()
+
+        intro(__name__, NLCG.__doc__)
+
+        parpt(PAR,['NLCGMAX', 'NLCGTHRESH'])
 
 
     def setup(self):

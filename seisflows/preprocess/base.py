@@ -5,7 +5,7 @@ import obspy
 
 from seisflows.tools import msg, unix
 from seisflows.tools.tools import exists, getset
-from seisflows.config import ParameterError
+from seisflows.config import intro, parpt, ParameterError
 
 from seisflows.plugins import adjoint, misfit, readers, writers
 from seisflows.tools import signal
@@ -24,6 +24,7 @@ class base(object):
     def check(self):
         """ Checks parameters and paths
         """
+        intro(__name__, base.__doc__)
         # used for inversion
         if 'MISFIT' not in PAR:
             setattr(PAR, 'MISFIT', None)
@@ -32,10 +33,6 @@ class base(object):
         if 'BACKPROJECT' not in PAR:
             setattr(PAR, 'BACKPROJECT', None)
 
-        # data file format
-        if 'FORMAT' not in PAR:
-            raise ParameterError(PAR, 'FORMAT')
-
         # data normalization option
         if 'NORMALIZE' not in PAR:
             setattr(PAR, 'NORMALIZE', None)
@@ -43,13 +40,23 @@ class base(object):
         # data muting option
         if 'MUTE' not in PAR:
             setattr(PAR, 'MUTE', None)
+        mpars = ['MUTE', 'MUTE_EARLY_ARRIVALS_SLOPE', 'MUTE_EARLY_ARRIVALS_CONST', \
+                 'MUTE_SHORT_OFFSETS_DIST', 'MUTE_LONG_OFFSETS_DIST']
 
         # data filtering option
         if 'FILTER' not in PAR:
             setattr(PAR, 'FILTER', None)
+        fpars = ['FILTER','FREQ','FREQMIN','FREQMAX']
 
+        # report
+        parpt(PAR,['MISFIT','BACKPROJECT','FLIP_SIGN','NORMALIZE','FORMAT']+mpars+fpars)
 
         # assertions
+
+        # data file format
+        if 'FORMAT' not in PAR:
+            raise ParameterError(PAR, 'FORMAT')
+
         if PAR.FORMAT not in dir(readers):
             print msg.ReaderError
             raise ParameterError()

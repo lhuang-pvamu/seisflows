@@ -2,7 +2,7 @@
 
 import argparse, os, sys
 
-from seisflows.config import config, loadpy, tilde_expand, Dict
+from seisflows.config import config,intro, loadpy, tilde_expand, Dict
 from seisflows.tools import unix
 
 
@@ -22,7 +22,8 @@ def getargs():
 
 
 if __name__ == "__main__":
-    ### workflow submission script
+    ''' Seisflows workflow submission '''
+    intro('SEISFLOWS', ' Seisflows workflow submission ')
     args = getargs()
 
     # register parameters
@@ -49,6 +50,7 @@ if __name__ == "__main__":
     #sys.modules['seisflows_paths'] = Dict(paths)
     sys.modules['seisflows_paths'] = Dict(path_dict)
 
+    # Configure the workflow in the working directory
     unix.mkdir(args.workdir)
     unix.cd(args.workdir)
 

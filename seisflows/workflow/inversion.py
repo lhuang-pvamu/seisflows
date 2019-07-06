@@ -8,7 +8,7 @@ from os.path import join
 from seisflows.tools import msg
 from seisflows.tools import unix
 from seisflows.tools.tools import divides, exists
-from seisflows.config import ParameterError, save
+from seisflows.config import ParameterError, save, intro, parpt
 from seisflows.workflow.base import base
 
 PAR = sys.modules['seisflows_parameters']
@@ -23,6 +23,8 @@ postprocess = sys.modules['seisflows_postprocess']
 
 class inversion(base):
     """ Waveform inversion base class
+    """
+    """
 
       Peforms iterative nonlinear inversion and provides a base class on top
       of which specialized strategies can be implemented.
@@ -42,63 +44,86 @@ class inversion(base):
     def check(self):
         """ Checks parameters and paths
         """
+        intro(__name__, inversion.__doc__)
+        pars = []
+        paths = []
 
         # starting and stopping iterations
-        if 'BEGIN' not in PAR:
-            raise ParameterError(PAR, 'BEGIN')
-
-        if 'END' not in PAR:
-            raise ParameterError(PAR, 'END')
+        pars += ['BEGIN']
+        pars += ['END']
 
         # scratch paths
-        if 'SCRATCH' not in PATH:
-            raise ParameterError(PATH, 'SCRATCH')
+        paths += ['SCRATCH']
 
+        paths += ['LOCAL']
         if 'LOCAL' not in PATH:
             setattr(PATH, 'LOCAL', None)
 
+        paths += ['FUNC']
         if 'FUNC' not in PATH:
             setattr(PATH, 'FUNC', join(PATH.SCRATCH, 'evalfunc'))
 
+        paths += ['GRAD']
         if 'GRAD' not in PATH:
             setattr(PATH, 'GRAD', join(PATH.SCRATCH, 'evalgrad'))
 
+        paths += ['HESS']
         if 'HESS' not in PATH:
             setattr(PATH, 'HESS', join(PATH.SCRATCH, 'evalhess'))
 
+        paths += ['OPTIMIZE']
         if 'OPTIMIZE' not in PATH:
             setattr(PATH, 'OPTIMIZE', join(PATH.SCRATCH, 'optimize'))
 
         # input paths
+        paths += ['DATA']
         if 'DATA' not in PATH:
             setattr(PATH, 'DATA', None)
 
-        if 'MODEL_INIT' not in PATH:
-            raise ParameterError(PATH, 'MODEL_INIT')
+        paths += ['MODEL_INIT']
 
         # output paths
-        if 'OUTPUT' not in PATH:
-            raise ParameterError(PATH, 'OUTPUT')
+        paths += ['OUTPUT']
 
+        pars += ['SAVEMODEL']
         if 'SAVEMODEL' not in PAR:
             setattr(PAR, 'SAVEMODEL', 1)
 
+        pars += ['SAVEGRADIENT']
         if 'SAVEGRADIENT' not in PAR:
             setattr(PAR, 'SAVEGRADIENT', 0)
 
+        pars += ['SAVEKERNELS']
         if 'SAVEKERNELS' not in PAR:
             setattr(PAR, 'SAVEKERNELS', 0)
 
+        pars += ['SAVETRACES']
         if 'SAVETRACES' not in PAR:
             setattr(PAR, 'SAVETRACES', 0)
 
+        pars += ['SAVERESIDUALS']
         if 'SAVERESIDUALS' not in PAR:
             setattr(PAR, 'SAVERESIDUALS', 0)
 
+        # report
+        parpt(PAR, pars)
+        parpt(PATH, paths)
+
         # parameter assertions
+        if 'BEGIN' not in PAR:
+            raise ParameterError(PAR, 'BEGIN')
+        if 'END' not in PAR:
+            raise ParameterError(PAR, 'END')
         assert 1 <= PAR.BEGIN <= PAR.END
 
         # path assertions
+        if 'SCRATCH' not in PATH:
+            raise ParameterError(PATH, 'SCRATCH')
+        if 'MODEL_INIT' not in PATH:
+            raise ParameterError(PATH, 'MODEL_INIT')
+        if 'OUTPUT' not in PATH:
+            raise ParameterError(PATH, 'OUTPUT')
+
         if not exists(PATH.DATA):
             assert 'MODEL_TRUE' in PATH
             assert exists(PATH.MODEL_TRUE)

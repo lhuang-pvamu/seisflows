@@ -3,7 +3,7 @@ import sys
 
 from seisflows.tools import msg
 from seisflows.tools import unix
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import, intro, parpt
 from seisflows.workflow.base import base
 
 PAR = sys.modules['seisflows_parameters']
@@ -27,6 +27,10 @@ class thrifty_inversion(custom_import('workflow', 'inversion')):
     def initialize(self):
         if self.status==0:
             super(thrifty_inversion, self).initialize()
+
+    def check(self):
+        intro(__name__, self.__doc__)
+        super(thrifty_inversion, self).check()
 
 
     def clean(self):

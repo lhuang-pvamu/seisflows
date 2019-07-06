@@ -6,7 +6,7 @@ from os.path import abspath
 from seisflows.tools import unix
 from seisflows.tools.array import loadnpy, savenpy
 from seisflows.tools.tools import savetxt
-from seisflows.config import ParameterError
+from seisflows.config import ParameterError, intro, parpt
 from seisflows.workflow.base import base
 
 PAR = sys.modules['seisflows_parameters']
@@ -24,6 +24,8 @@ class test_optimize(base):
     """
 
     def check(cls):
+        intro(__name__, cls.__doc__)
+
         cls.path = PATH.OPTIMIZE
 
         # check parameters
@@ -54,6 +56,9 @@ class test_optimize(base):
 
         if 'OPTIMIZE' not in PATH:
             setattr(PATH,'OPTIMIZE',PATH.SCRATCH)
+
+        parpt(PAR, ['OPTIMIZE','VERBOSE','BEGIN','END','STEPLENMAX','THRESH'])
+        parpt(PATH, ['SCRATCH','SUBMIT','OPTIMIZE'])
 
         # assertions
         assert PAR.BEGIN == 1

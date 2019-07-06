@@ -7,7 +7,7 @@ from obspy.core import Stream, Trace
 
 from seisflows.plugins import adjoint, misfit
 from seisflows.tools import unix
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import, intro,parpt
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -25,6 +25,7 @@ class double_difference(custom_import('preprocess', 'base')):
         """ Checks parameters, paths, and dependencies
         """
         super(double_difference, self).check()
+        intro(__name__, double_difference.__doc__)
 
         if not hasattr(PAR, 'DISTMAX'):
             setattr(PAR, 'DISTMAX', float("inf"))
@@ -34,6 +35,9 @@ class double_difference(custom_import('preprocess', 'base')):
 
         if not hasattr(PATH, 'WEIGHTS'):
             setattr(PATH, 'WEIGHTS', None)
+
+        parpt(PAR, ['MISFIT','DISTMAX','UNITS'])
+        parpt(PATH, ['WEIGHTS'])
 
         if PATH.WEIGHTS:
             assert exists(PATH.WEIGHTS)

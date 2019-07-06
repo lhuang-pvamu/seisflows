@@ -2,7 +2,7 @@
 import sys
 import numpy as np
 
-from seisflows.config import custom_import, ParameterError
+from seisflows.config import custom_import, ParameterError, intro, parpt
 from seisflows.plugins import optimize
 
 PAR = sys.modules['seisflows_parameters']
@@ -16,10 +16,6 @@ class LBFGS(custom_import('optimize', 'base')):
     def check(self):
         """ Checks parameters, paths, and dependencies
         """
-        # line search algorithm
-        if 'LINESEARCH' not in PAR:
-            setattr(PAR, 'LINESEARCH', 'Backtrack')
-
         # LBFGS memory
         if 'LBFGSMEM' not in PAR:
             setattr(PAR, 'LBFGSMEM', 3)
@@ -33,6 +29,10 @@ class LBFGS(custom_import('optimize', 'base')):
             setattr(PAR, 'LBFGSTHRESH', 0.)
 
         super(LBFGS, self).check()
+
+        intro(__name__, LBFGS.__doc__)
+
+        parpt(PAR,['LBFGSMEM', 'LBFGSMAX', 'LBFGSTHRESH'])
 
 
     def setup(self):

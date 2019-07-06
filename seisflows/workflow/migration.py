@@ -4,7 +4,7 @@ from glob import glob
 
 from seisflows.tools import unix
 from seisflows.tools.tools import exists
-from seisflows.config import ParameterError
+from seisflows.config import ParameterError, intro, parpt
 from seisflows.workflow.base import base
 
 PAR = sys.modules['seisflows_parameters']
@@ -26,25 +26,15 @@ class migration(base):
     def check(self):
         """ Checks parameters and paths
         """
-        # check paths
-        if 'SCRATCH' not in PATH:
-            raise ParameterError(PATH, 'SCRATCH')
+        intro(__name__, migration.__doc__)
 
+        # check paths
         if 'LOCAL' not in PATH:
             setattr(PATH, 'LOCAL', None)
-
-        if 'OUTPUT' not in PATH:
-            raise ParameterError(PATH, 'OUTPUT')
 
         # check input
         if 'DATA' not in PATH:
             setattr(PATH, 'DATA', None)
-
-        if not exists(PATH.DATA):
-            assert 'MODEL_TRUE' in PATH
-
-        if 'MODEL_INIT' not in PATH:
-            raise ParameterError(PATH, 'MODEL_INIT')
 
         # check output
         if 'SAVEGRADIENT' not in PAR:
@@ -55,6 +45,21 @@ class migration(base):
 
         if 'SAVETRACES' not in PAR:
             setattr(PAR, 'SAVETRACES', 0)
+
+        parpt(PAR, ['SAVEGRADIENT','SAVEKERNELS','SAVETRACES'])
+        parpt(PATH, ['SCRATCH','LOCAL','OUTPUT','DATA','MODEL_TRUE','MODEL_INIT'])
+
+        if 'SCRATCH' not in PATH:
+            raise ParameterError(PATH, 'SCRATCH')
+
+        if 'OUTPUT' not in PATH:
+            raise ParameterError(PATH, 'OUTPUT')
+
+        if not exists(PATH.DATA):
+            assert 'MODEL_TRUE' in PATH
+
+        if 'MODEL_INIT' not in PATH:
+            raise ParameterError(PATH, 'MODEL_INIT')
 
 
     def main(self):

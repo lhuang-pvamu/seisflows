@@ -2,7 +2,7 @@
 import sys
 import time
 
-from seisflows.config import ParameterError
+from seisflows.config import ParameterError, intro, parpt
 from seisflows.workflow.base import base
 
 
@@ -17,14 +17,18 @@ class test_system(base):
     """
 
     def check(self):
-        if 'NTASK' not in PAR:
-            raise Exception
+        intro(__name__, self.__doc__)
 
         if 'NPROC' not in PAR:
             setattr(PAR,'NPROC',1)
 
         if 'VERBOSE' not in PAR:
             setattr(PAR,'VERBOSE',0)
+
+        parpt(PAR, ['NTASK','NPROC','VERBOSE'])
+
+        if 'NTASK' not in PAR:
+            raise Exception
 
 
     def main(self):

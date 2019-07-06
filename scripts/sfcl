@@ -27,7 +27,7 @@ if output_path:
 
 
 #remove output*
-print "remove  " + output
+print "removing " + output
 #if os.path.exists(output):
 #    shutil.rmtree(output)
 #else:

@@ -3,7 +3,7 @@ import sys
 import numpy as np
 
 from os.path import join
-from seisflows.config import ParameterError
+from seisflows.config import ParameterError, intro, parpt
 from seisflows.plugins import line_search, preconds
 from seisflows.tools import msg, unix
 from seisflows.tools.array import loadnpy, savenpy
@@ -18,6 +18,8 @@ PATH = sys.modules['seisflows_paths']
 
 class base(object):
     """ Nonlinear optimization abstract base class
+    """
+    """
 
      Base class on top of which steepest descent, nonlinear conjugate, quasi-
      Newton and Newton methods can be implemented.  Includes methods for
@@ -53,6 +55,7 @@ class base(object):
         # manifest themselves through stagnation of the nonlinear optimization
         # algorithm.
 
+        intro(__name__, base.__doc__)
         # line search algorithm
         if 'LINESEARCH' not in PAR:
             setattr(PAR, 'LINESEARCH', 'Bracket')
@@ -77,6 +80,8 @@ class base(object):
         if 'OPTIMIZE' not in PATH:
             setattr(PATH, 'OPTIMIZE', PATH.SCRATCH+'/'+'optimize')
 
+        parpt(PAR, ['LINESEARCH','PRECOND','STEPCOUNTMAX','STEPLENINIT','STEPLENMAX'])
+        parpt(PATH, ['OPTIMIZE'])
 
         # assertions
         if 'WORKDIR' not in PATH:

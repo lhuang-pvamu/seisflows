@@ -24,7 +24,6 @@ class Struct(dict):
         super(Struct, self).__init__(*args, **kwargs)
         self.__dict__ = self
 
-
 def call(*args, **kwargs):
     if 'shell' not in kwargs:
         kwargs['shell'] = True

@@ -5,7 +5,7 @@ import numpy as np
 
 from os.path import abspath, basename, join
 from seisflows.tools import unix
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import, intro, parpt
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -26,47 +26,63 @@ class serial(custom_import('system', 'base')):
     def check(self):
         """ Checks parameters and paths
         """
+        intro(__name__, serial.__doc__)
+        pars = []
+        paths = []
 
         # name of job
+        pars += ['TITLE']
         if 'TITLE' not in PAR:
             setattr(PAR, 'TITLE', basename(abspath('.')))
 
         # number of tasks
+        pars += ['NTASK']
         if 'NTASK' not in PAR:
             setattr(PAR, 'NTASK', 1)
 
         # number of processers per task
+        pars += ['NPROC']
         if 'NPROC' not in PAR:
             setattr(PAR, 'NPROC', 1)
 
         # how to invoke executables
+        pars += ['MPIEXEC']
         if 'MPIEXEC' not in PAR:
             setattr(PAR, 'MPIEXEC', '')
 
         # level of detail in output messages
+        pars += ['VERBOSE']
         if 'VERBOSE' not in PAR:
             setattr(PAR, 'VERBOSE', 1)
 
         # where job was submitted
+        paths += ['WORKDIR']
         if 'WORKDIR' not in PATH:
             setattr(PATH, 'WORKDIR', abspath('.'))
 
         # where output files are written
+        paths += ['OUTPUT']
         if 'OUTPUT' not in PATH:
             setattr(PATH, 'OUTPUT', PATH.WORKDIR+'/'+'output')
 
         # where temporary files are written
+        paths += ['SCRATCH']
         if 'SCRATCH' not in PATH:
             setattr(PATH, 'SCRATCH', PATH.WORKDIR+'/'+'scratch')
 
         # where system files are written
+        paths += ['SYSTEM']
         if 'SYSTEM' not in PATH:
             setattr(PATH, 'SYSTEM', PATH.SCRATCH+'/'+'system')
 
         # optional local filesystem scratch path
+        paths += ['LOCAL']
         if 'LOCAL' not in PATH:
             setattr(PATH, 'LOCAL', None)
 
+        # report
+        parpt(PAR, pars)
+        parpt(PATH, paths)
 
     def submit(self, workflow):
         """ Submits job

@@ -5,7 +5,7 @@ import numpy as np
 
 from glob import glob
 from os.path import abspath, basename, dirname, exists
-from seisflows.config import ParameterError
+from seisflows.config import ParameterError, intro, parpt
 from seisflows.workflow.base import base
 
 PAR = sys.modules['seisflows_parameters']
@@ -21,10 +21,9 @@ class test_preprocess(base):
     def check(self):
         """ Checks parameters and paths
         """
-        # data file format
-        if 'FORMAT' not in PAR:
-            raise ParameterError(PAR, 'FORMAT')
+        intro(__name__, self.__doc__)
 
+        # data file format
         # data normalization option
         if 'NORMALIZE' not in PAR:
             setattr(PAR, 'NORMALIZE', None)
@@ -37,6 +36,17 @@ class test_preprocess(base):
         if 'FILTER' not in PAR:
             setattr(PAR, 'FILTER', None)
 
+        if 'SYNTHETICS' not in PATH:
+            setattr(PATH, 'SYNTHETICS', '')
+
+        if 'WORKDIR' not in PATH:
+            setattr(PATH, 'WORKDIR', abspath('.'))
+
+        parpt(PAR, ['FORMAT','NORMALIZE','MUTE','FILTER'])
+        parpt(PATH, ['DATA','SYNTHETICS','WORKDIR'])
+
+        if 'FORMAT' not in PAR:
+            raise ParameterError(PAR, 'FORMAT')
 
         if 'DATA' not in PATH:
             raise Exception
@@ -44,14 +54,9 @@ class test_preprocess(base):
         if not exists(PATH.DATA):
             raise Exception
 
-        if 'SYNTHETICS' not in PATH:
-            setattr(PATH, 'SYNTHETICS', '')
-
         if PATH.SYNTHETICS:
             assert exists(PATH.SYNTHETICS)
 
-        if 'WORKDIR' not in PATH:
-            setattr(PATH, 'WORKDIR', abspath('.'))
 
 
     def main(self):

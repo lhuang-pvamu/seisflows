@@ -7,7 +7,7 @@ from seisflows.tools import unix
 
 
 class base(object):
-    """ Abstract base class
+    """ Abstract base class for 'system' module
     """
 
     def check(self):
