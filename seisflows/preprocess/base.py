@@ -169,8 +169,8 @@ class base(object):
         sign_var = 1
         if 'FLIP_SIGN' in PAR:
             sign_var = -1
-            for ii in range(nn):
-                adj[ii].data = sign_var * self.adjoint(syn[ii].data, obs[ii].data, nt, dt)
+        for ii in range(nn):
+            adj[ii].data = sign_var * self.adjoint(syn[ii].data, obs[ii].data, nt, dt)
 
         self.writer(adj, path, channel)
 
