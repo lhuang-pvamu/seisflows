@@ -5,7 +5,7 @@ import sys
 from os.path import abspath, basename, join
 from seisflows.tools import unix
 from seisflows.tools.tools import call, findpath, saveobj
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import, intro, parpt
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -33,7 +33,11 @@ class slurm_sm(custom_import('system', 'base')):
     def check(self):
         """ Checks parameters and paths
         """
+        intro(__name__, slurm_sm.__doc__)
+        pars = []
+
         # name of job
+        pars += ['TITLE','WALLTIME']
         if 'TITLE' not in PAR:
             setattr(PAR, 'TITLE', basename(abspath('.')))
 
@@ -41,15 +45,14 @@ class slurm_sm(custom_import('system', 'base')):
         if 'WALLTIME' not in PAR:
             setattr(PAR, 'WALLTIME', 30.)
 
-        # number of tasks
-        if 'NTASK' not in PAR:
-            raise ParameterError(PAR, 'NTASK')
+        pars += ['NTASK','NPROC','NTASKMAX']
 
-        # number of cores per task
-        if 'NPROC' not in PAR:
-            raise ParameterError(PAR, 'NPROC')
+        # limit on number of concurrent tasks
+        if 'NTASKMAX' not in PAR:
+            setattr(PAR, 'NTASKMAX', 100)
 
         # how to invoke executables
+        pars += ['MOIEXEC','SLURMARGS','ENVIRONS','VERBOSE']
         if 'MPIEXEC' not in PAR:
             setattr(PAR, 'MPIEXEC', '')
 
@@ -64,6 +67,8 @@ class slurm_sm(custom_import('system', 'base')):
         # level of detail in output messages
         if 'VERBOSE' not in PAR:
             setattr(PAR, 'VERBOSE', 1)
+
+        parpt(PAR,pars)
 
         # where job was submitted
         if 'WORKDIR' not in PATH:
@@ -84,6 +89,16 @@ class slurm_sm(custom_import('system', 'base')):
         # optional local scratch path
         if 'LOCAL' not in PATH:
             setattr(PATH, 'LOCAL', None)
+
+        parpt(PATH, ['WORKDIR','OUTPUT','SCRATCH','SYSTEM','LOCAL'])
+
+        # number of tasks
+        if 'NTASK' not in PAR:
+            raise ParameterError(PAR, 'NTASK')
+
+        # number of cores per task
+        if 'NPROC' not in PAR:
+            raise ParameterError(PAR, 'NPROC')
 
 
     def submit(self, workflow):

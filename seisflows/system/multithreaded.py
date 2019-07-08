@@ -9,7 +9,7 @@ from time import sleep
 
 from seisflows.tools import unix
 from seisflows.tools.tools import call, findpath, nproc, saveobj
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import, intro, parpt
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -30,6 +30,7 @@ class multithreaded(custom_import('system', 'multicore')):
     def check(self):
         """ Checks parameters and paths
         """
+        intro(__name__, multithreaded.__doc__)
         print """
             DEPRECATION WARNING
 

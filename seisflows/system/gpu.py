@@ -8,7 +8,7 @@ from time import sleep
 
 from seisflows.tools import unix
 from seisflows.tools.tools import call, findpath, nproc, saveobj
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import, intro, parpt
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -30,6 +30,7 @@ class gpu(custom_import('system', 'serial')):
         """ Checks parameters and paths
         """
         super(gpu, self).check()
+        intro(__name__, gpu.__doc__)
 
         # number of tasks
         if 'NTASK' not in PAR:
@@ -47,6 +48,7 @@ class gpu(custom_import('system', 'serial')):
         if 'NTASKMAX' not in PAR:
             setattr(PAR, 'NTASKMAX', PAR.NPROCMAX/PAR.NPROC)
 
+        parpt(PAR, ['NTASK','NPROC','NPROCMAX','NTASKMAX'])
 
         # assertions
         assert PAR.NPROC <= PAR.NPROCMAX

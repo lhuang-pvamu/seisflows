@@ -8,7 +8,7 @@ from os.path import abspath, basename, join
 from seisflows.tools import msg
 from seisflows.tools import unix
 from seisflows.tools.tools import call, findpath, saveobj
-from seisflows.config import ParameterError, custom_import
+from seisflows.config import ParameterError, custom_import, intro, parpt
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -35,33 +35,31 @@ class pbs_lg(custom_import('system', 'base')):
     def check(self):
         """ Checks parameters and paths
         """
+        intro(__name__, pbs_lg.__doc__)
         print msg.Warning_pbs_lg
+        pars = []
+        paths = []
 
         # name of job
+        pars += ['TITLE']
         if 'TITLE' not in PAR:
             setattr(PAR, 'TITLE', basename(abspath('.')))
 
         # time allocated for workflow in minutes
+        pars += ['WALLTIME']
         if 'WALLTIME' not in PAR:
             setattr(PAR, 'WALLTIME', 30.)
 
         # number of tasks
-        if 'NTASK' not in PAR:
-            raise ParameterError(PAR, 'NTASK')
-
-        # number of cores per task
-        if 'NPROC' not in PAR:
-            raise ParameterError(PAR, 'NPROC')
-
-        # number of cores per node
-        if 'NODESIZE' not in PAR:
-            raise ParameterError(PAR, 'NODESIZE')
+        pars += ['NTASK','NODESIZE','NPROC']
 
         # how to invoke executables
+        pars += ['MPIEXEC']
         if 'MPIEXEC' not in PAR:
             setattr(PAR, 'MPIEXEC', 'mpiexec')
 
         # optional additional PBS arguments
+        pars += ['PBSARGS','ENVIRONS','VERBOSE']
         if 'PBSARGS' not in PAR:
             setattr(PAR, 'PBSARGS', '')
 
@@ -74,24 +72,45 @@ class pbs_lg(custom_import('system', 'base')):
             setattr(PAR, 'VERBOSE', 1)
 
         # where job was submitted
+        paths += ['WORKDIR']
         if 'WORKDIR' not in PATH:
             setattr(PATH, 'WORKDIR', abspath('.'))
 
         # where output files are written
+        paths += ['OUTPUT']
         if 'OUTPUT' not in PATH:
             setattr(PATH, 'OUTPUT', PATH.WORKDIR+'/'+'output')
 
         # where temporary files are written
+        paths += ['SCRATCH']
         if 'SCRATCH' not in PATH:
             setattr(PATH, 'SCRATCH', PATH.WORKDIR+'/'+'scratch')
 
         # where system files are written
+        paths += ['SYSTEM']
         if 'SYSTEM' not in PATH:
             setattr(PATH, 'SYSTEM', PATH.SCRATCH+'/'+'system')
 
-        # optional local scratch path
+        # optional local filesystem scratch path
+        paths += ['LOCAL']
         if 'LOCAL' not in PATH:
             setattr(PATH, 'LOCAL', None)
+
+        # report
+        parpt(PAR, pars)
+        parpt(PATH, paths)        
+
+        # number of tasks
+        if 'NTASK' not in PAR:
+            raise ParameterError(PAR, 'NTASK')
+
+        # number of cores per task
+        if 'NPROC' not in PAR:
+            raise ParameterError(PAR, 'NPROC')
+
+        # number of cores per node
+        if 'NODESIZE' not in PAR:
+            raise ParameterError(PAR, 'NODESIZE')
 
 
     def submit(self, workflow):
