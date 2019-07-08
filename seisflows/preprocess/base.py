@@ -29,6 +29,10 @@ class base(object):
         if 'MISFIT' not in PAR:
             setattr(PAR, 'MISFIT', None)
 
+        # option to flip sign when applying adjoint update
+        if 'FLIP_SIGN' not in PAR:
+            setattr(PAR, 'MISFIT', False)
+
         # used for migration
         if 'BACKPROJECT' not in PAR:
             setattr(PAR, 'BACKPROJECT', None)
@@ -167,8 +171,9 @@ class base(object):
 
         adj = syn
         sign_var = 1
-        if 'FLIP_SIGN' in PAR:
+        if PAR.FLIP_SIGN or int(PAR.FLIP_SIGN)>0 :
             sign_var = -1
+        # print "adjoint sign_var=",sign_var
         for ii in range(nn):
             adj[ii].data = sign_var * self.adjoint(syn[ii].data, obs[ii].data, nt, dt)
 
