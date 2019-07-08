@@ -96,6 +96,11 @@ if __name__ == '__main__':
     if args.title=='':
         args.title = args.file
 
+    msg = '\n X length= %d range: (%f, %f)'
+    print msg % (len(x), min(x), max(x))
+    msg = ' Z length= %d range: (%f, %f)'
+    print msg % (len(y), min(y), max(y))
+
     # Find data range and magnitude
     maxval = max(v)
     minval = min(v)
@@ -109,8 +114,8 @@ if __name__ == '__main__':
     else:
         vmsk = v
 
-    msg = '\n%s data range: (%f, %f)'
-    print msg % (args.file, minval, maxval)
+    msg = '\n%s data length= %d range: (%f, %f)'
+    print msg % (args.file, len(vmsk), minval, maxval)
 
     if vmag==0. :
         print "skipping all-zero data."
