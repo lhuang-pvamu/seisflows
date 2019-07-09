@@ -52,7 +52,7 @@ class slurm_sm(custom_import('system', 'base')):
             setattr(PAR, 'NTASKMAX', 100)
 
         # how to invoke executables
-        pars += ['MOIEXEC','SLURMARGS','ENVIRONS','VERBOSE']
+        pars += ['MPIEXEC','SLURMARGS','ENVIRONS','VERBOSE']
         if 'MPIEXEC' not in PAR:
             setattr(PAR, 'MPIEXEC', '')
 

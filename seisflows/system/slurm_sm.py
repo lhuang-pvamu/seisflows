@@ -47,6 +47,11 @@ class slurm_sm(custom_import('system', 'base')):
 
         pars += ['NTASK','NPROC']
 
+        # how to invoke executables
+        pars += ['MPIEXEC']
+        if 'MPIEXEC' not in PAR:
+            setattr(PAR, 'MPIEXEC', 'mpiexec')
+
         # optional additional SLURM arguments
         pars += ['SLURMARGS','ENVIRONS','VERBOSE']
         if 'SLURMARGS' not in PAR:
