@@ -55,7 +55,7 @@ class lsf_lg(custom_import('system', 'base')):
             setattr(PAR, 'TASKTIME', 15.)
 
         # number of tasks
-        pars += ['NTASK','NTASKMAX','NODESIZE']
+        pars += ['NTASK','NTASKMAX','NODESIZE','NSRC']
 
         # number of processers per task
         pars += ['NPROC']

@@ -51,7 +51,7 @@ class specfem2d(custom_import('solver', 'base')):
         #if PAR.FORMAT != 'su':
         #    raise Exception()
 
-        parpt(PAR, ['NT','DT','F0','FORMAT'])
+        parpt(PAR, ['NT','DT','F0','FORMAT','CHANNELS'])
 
 
     def check_solver_parameter_files(self):

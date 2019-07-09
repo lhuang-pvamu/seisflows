@@ -34,7 +34,7 @@ class specfem3d(custom_import('solver', 'base')):
 
         intro(__name__, specfem3d.__doc__)
 
-        parpt(PAR, ['NT','DT','F0','FORMAT'])
+        parpt(PAR, ['NT','DT','F0','FORMAT','CHANNELS'])
 
         # check time stepping parameters
         if 'NT' not in PAR:
