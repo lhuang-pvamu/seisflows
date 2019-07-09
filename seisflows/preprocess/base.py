@@ -20,6 +20,7 @@ class base(object):
       Provides data processing functions for seismic traces, with options for
       data misfit, filtering, normalization and muting
     """
+    sign_var = +1
 
     def check(self):
         """ Checks parameters and paths
@@ -31,7 +32,10 @@ class base(object):
 
         # option to flip sign when applying adjoint update
         if 'FLIP_SIGN' not in PAR:
-            setattr(PAR, 'MISFIT', False)
+            setattr(PAR, 'FLIP_SIGN', False)
+
+        if PAR.FLIP_SIGN or int(PAR.FLIP_SIGN)>0 :
+            self.sign_var = -1
 
         # used for migration
         if 'BACKPROJECT' not in PAR:
@@ -170,12 +174,8 @@ class base(object):
         nn, _ = self.get_network_size(syn)
 
         adj = syn
-        sign_var = 1
-        if PAR.FLIP_SIGN or int(PAR.FLIP_SIGN)>0 :
-            sign_var = -1
-        # print "adjoint sign_var=",sign_var
         for ii in range(nn):
-            adj[ii].data = sign_var * self.adjoint(syn[ii].data, obs[ii].data, nt, dt)
+            adj[ii].data = self.sign_var * self.adjoint(syn[ii].data, obs[ii].data, nt, dt)
 
         self.writer(adj, path, channel)
 
