@@ -18,7 +18,7 @@ NPROC                           = 1              # number of processes
 partitioning_method             = 3              # SCOTCH = 3
 
 # number of control nodes per element (4 or 9)
-ngnod                           = 4
+ngnod                           = 9
 
 # time step parameters (recording time 5 sec)
 # total number of time steps
@@ -55,7 +55,7 @@ MODEL                           = gll
 
 # Output the model with the requested type, does not save if turn to default or .false.
 # (available output formats: ascii,binary,gll,legacy)
-SAVE_MODEL                      = .false.
+SAVE_MODEL                      = default
 
 
 #-----------------------------------------------------------------------------
@@ -215,7 +215,7 @@ PERIODIC_HORIZ_DIST             = 4000.
 #   poroelastic: model_number 3 rhos rhof phi c kxx kxz kzz Ks Kf Kfr etaf mufr Qmu
 #   tomo:        model_number -1 0 0 A 0 0 0 0 0 0 0 0 0 0
 
-nbmodels                        = 5  # number of model materials
+nbmodels                        = 1  # 5  # number of model materials
 #1 1 2650.0 5300.0 3120.0 0 0 42.6 58.4 0 0 0 0 0 0   # basement
 #2 1 2450.0 3900.0 2050.0 0 0 40.9 47.8 0 0 0 0 0 0   # carbonate
 #3 1 2170.0 4500.0 2250.0 0 0 41.6 52.6 0 0 0 0 0 0   # salt
@@ -224,10 +224,10 @@ nbmodels                        = 5  # number of model materials
 
 # Acoustic case:
 1 1 2650.0 5300.0 0.0 0 0 9999 9999 0 0 0 0 0 0   # basement
-2 1 2450.0 3900.0 0.0 0 0 9999 9999 0 0 0 0 0 0   # carbonate
-3 1 2170.0 4500.0 0.0 0 0 9999 9999 0 0 0 0 0 0   # salt
-4 1 2170.0 2400.0 0.0 0 0 9999 9999 0 0 0 0 0 0   # clastics
-5 1 1750.0 1400.0 0.0 0 0 9999 9999 0 0 0 0 0 0   # overburden
+#2 1 2450.0 3900.0 0.0 0 0 9999 9999 0 0 0 0 0 0   # carbonate
+#3 1 2170.0 4500.0 0.0 0 0 9999 9999 0 0 0 0 0 0   # salt
+#4 1 2170.0 2400.0 0.0 0 0 9999 9999 0 0 0 0 0 0   # clastics
+#5 1 1750.0 1400.0 0.0 0 0 9999 9999 0 0 0 0 0 0   # overburden
 
 
 # external tomography file
