@@ -3,11 +3,11 @@
 # simulation input parameters
 #
 #-----------------------------------------------------------------------------
-title = Red Sea (KAUST) -- binary true model
+title = Red Sea (KAUST) -- approximate initial model
 
 # forward or adjoint simulation
 # 1 = forward, 2 = adjoint, 3 = both simultaneously ( 2 is UNUSED )
-SIMULATION_TYPE                 = 3
+SIMULATION_TYPE                 = 1
 # 0 = regular wave propagation simulation, 1/2/3 = noise simulation
 NOISE_TOMOGRAPHY                = 0
 # save the last frame, needed for adjoint simulation
@@ -23,7 +23,7 @@ ngnod                           = 4
 # time step parameters (recording time 5 sec)
 # total number of time steps
 NSTEP                           = 3334  # number of time steps
-DT                              = .0015 # time step size
+DT                              = .0005 # time step size
 
 # time stepping
 # 1 = Newmark (2nd order), 2 = LDDRK4-6 (4th-order 6-stage low storage Runge-Kutta), 3 = classical RK4 4th-order 4-stage Runge-Kutta
@@ -41,7 +41,7 @@ GPU_MODE                        = .false.  # use GPUs?
 # 0 = does not read/create database
 # 1 = creates database
 # 2 = reads database
-setup_with_binary_database      = 0
+setup_with_binary_database      = 1
 
 # available models
 #   default       - define model using nbmodels below
@@ -51,11 +51,11 @@ setup_with_binary_database      = 0
 #   external      - define model using define_external_model subroutine
 #   gll           - read GLL model from binary database file
 #   legacy        - read model from model_velocity.dat_input
-MODEL                           = gll
+MODEL                           = default
 
 # Output the model with the requested type, does not save if turn to default or .false.
 # (available output formats: ascii,binary,gll,legacy)
-SAVE_MODEL                      = .false.
+SAVE_MODEL                      = gll
 
 
 #-----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ freq0_poroelastic               = 10             # frequency for viscous attenua
 # use the flag below. It performs undoing of attenuation and/or of PMLs in an exact way for sensitivity kernel calculations
 # but requires disk space for temporary storage, and uses a significant amount of memory used as buffers for temporary storage.
 # When that option is on the second parameter indicates how often the code dumps restart files to disk (if in doubt, use something between 100 and 1000).
-UNDO_ATTENUATION_AND_OR_PML     = .true.
+UNDO_ATTENUATION_AND_OR_PML     = .false.
 NT_DUMP_ATTENUATION             = 500
 # Instead of reconstructing the forward wavefield, this option reads it from the disk using asynchronous I/O. Outperforms conventional mode using a value of NSTEP_BETWEEN_COMPUTE_KERNELS high enough.
 NO_BACKWARD_RECONSTRUCTION      = .false.
@@ -162,7 +162,7 @@ record_at_surface_same_vertical = .false.         # receivers inside the medium 
 #-----------------------------------------------------------------------------
 
 # save sensitivity kernels in ASCII format (much bigger files, but compatible with current GMT scripts) or in binary format
-save_ASCII_kernels              = .false.
+save_ASCII_kernels              = .true.
 # since the accuracy of kernel integration may not need to respect the CFL, this option permits to save computing time, and memory with UNDO_ATTENUATION_AND_OR_PML mode
 NSTEP_BETWEEN_COMPUTE_KERNELS   = 1
 
@@ -194,7 +194,7 @@ STACEY_ABSORBING_CONDITIONS     = .false.
 
 # periodic boundaries
 ADD_PERIODIC_CONDITIONS         = .false.
-PERIODIC_HORIZ_DIST             = 4000.
+PERIODIC_HORIZ_DIST             = 4000.d0
 
 
 #-----------------------------------------------------------------------------
@@ -274,7 +274,7 @@ tangential_detection_curve_file = ./DATA/courbe_eros_nodes
 #-----------------------------------------------------------------------------
 
 # file containing interfaces for internal mesh
-interfacesfile                  = ./FlatTopBotInterfaces.txt
+interfacesfile                  = ./interfaces_aprx.txt
 
 # geometry of the model (origin lower-left corner = 0,0) and mesh description
 xmin                            = -300.0           # abscissa of left side of the model
@@ -282,15 +282,21 @@ xmax                            = 12100.        # abscissa of right side of the 
 nx                              = 124             # number of elements along X
 
 # absorbing boundary parameters (see absorbing_conditions above)
-absorbtop                       = .false.
 absorbbottom                    = .true.
 absorbright                     = .true.
+absorbtop                       = .false.
 absorbleft                      = .true.
 
 # define the different regions of the model in the (nx,nz) spectral-element mesh
-nbregions                       = 1               # then set below the different regions and model number for each region
+nbregions                       = 6               # then set below the different regions and model number for each region
 # format of each line: nxmin nxmax nzmin nzmax material_number
-1 124  1 38 1
+1 124  1  3 1
+1 124  4 11 1
+1 124 12 19 2
+1 124 20 27 3
+1 124 28 39 4
+1 124 40 51 5 
+
 
 #-----------------------------------------------------------------------------
 #
