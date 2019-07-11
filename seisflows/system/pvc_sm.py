@@ -52,9 +52,9 @@ class pvc_sm(custom_import('system', 'base')):
         pars += ['NTASK','NPROC']
 
         # number of tasks per node
-        pars += ['CORES_PER_NODE']
-        if 'CORES_PER_NODE' not in PAR:
-            setattr(PAR, 'CORES_PER_NODE', 12)
+        pars += ['NODESIZE']
+        if 'NODESIZE' not in PAR:
+            setattr(PAR, 'NODESIZE', 12)
 
         # how to invoke executables
         pars += ['MPIEXEC']
@@ -128,7 +128,7 @@ class pvc_sm(custom_import('system', 'base')):
 
         workflow.checkpoint()
 
-        TASKS_PER_NODE = PAR.CORES_PER_NODE / PAR.NPROC
+        TASKS_PER_NODE = PAR.NODESIZE / PAR.NPROC
         #OMP_NT = os.getenv('OMP_NUM_THREADS')
         os.environ['OMP_NUM_THREADS'] = str(PAR.NPROC)
 
