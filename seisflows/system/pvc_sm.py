@@ -59,7 +59,7 @@ class pvc_sm(custom_import('system', 'base')):
         # how to invoke executables
         pars += ['MPIEXEC']
         if 'MPIEXEC' not in PAR:
-            setattr(PAR, 'MPIEXEC', 'mpiexec')
+            setattr(PAR, 'MPIEXEC', '')
 
         # optional additional PBS arguments
         pars += ['SLURMARGS','ENVIRONS','VERBOSE']
