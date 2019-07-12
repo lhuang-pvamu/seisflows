@@ -2,18 +2,25 @@
 
 from os.path import join
 
-from seisflows.config import save, saveobj
+from seisflows.config import save, saveobj, intro
 from seisflows.tools import unix
 
 
 class base(object):
-    """ Abstract base class for 'system' module
+    """ Base class for 'system' module
+      Interface to submit workflows, run tasks in serial or parallel.
+      Implements checkpointing. 
+
+      More information at: 
+      http://seisflows.readthedocs.org/en/stable/manual/manual.html
     """
 
     def check(self):
         """ Checks parameters and paths
         """
-        raise NotImplementedError('Must be implemented by subclass.')
+        intro(__name__, base.__doc__)
+        pass
+        # raise NotImplementedError('Must be implemented by subclass.')
 
 
 
