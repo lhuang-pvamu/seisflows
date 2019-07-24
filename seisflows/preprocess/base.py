@@ -66,11 +66,11 @@ class base(object):
             raise ParameterError(PAR, 'FORMAT')
 
         if PAR.FORMAT not in dir(readers):
-            print msg.ReaderError
+            print( msg.ReaderError )
             raise ParameterError()
 
         if PAR.FORMAT not in dir(writers):
-            print msg.WriterError
+            print( msg.WriterError )
             raise ParameterError()
 
         self.check_filter()
@@ -106,7 +106,7 @@ class base(object):
             obs = self.reader(path+'/'+'traces/obs', filename)
             syn = self.reader(path+'/'+'traces/syn', filename)
             if PAR.VERBOSE > 3:
-                print "[Preprocessing] prepare_eval_grad"
+                print( "[Preprocessing] prepare_eval_grad" )
 
             # process observations
             obs = self.apply_filter(obs)

@@ -27,16 +27,14 @@ class Struct(dict):
 def call(*args, **kwargs):
     if 'shell' not in kwargs:
         kwargs['shell'] = True
-    #print "spawning subprocess for: " + str(args) + " + " + str(kwargs)
-    #sys.stdout.flush()
     kwargs['stderr'] = subprocess.STDOUT
     try:
         subprocess.check_call(*args, **kwargs)
         #output = subprocess.check_output(*args, **kwargs)
     except subprocess.CalledProcessError as e:
-        print "subprocess failed: "
-        print e.cmd
-        print e.returncode
+        print( "subprocess failed: " )
+        print( e.cmd )
+        print( e.returncode )
         sys.exit(-1)
     #subprocess.check_call(*args, **kwargs)
 
@@ -64,7 +62,7 @@ def exists(names):
     for name in iterable(names):
         if not name:
             return False
-        elif not isinstance(name, basestring):
+        elif not isinstance(name, str):
             raise TypeError
         elif not os.path.exists(name):
             return False
@@ -136,7 +134,7 @@ def savejson(filename, obj):
 
 def loadpy(filename):
     if not exists(filename):
-        print msg.FileError % filename
+        print( msg.FileError % filename )
         raise IOError
 
     # load module

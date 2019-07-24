@@ -21,19 +21,6 @@ if __name__ == '__main__':
     myclass = sys.argv[2]
     myfunc = sys.argv[3]
 
-    taskid=-1
-    slurm_env = os.getenv('SLURM_GTIDS')
-    if slurm_env:
-        gid = slurm_env.split(',')
-        lid = int(os.getenv('SLURM_LOCALID'))
-        taskid=gid[lid]
-    seis_env = os.getenv('SEISFLOWS_TASKID')
-    if seis_env:
-        taskid = int(seis_env)
-
-    #print "task " + str(taskid) + " running " + str(myclass) + "." + str(myfunc) 
-    #+ " from directory " + str(mypath)
-
     if nargs == 4: 
         myenv = sys.argv[4].strip(',')
         export(myenv)
@@ -52,7 +39,5 @@ if __name__ == '__main__':
     # call function
     func = getattr(sys.modules['seisflows_'+myclass], myfunc)
     func(**kwargs)
-    #print "finished running " + str(myclass) + "." + str(myfunc) 
-    #print "task " + str(taskid) + " finished running " + str(myclass) + "." + str(myfunc) 
     sys.stdout.flush()
 

@@ -177,9 +177,11 @@ class dask_sm(custom_import('system', 'base')):
     def taskid(self):
         """ Provides a unique identifier for each running task
         """
-        gid = os.getenv('SLURM_GTIDS').split(',')
-        lid = int(os.getenv('SLURM_LOCALID'))
-        return int(gid[lid])
+        #TODO: how do I store this in task creation and access it here?
+
+        #gid = os.getenv('SLURM_GTIDS').split(',')
+        #lid = int(os.getenv('SLURM_LOCALID'))
+        #return int(gid[lid])
 
 
     def mpiexec(self):
