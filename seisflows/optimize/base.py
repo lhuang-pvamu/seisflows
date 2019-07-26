@@ -88,7 +88,7 @@ class base(object):
             raise ParameterError
 
         if PAR.OPTIMIZE in ['base']:
-            print msg.CompatibilityError1
+            print( msg.CompatibilityError1 )
             sys.exit(-1)
 
         if PAR.LINESEARCH:
@@ -167,8 +167,8 @@ class base(object):
             self.line_search.step_len_max = \
                 PAR.STEPLENMAX*norm_m/norm_p
           else:
-            print "optimize.base: norm_p is zero, will use", \
-                "unnormalized STEPLENMAX = %g"%PAR.STEPLENMAX
+            print ("optimize.base: norm_p is zero, will use", \
+                "unnormalized STEPLENMAX = %g"%PAR.STEPLENMAX )
             self.line_search.step_len_max = PAR.STEPLENMAX
 
         # determine initial step length
@@ -179,8 +179,8 @@ class base(object):
           if norm_p > 0. :
             alpha = PAR.STEPLENINIT*norm_m/norm_p
           else:
-            print "optimize.base: norm_p is zero, will use", \
-                "unnormalized STEPLENINIT = %g"%PAR.STEPLENINIT
+            print( "optimize.base: norm_p is zero, will use", \
+                "unnormalized STEPLENINIT = %g"%PAR.STEPLENINIT )
             alpha = PAR.STEPLENINIT
 
         # write model corresponding to chosen step length
@@ -261,7 +261,7 @@ class base(object):
         theta = angle(p,-g)
 
         if PAR.VERBOSE >= 2:
-            print ' theta: %6.3f' % theta
+            print( ' theta: %6.3f' % theta )
 
         thresh = 1.e-3
         if abs(theta) < thresh:
@@ -296,29 +296,25 @@ class base(object):
         # reads vectors from disk
         vector = loadnpy(PATH.OPTIMIZE+'/'+filename)
         if PAR.VERBOSE > 3:
-            print " [Optimizer] loading vector from " + filename + ":"
-            print "  " + str(vector)
+            print( " [Optimizer] loading vector from " + filename + ":" )
+            print( "  " + str(vector) )
         return vector
         #return loadnpy(PATH.OPTIMIZE+'/'+filename)
 
     def save(self, filename, array):
         # writes vectors to disk
         if PAR.VERBOSE > 3:
-            print " [Optimizer] writing vector to " + filename + ":"
-            print "  " + str(array)
+            print( " [Optimizer] writing vector to " + filename + ":" )
+            print( "  " + str(array) )
         savenpy(PATH.OPTIMIZE+'/'+filename, array)
 
     def loadtxt(self, filename):
         # reads scalars from disk
-#        print " [Optimizer] loading scalar from " + filename + ":"
         scalar = float(np.loadtxt(PATH.OPTIMIZE+'/'+filename))
-#        print "  " + str(scalar)
         return scalar
 
     def savetxt(self, filename, scalar):
         # writes scalars to disk
-#        print " [Optimizer] writing scalar to " + filename + ":"
-#        print "  " + str(scalar)
         np.savetxt(PATH.OPTIMIZE+'/'+filename, [scalar] ) #TEC , '%11.6e')
 
 

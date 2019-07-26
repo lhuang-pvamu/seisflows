@@ -128,7 +128,8 @@ def loadjson(filename):
 
 def savejson(filename, obj):
     """Save object using json"""
-    with open(filename, 'wb') as file:
+    #with open(filename, 'wb') as file:
+    with open(filename, 'w') as file:
         json.dump(obj, file, sort_keys=True, indent=4)
 
 

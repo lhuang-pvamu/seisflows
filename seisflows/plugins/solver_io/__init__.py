@@ -5,5 +5,6 @@
 # ADIOS IO format is currently implemented in SPECFEM3D, but not SeisFlows
 #import adios
 
-import fortran_binary
+#import fortran_binary
+from . import fortran_binary
 
