@@ -68,8 +68,6 @@ class specfem2d(custom_import('solver', 'base')):
             PAR.NT = nt
 
         if "DT" in PAR:
-            print(dt)
-            print(PAR.DT)
             assert(PAR.DT == dt)
         else: 
             PAR.DT = dt

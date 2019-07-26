@@ -18,6 +18,7 @@ PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
 
 def create_task_dask(mypath, myclass, myfunc, taskid):
+    print("task_creation")
     # reload from last checkpoint
     load(mypath)
 
@@ -159,7 +160,7 @@ class dask_sm(custom_import('system', 'base')):
 
         #for each task
         for taskid in PAR.NTASK:
-            futures.append(client.submit(run, PATH.OUTPUT, classname, method, taskid, pure=False))
+            futures.append(client.submit(create_task_dask, PATH.OUTPUT, classname, method, taskid, pure=False))
 
         wait(futures)
 
