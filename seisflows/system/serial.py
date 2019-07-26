@@ -12,20 +12,13 @@ PATH = sys.modules['seisflows_paths']
 
 
 class serial(custom_import('system', 'base')):
-    """ An interface through which to submit workflows, run tasks in serial or 
-      parallel, and perform other system functions.
-
-      By hiding environment details behind a python interface layer, these 
-      classes provide a consistent command set across different computing
-      environments.
-
-      For important additional information, please see 
-      http://seisflows.readthedocs.org/en/latest/manual/manual.html#system-configuration
-    """
+    "Implements workflow serially instead of in parallel, for testing. "
 
     def check(self):
         """ Checks parameters and paths
         """
+        super(serial, self).check()
+
         intro(__name__, serial.__doc__)
         pars = []
         paths = []

@@ -1,0 +1,9 @@
+[teclee@master model_init_flat]$ createInitModel -n -500 1400 -n -1500 2500 -n -2000 4500 -n -2500 4000 -n -3000 5000 *_[xz]* ../model_true_pml/proc000000_vp.bin proc000000_vp.bin
+Node depths:  [    0.  -500. -1500. -2000. -2500. -3000. -3800.]
+Node values:  [1400. 1400. 2500. 4500. 4000. 5000. 5000.]
+Preserving to depth  100
+[teclee@master model_init_flat]$ createInitModel -n -500 1750 -n -1500 2100 -n -2000 2200 -n -2500 2500 -n -3000 2600 *_[xz]* ../model_true_pml/proc000000_rho.bin proc000000_rho.bin
+Node depths:  [    0.  -500. -1500. -2000. -2500. -3000. -3800.]
+Node values:  [1750. 1750. 2100. 2200. 2500. 2600. 2600.]
+Preserving to depth  100
+

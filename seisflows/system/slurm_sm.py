@@ -12,27 +12,16 @@ PATH = sys.modules['seisflows_paths']
 
 
 class slurm_sm(custom_import('system', 'base')):
-    """ An interface through which to submit workflows, run tasks in serial or 
-      parallel, and perform other system functions.
-
-      By hiding environment details behind a python interface layer, these 
-      classes provide a consistent command set across different computing
-      environments.
-
-      Intermediate files are written to a global scratch path PATH.SCRATCH,
-      which must be accessible to all compute nodes.
-
-      Optionally, users can provide a local scratch path PATH.LOCAL if each
-      compute node has its own local filesystem.
-
-      For important additional information, please see 
-      http://seisflows.readthedocs.org/en/latest/manual/manual.html#system-configuration
+    """ Run small 2D inversions on SLURM clusters. 
+    All resources are allocated at the beginning and all simulations are run
+    within a single job. Requires that each individual wavefield simulation
+    runs only a single core.
     """
-
 
     def check(self):
         """ Checks parameters and paths
         """
+        super(serial, self).check()
         intro(__name__, slurm_sm.__doc__)
         pars = []
 

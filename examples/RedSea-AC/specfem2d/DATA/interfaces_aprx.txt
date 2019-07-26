@@ -1,11 +1,16 @@
 # Red Sea model (KAUST) -- Approximate interfaces used for initial model
 #
 # number of interfaces
-   6
+   7
 #
 # for each interface below, we give the number of points and then x,z for each point
 #
-# interface 1 (bottom of the mesh)
+# interface 0 (bottom of the mesh) (includes 300 m PML layer)
+ 2
+       0 -3800
+   11800 -3800
+#
+# interface 1 (bottom of the model) (above the PML layer)
  2
        0 -3500
    11800 -3500
@@ -45,8 +50,11 @@
 #
 # for each layer, we give the number of spectral elements in the vertical direction
 #
+# PML
+  3
+#
 # basement
- 16
+  8
 # carbonates
  8
 # salt
@@ -54,5 +62,5 @@
 # clastics
 12
 # overburden
- 6
+12
 
