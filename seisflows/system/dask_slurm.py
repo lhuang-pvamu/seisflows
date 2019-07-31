@@ -1,6 +1,7 @@
 
 import os
 import sys
+import time
 
 from os.path import abspath, basename, join
 from seisflows.tools import unix
@@ -8,32 +9,50 @@ from seisflows.tools.tools import call, findpath, saveobj
 from seisflows.config import ParameterError, custom_import, intro, parpt
 
 from dask_jobqueue import SLURMCluster
-from dask.distributed import Client
-from dask.distributed import wait
+from dask.distributed import Client, wait, get_client
 
 from seisflows.tools.tools import loadjson, loadobj
 from seisflows.config import load
 
+from seisflows.system.dask_utils import submit_workflow_dask
+from seisflows.system.dask_utils import create_task_dask
+
+#def submit_workflow_dask(output_path):
+#
+#    print("workflow changing directories to " + output_path)
+#    unix.cd(output_path)
+#    load(output_path)
+#
+#    workflow = sys.modules['seisflows_workflow']
+#    systyem = sys.modules['seisflows_system']
+#    print("running workflow.main()")
+#
+#    workflow.main()
+#    return 42
+#
+#
+#def create_task_dask(mypath, myclass, myfunc, taskid):
+#    print("task_creation")
+#    # reload from last checkpoint
+#    load(mypath)
+#
+#    # load function arguments
+#    kwargspath = join(mypath, 'kwargs')
+#    kwargs = loadobj(join(kwargspath, myclass+'_'+myfunc + '.p'))
+#
+#    # call function
+#    func = getattr(sys.modules['seisflows_'+myclass], myfunc)
+#    func(**kwargs)
+#    sys.stdout.flush()
+#
+
+
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
 
-def create_task_dask(mypath, myclass, myfunc, taskid):
-    print("task_creation")
-    # reload from last checkpoint
-    load(mypath)
-
-    # load function arguments
-    kwargspath = join(mypath, 'kwargs')
-    kwargs = loadobj(join(kwargspath, myclass+'_'+myfunc + '.p'))
-
-    # call function
-    func = getattr(sys.modules['seisflows_'+myclass], myfunc)
-    func(**kwargs)
-    sys.stdout.flush()
 
 
-
-class dask_sm(custom_import('system', 'base')):
+class dask_slurm(custom_import('system', 'base')):
     """ An interface through which to submit workflows, run tasks in serial or 
       parallel, and perform other system functions.
 
@@ -55,7 +74,7 @@ class dask_sm(custom_import('system', 'base')):
     def check(self):
         """ Checks parameters and paths
         """
-        intro(__name__, slurm_sm.__doc__)
+        intro(__name__, dask_slurm.__doc__)
         pars = []
 
         # name of job
@@ -91,7 +110,7 @@ class dask_sm(custom_import('system', 'base')):
             setattr(PAR, 'QUEUE', 'compute')
 
         if 'MEMORY' not in  PAR:
-            setattr(PAR, 'MEMORY', '50 GB')
+            setattr(PAR, 'MEMORY', '16 GB')
 
 
         parpt(PAR,pars)
@@ -124,11 +143,11 @@ class dask_sm(custom_import('system', 'base')):
         
         # number of nodes to run on
         if 'NNODES' not in PAR:
-            raise ParameterError(PAR, 'NPROC')
+            raise ParameterError(PAR, 'NNODES')
 
         # number of processors per node
         if 'CORES' not in PAR:
-            raise ParameterError(PAR, 'NPROC')
+            raise ParameterError(PAR, 'CORES')
 
 
     def submit(self, workflow):
@@ -143,12 +162,30 @@ class dask_sm(custom_import('system', 'base')):
 
         workflow.checkpoint()
 
-        cluster = SLURMCluster(cores=PAR.CORES, memory = PAR.MEMORY, queue = PAR.QUEUE, walltime = PAR.WALLTIME)
-        cluster.scale(PAR.NNODES)
-        client = Client(cluster)
+        self.cluster = SLURMCluster(cores=12, memory = '16GB', queue = 'compute')#, walltime = PAR.WALLTIME)
+        #cluster = SLURMCluster(cores=PAR.CORES, memory = PAR.MEMORY, queue = PAR.QUEUE)#, walltime = PAR.WALLTIME)
+        #print(PAR.CORES)
+        #print(PAR.MEMORY)
+        #print(PAR.QUEUE)
 
+        self.cluster.start_workers(PAR.NNODES)
+        print(self.cluster)
+        
+        time.sleep(1)
+
+        #while len(cluster.running_jobs) < PAR.NNODES:
+        #    print(cluster)
+        #    time.sleep(1)
+
+        self.client = Client(self.cluster)
+
+        print("submitting job")
+        print(self.cluster)
         #TODO: Not sure if this works, might need to use the submit script
-        client.submit(workflow.main)
+        main_workflow = self.client.submit(submit_workflow_dask, PATH.OUTPUT, pure=False)
+
+        print(main_workflow.result())
+
 
         
 
@@ -157,9 +194,10 @@ class dask_sm(custom_import('system', 'base')):
         """
         self.checkpoint(PATH.OUTPUT, classname, method, args, kwargs)
         futures = []
+        client = get_client()
 
         #for each task
-        for taskid in PAR.NTASK:
+        for taskid in range(PAR.NTASK):
             futures.append(client.submit(create_task_dask, PATH.OUTPUT, classname, method, taskid, pure=False))
 
         wait(futures)
@@ -170,7 +208,9 @@ class dask_sm(custom_import('system', 'base')):
         """
         self.checkpoint(PATH.OUTPUT, classname, method, args, kwargs)
 
-        future = client.submit(run, PATH.OUTPUT, classname, method, 0, pure=False))
+        client = get_client()
+
+        future = client.submit(create_task_dask, PATH.OUTPUT, classname, method, 0, pure=False)
 
         wait(future)
 
