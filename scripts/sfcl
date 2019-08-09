@@ -27,16 +27,16 @@ if output_path:
 
 
 #remove output*
-print "removing " + output
+print( "removing " + output)
 #if os.path.exists(output):
 #    shutil.rmtree(output)
 #else:
 #    print "\t" + output + " does not exist"
 for outfile in glob.glob(output + "*"):
-    print outfile
+    print( outfile)
     os.system("rm -rf " + outfile)
 
 #remove scratch
-print "removing " + scratch
+print( "removing " + scratch)
 if os.path.exists(scratch):
     shutil.rmtree(scratch)

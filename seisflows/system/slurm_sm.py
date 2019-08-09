@@ -21,7 +21,7 @@ class slurm_sm(custom_import('system', 'base')):
     def check(self):
         """ Checks parameters and paths
         """
-        super(serial, self).check()
+        super(slurm_sm, self).check()
         intro(__name__, slurm_sm.__doc__)
         pars = []
 

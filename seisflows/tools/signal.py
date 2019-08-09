@@ -36,7 +36,7 @@ def mute_early_arrivals(traces, slope, const, time_scheme, s_coords, r_coords):
 
 
     for ir in range(nr):
-        # calculate source-reciever distance
+        # calculate source-receiver distance
         (sx, sy) = (s_coords[0][ir], s_coords[1][ir])
         (rx, ry) = (r_coords[0][ir], r_coords[1][ir])
         offset = np.sqrt((rx-sx)**2 + (ry-sy)**2)
@@ -135,7 +135,7 @@ def mask(slope, const, offset, time_scheme, length=400):
     win = win[0:length]
 
     # caculate offsets
-    itmin = int(np.ceil((slope*abs(offset)+const)/dt)) - length/2
+    itmin = int(np.ceil((slope*abs(offset)+const)/dt) - length/2 )
     itmax = itmin + length
 
     if 1 < itmin < itmax < nt:
