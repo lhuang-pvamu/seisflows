@@ -135,8 +135,6 @@ class base(object):
           generates seismic data to be inverted or migrated
         """
         # clean up for new inversion
-        #print os.getcwd()
-        #print self.cwd
         unix.rm(self.cwd)
 
         # As input for an inversion or migration, users can choose between
@@ -146,7 +144,7 @@ class base(object):
         # provided
 
         if PATH.DATA:
-            print "copying user supplied data"
+            print( "copying user supplied data" )
             self.initialize_solver_directories()
 
             src = glob(PATH.DATA +'/'+ self.source_name +'/'+ '*')
@@ -155,7 +153,7 @@ class base(object):
 
         else:
             if PAR.VERBOSE > 3:
-                print "generating data on the fly"
+                print( "generating data on the fly" )
             self.generate_data(
                 model_path=PATH.MODEL_TRUE,
                 model_name='model_true',
@@ -280,13 +278,11 @@ class base(object):
         """
         dict = Container()
         if PAR.VERBOSE > 3:
-            print " [Solver] loading specfem model " + path + ": "
+            print( " [Solver] loading specfem model " + path + ": " )
         for iproc in range(self.mesh_properties.nproc):
             for key in parameters or self.parameters:
                 dict[key] += self.io.read_slice(
                     path, prefix+key+suffix, iproc)
-                #print "  " + str(key) + ": " + str(dict[key])
-                #print dict[key]
         return dict
 
 
@@ -303,7 +299,7 @@ class base(object):
         """
         unix.mkdir(path)
         if PAR.VERBOSE > 3:
-            print " [Solver] saving specfem model " + path + ": "
+            print( " [Solver] saving specfem model " + path + ": " )
 
         # fill in any missing parameters
         missing_keys = diff(parameters, dict.keys())
@@ -315,8 +311,6 @@ class base(object):
         # write slices to disk
         for iproc in range(self.mesh_properties.nproc):
             for key in parameters:
-                #print "  " + str(dict[key][iproc])
-                #print dict[key][iproc]
                 self.io.write_slice(
                     dict[key][iproc], path, prefix+key+suffix, iproc)
 
@@ -366,8 +360,7 @@ class base(object):
 
         for name in parameters or self.parameters:
             if PAR.VERBOSE > 3:
-                print "calling " + PATH.SPECFEM_BIN +'/xcombine_sem ' + name + '_kernel kernel_paths ' + output_path
-                #raw_input("calling combine")
+                print( "calling " + PATH.SPECFEM_BIN +'/xcombine_sem ' + name + '_kernel kernel_paths ' + output_path )
             call_solver(
                 system.mpiexec(),
                 PATH.SPECFEM_BIN +'/'+ 'xcombine_sem '
@@ -389,7 +382,7 @@ class base(object):
         # apply smoothing operator
         unix.cd(self.cwd)
         for name in parameters or self.parameters:
-            print ' smoothing', name
+            print( ' smoothing', name )
             call_solver(
                 system.mpiexec(),
                 PATH.SPECFEM_BIN +'/'+ 'xsmooth_sem '
@@ -400,7 +393,7 @@ class base(object):
                 + output_path + '/ ',
                 output='/dev/null')
 
-        print ''
+        print( '' )
 
         # rename output files
         files = glob(output_path+'/*')
@@ -433,8 +426,6 @@ class base(object):
 
         src = glob('*_kernel.bin')
         dst = join(path, 'kernels', self.source_name)
-#        if PAR.VERBOSE > 3:
-#            print " [Solver] moving kernels from " + str(self.kernel_databases) + " to " + str(dst)
         unix.mkdir(dst)
         unix.mv(src, dst)
 
@@ -524,9 +515,6 @@ class base(object):
     def initialize_adjoint_traces(self):
         """ Puts in place "adjoint traces" expected by SPECFEM
         """
-        #print "filenames in " + self.cwd
-        #for filename in self.data_filenames:
-        #    print filename
         for filename in self.data_filenames:
             # read traces
             d = preprocess.reader(self.cwd +'/'+ 'traces/obs', filename)
@@ -579,14 +567,14 @@ class base(object):
         """
         path = PATH.SPECFEM_DATA
         if not os.path.exists(os.path.realpath(path)):
-            print "path missing: " + os.path.realpath(path)
+            print( "path missing: " + os.path.realpath(path) )
             raise Exception
 
         # apply wildcard rule
         wildcard = self.source_prefix+'_*'
         globstar = sorted(glob(path +'/'+ wildcard))
         if not globstar:
-             print msg.SourceError_SPECFEM % (path, wildcard)
+             print( msg.SourceError_SPECFEM % (path, wildcard) )
              sys.exit(-1)
 
         names = []
