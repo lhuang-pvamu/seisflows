@@ -362,13 +362,7 @@ class base(object):
 
         if 'MuteLongOffsets' in PAR.MUTE:
             assert 'MUTE_LONG_OFFSETS_DIST' in PAR
-            assert 0 < PAR.MUTE_SHORT_OFFSETS_DIST
-
-        if 'MuteShortOffsets' not in PAR.MUTE:
-            setattr(PAR, 'MUTE_SHORT_OFFSETS_DIST', 0.)
-
-        if 'MuteLongOffsets' not in PAR.MUTE:
-            setattr(PAR, 'MUTE_LONG_OFFSETS_DIST', 0.)
+            assert 0 < PAR.MUTE_LONG_OFFSETS_DIST
 
 
     def check_normalize(self):

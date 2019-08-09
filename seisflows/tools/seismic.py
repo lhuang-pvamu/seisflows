@@ -28,7 +28,7 @@ def call_solver(mpiexec, executable, output='solver.log'):
             mpiexec +' '+ executable,
             shell=True,
             stdout=f)
-        print mpiexec + " " + executable + ":  " + str(time.time()-t1)
+        #TEC print mpiexec + " " + executable + ":  " + str(time.time()-t1)
         sys.stdout.flush()
         #print "call took " + str(time.time()-t1) + " seconds"
         #raw_input("call complete")
