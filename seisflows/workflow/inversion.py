@@ -136,41 +136,41 @@ class inversion(base):
         """ Carries out seismic inversion
         """
         optimize.iter = PAR.BEGIN
-        print ''
-        print "-------------------------"
-        print "main setup"
+        print( '' )
+        print( "-------------------------" )
+        print( "main setup" )
         sys.stdout.flush()
         python_time_start = time.clock()
         time_start = time.time()
         self.setup()
-        print "setup time: " + str(time.time() - time_start)
-        print "-------------------------"
+        print( "setup time: " + str(time.time() - time_start) )
+        print( "-------------------------" )
         sys.stdout.flush()
 
         while optimize.iter <= PAR.END:
             time_iter = time.time()
             python_time_iter = time.clock()
-            print "\n-------------------------"
-            print "Starting iteration", optimize.iter
-            print "-------------------------\n"
+            print( "\n-------------------------" )
+            print( "Starting iteration", optimize.iter )
+            print( "-------------------------\n" )
             sys.stdout.flush()
             self.initialize()
 
-            print "-------------------------"
-            print "Computing gradient"
-            print "-------------------------"
+            print( "-------------------------" )
+            print( "Computing gradient" )
+            print( "-------------------------" )
             sys.stdout.flush()
             self.evaluate_gradient()
 
-            print "-------------------------"
-            print "Computing search direction"
-            print "-------------------------"
+            print( "-------------------------" )
+            print( "Computing search direction" )
+            print( "-------------------------" )
             sys.stdout.flush()
             self.compute_direction()
 
-            print "-------------------------"
-            print "Computing step length"
-            print "-------------------------"
+            print( "-------------------------" )
+            print( "Computing step length" )
+            print( "-------------------------" )
             sys.stdout.flush()
             self.line_search()
 
@@ -178,14 +178,14 @@ class inversion(base):
             self.clean()
             optimize.iter += 1
 
-            print "-------------------------"
-            print "iteration time: " + str(time.time() - time_iter)
-            print "-------------------------\n"
+            print( "-------------------------" )
+            print( "iteration time: " + str(time.time() - time_iter) )
+            print( "-------------------------\n" )
 
-        print "-------------------------"
-        print "inversion time: " + str(time.time() - time_start)
-        print "Total time spent in python: " + str( time.clock()-python_time_start )
-        print "-------------------------"
+        print( "-------------------------" )
+        print( "inversion time: " + str(time.time() - time_start) )
+        print( "Total time spent in python: " + str( time.clock()-python_time_start ) )
+        print( "-------------------------" )
 
 
     def setup(self):
@@ -198,11 +198,11 @@ class inversion(base):
 
         if optimize.iter == 1 or PATH.LOCAL:
             if PATH.DATA:
-                print 'Copying data' 
+                print( 'Copying data'  )
             else:
                 if PAR.VERBOSE > 3:
-                    print "Data not present in " + str(PATH.DATA)
-                print 'Generating data' 
+                    print( "Data not present in " + str(PATH.DATA) )
+                print( 'Generating data'  )
 
             system.run('solver', 'setup')
 
@@ -211,15 +211,15 @@ class inversion(base):
         """ Prepares for next model update iteration
         """
         if PAR.VERBOSE > 3:
-            print "[Initialize] write_model: "
+            print( "[Initialize] write_model: " )
         self.write_model(path=PATH.GRAD, suffix='new')
 
         if PAR.VERBOSE > 3:
-            print '[Initialize] Generate synthetics (run forward model)'
+            print( '[Initialize] Generate synthetics (run forward model)' )
         system.run('solver', 'eval_func', path=PATH.GRAD)
 
         if PAR.VERBOSE > 3:
-            print "[Initialize] write_misfit"
+            print( "[Initialize] write_misfit" )
         self.write_misfit(path=PATH.GRAD, suffix='new')
 
 
@@ -240,7 +240,7 @@ class inversion(base):
         optimize.initialize_search()
 
         while True:
-            print "\n\t-- Trial step " + str( optimize.line_search.step_count + 1) + " --"
+            print( "\n\t-- Trial step " + str( optimize.line_search.step_count + 1) + " --" )
             sys.stdout.flush()
             self.evaluate_function()
             status = optimize.update_search()
@@ -254,12 +254,12 @@ class inversion(base):
 
             elif status < 0:
                 if optimize.retry_status():
-                    print ' Line search failed\n\n Retrying...'
+                    print( ' Line search failed\n\n Retrying...' )
                     optimize.restart()
                     self.line_search()
                     break
                 else:
-                    print ' Line search failed\n\n Aborting...'
+                    print( ' Line search failed\n\n Aborting...' )
                     sys.exit(-1)
 
 
@@ -267,15 +267,15 @@ class inversion(base):
         """ Performs forward simulation to evaluate objective function
         """
         if PAR.VERBOSE > 3:
-            print "[evaluate_function] write_model"
+            print( "[evaluate_function] write_model" )
         self.write_model(path=PATH.FUNC, suffix='try')
 
         if PAR.VERBOSE > 3:
-            print "[evaluate_function] run eval_func"
+            print( "[evaluate_function] run eval_func" )
         system.run('solver', 'eval_func', path=PATH.FUNC)
 
         if PAR.VERBOSE > 3:
-            print "[evaluate_function] write_misfit"
+            print( "[evaluate_function] write_misfit" )
         self.write_misfit(path=PATH.FUNC, suffix='try')
 
 
@@ -283,16 +283,16 @@ class inversion(base):
         """ Performs adjoint simulation to evaluate gradient
         """
         if PAR.VERBOSE > 3:
-            print "\neval_grad run"
+            print( "\neval_grad run" )
         system.run('solver', 'eval_grad',
                    path=PATH.GRAD,
                    export_traces=divides(optimize.iter, PAR.SAVETRACES))
 
         if PAR.VERBOSE > 3:
-            print "eval_grad write"
+            print( "eval_grad write" )
         self.write_gradient(path=PATH.GRAD, suffix='new')
         if PAR.VERBOSE > 3:
-            print "eval_grad done"
+            print( "eval_grad done" )
 
 
     def finalize(self):
@@ -337,15 +337,15 @@ class inversion(base):
         """ Writes model in format expected by solver
         """
         src = 'm_'+suffix
-        #print " source = " + src
+        #print( " source = " + src )
         if PAR.VERBOSE > 3:
-            print " write_model " + path + "/" + src
+            print( " write_model " + path + "/" + src )
         dst = path +'/'+ 'model'
         if PAR.VERBOSE > 3:
-            print "  to: " + dst 
+            print( "  to: " + dst  )
             tmp_split = solver.split(optimize.load(src))
             for entry in tmp_split:
-                print "   " + str(entry) + ": " + str(tmp_split[entry])
+                print( "   " + str(entry) + ": " + str(tmp_split[entry]) )
 
         solver.save(solver.split(optimize.load(src)), dst)
 
@@ -355,7 +355,7 @@ class inversion(base):
         """
         src = join(path, 'gradient')
         if PAR.VERBOSE > 3:
-            print " writing gradient " + src 
+            print( " writing gradient " + src  )
         dst = 'g_'+suffix
         postprocess.write_gradient(path)
         parts = solver.load(src, suffix='_kernel')
@@ -368,10 +368,10 @@ class inversion(base):
         src = glob(path +'/'+ 'residuals/*')
         dst = 'f_'+suffix
 #        if PAR.VERBOSE > 3:
-#            print " summing residuals from: " + str(src)
+#            print( " summing residuals from: " + str(src) )
         total_misfit = preprocess.sum_residuals(src)
         if PAR.VERBOSE > 3:
-            print " saving total misfit " + str(total_misfit) + " to " + str(dst)
+            print( " saving total misfit " + str(total_misfit) + " to " + str(dst) )
         optimize.savetxt(dst, total_misfit)
 
 

@@ -19,7 +19,7 @@ def cat(src, *dst):
     f.close()
 
     if not dst:
-        print contents
+        print( contents )
     else:
         f = open(dst, 'w')
         f.write(contents)
@@ -28,7 +28,7 @@ def cat(src, *dst):
 
 def cd(path):
     if debug_print:
-	print " cd " + path
+        print( " cd " + path )
     os.chdir(path)
 
 
@@ -50,14 +50,14 @@ def cp(src='', dst=''):
 
     if isfile(src):
         if debug_print:
-            print "  copying file " + src 
-            print "   to " + dst
+            print( "  copying file " + src )
+            print( "   to " + dst )
         shutil.copy(src, dst)
 
     elif isdir(src):
         if debug_print:
-            print "  copying directory " + src 
-            print "   to " + dst
+            print( "  copying directory " + src )
+            print( "   to " + dst )
         shutil.copytree(src, dst)
 
 
@@ -88,7 +88,7 @@ def mkdir(dirs):
     for dir in iterable(dirs):
         try:
             if debug_print:
-                print "  mkdir " + dir
+                print( "  mkdir " + dir )
             os.makedirs(dir)
         except OSError as exc:
             if exc.errno == errno.EEXIST and os.path.isdir(dir):
@@ -107,40 +107,40 @@ def mv(src='', dst=''):
     if isdir(dst):
         dst = join(dst, basename(src))
     if debug_print:
-        print "  moving " + src 
-        print "   to " + dst
+        print( "  moving " + src )
+        print( "   to " + dst )
     shutil.move(src, dst)
 
 
 def rename(old, new, names):
     for name in iterable(names):
         if name.find(old) >= 0:
-	    if debug_print:
-                print "  renaming " + old 
-                print "   to " + new
+            if debug_print:
+                print( "  renaming " + old )
+                print( "   to " + new )
             os.rename(name, name.replace(old, new))
 
 
 def rm(path=''):
     for name in iterable(path):
         if os.path.isfile(name):
-	    if debug_print:
-                print "  removing file " + name
+            if debug_print:
+                print( "  removing file " + name )
             os.remove(name)
         elif os.path.islink(name):
-	    if debug_print:
-                print "  removing link " + name
+            if debug_print:
+                print( "  removing link " + name )
             os.remove(name)
         elif os.path.isdir(name):
-	    if debug_print:
-                print "  removing  tree " + name
+            if debug_print:
+                print( "  removing  tree " + name )
             shutil.rmtree(name)
 
 
 def select(items, prompt=''):
     while True:
         if prompt:
-            print prompt
+            print( prompt )
         for i, item in enumerate(items):
             print("%2d) %s" % (i + 1, item))
         try:
