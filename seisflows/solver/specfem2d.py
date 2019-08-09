@@ -75,12 +75,12 @@ class specfem2d(custom_import('solver', 'base')):
         if "F0" in PAR:
             assert(PAR.F0 == f0)
         else: 
-            PAR.DT = dt
+            PAR.F0 = f0
 
         if self.mesh_properties.nproc != PAR.NPROC:
             if self.taskid == 0:
-                print 'Warning: mesh_properties.nproc != PAR.NPROC'
-                print str(self.mesh_properties.nproc) + " != " + str(PAR.NPROC)
+                print( 'Warning: mesh_properties.nproc != PAR.NPROC' )
+                print( str(self.mesh_properties.nproc) + " != " + str(PAR.NPROC) )
 
         if 'MULTIPLES' in PAR:
             if PAR.MULTIPLES:

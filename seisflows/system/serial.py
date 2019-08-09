@@ -12,20 +12,13 @@ PATH = sys.modules['seisflows_paths']
 
 
 class serial(custom_import('system', 'base')):
-    """ An interface through which to submit workflows, run tasks in serial or 
-      parallel, and perform other system functions.
-
-      By hiding environment details behind a python interface layer, these 
-      classes provide a consistent command set across different computing
-      environments.
-
-      For important additional information, please see 
-      http://seisflows.readthedocs.org/en/latest/manual/manual.html#system-configuration
-    """
+    "Implements workflow serially instead of in parallel, for testing. "
 
     def check(self):
         """ Checks parameters and paths
         """
+        super(serial, self).check()
+
         intro(__name__, serial.__doc__)
         pars = []
         paths = []
@@ -111,7 +104,7 @@ class serial(custom_import('system', 'base')):
                 self.progress(taskid)
             func = getattr(__import__('seisflows_'+classname), method)
             func(**kwargs)
-        print ''
+        print( '' )
 
 
     def run_single(self, classname, method, *args, **kwargs):
@@ -138,4 +131,4 @@ class serial(custom_import('system', 'base')):
         """ Provides status update
         """
         if PAR.NTASK > 1:
-            print ' task ' + '%02d of %02d' % (taskid+1, PAR.NTASK)
+            print( ' task ' + '%02d of %02d' % (taskid+1, PAR.NTASK) )
