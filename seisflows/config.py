@@ -1,5 +1,9 @@
 
-import copy_reg
+try:
+    import copy_reg
+except:
+    import copyreg as copy_reg
+
 import imp
 import os
 import re
@@ -46,11 +50,11 @@ def config():
 
     # check if objects already exist on disk
     if exists(_output()):
-        print msg.WarningOverwrite
+        print (msg.WarningOverwrite)
         sys.exit()
 
     # instantiate and register objects
-    print '\nconfig: checking parameters and paths settings for each module...'
+    print( '\nconfig: checking parameters and paths settings for each module...' )
     NAMES = []
     for name in names:
         NAMES += [name.upper()]
@@ -58,7 +62,7 @@ def config():
 
     for name in names:
         imp = custom_import(name)
-        print "Imported module:",imp.__module__
+        print( "Imported module:",imp.__module__ )
         sys.modules['seisflows_'+name] = imp()
 
     # error checking
@@ -66,37 +70,37 @@ def config():
         sys.modules['seisflows_'+name].check()
 
     if not hasattr(sys.modules['seisflows_parameters'], 'WORKFLOW'):
-        print msg.MissingParameter_Worfklow
+        print( msg.MissingParameter_Worfklow )
         sys.exit(-1)
 
     if not hasattr(sys.modules['seisflows_parameters'], 'SYSTEM'):
-        print msg.MissingParameter_System
+        print( msg.MissingParameter_System )
         sys.exit(-1)
 
     # Report unused (unreported) parameters
-    print '\nNOTE: Parameters listed below were included in your parameters file,\n',\
+    print( '\nNOTE: Parameters listed below were included in your parameters file,\n',\
         '      but were not reported by any module.check() function.\n',\
         '      If any of your parameters appears here unexpectedly, please check\n',\
-        '      spelling, or ensure that some check() function references it.'
+        '      spelling, or ensure that some check() function references it.' )
     for par in PARCH:
         if not PARCH[par]:
-            print '         ', par
+            print ( '         ', par )
 
-    print 'config: checks completed.\n'
+    print( 'config: checks completed.\n' )
 
 def intro(name,desc='Undocumented'):
     ' Prints name and description for a class or function'
-    print '\n'+name+':\n    ',desc
+    print( '\n'+name+':\n    ',desc )
 
 def parpt(dict,keys): 
     ''' Report selected key values from a path/parameter dictionary '''
-    print ''
+    print( '' )
     for key in keys:
         val = 'Absent'
         if key in dict:  
             val=dict[key]
             PARCH[key] = True
-        print '    ',key,' \t =  ',val
+        print( '    ',key,' \t =  ',val )
 
 
 def save():
@@ -223,7 +227,7 @@ def tilde_expand(mydict):
     """ Expands tilde character in path strings
     """
     for key,val in mydict.items():
-        if type(val) not in [str, unicode]:
+        if type(val) not in [str, str]:
             raise Exception
         if val[0:2] == '~/':
             mydict[key] = os.getenv('HOME') +'/'+ val[2:]
