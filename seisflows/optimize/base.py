@@ -183,6 +183,8 @@ class base(object):
           if norm_p > 0. :
             self.line_search.step_len_max = \
                 PAR.STEPLENMAX*norm_m/norm_p
+            print( "optimize.base: using normalized", \
+                "max step length = %g"%self.line_search.step_len_max)
           else:
             print ("optimize.base: norm_p is zero, will use", \
                 "unnormalized STEPLENMAX = %g"%PAR.STEPLENMAX )

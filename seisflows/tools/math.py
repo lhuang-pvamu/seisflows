@@ -73,7 +73,8 @@ def angle(x,y):
     xy = dot(x,y)
     xx = dot(x,x)
     yy = dot(y,y)
-    return np.arccos(xy/(xx*yy)**0.5)
+    #return np.arccos(xy/(xx*yy)**0.5)
+    return np.arccos(xy/np.sqrt(xx*yy + 1.e-30)) #TEC Avoid 0/0 problem
 
 
 def dot(x,y):
