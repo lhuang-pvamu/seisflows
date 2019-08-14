@@ -33,6 +33,9 @@ class Base(object):
         # optional maximum step length safeguard
         self.step_len_max = step_len_max
 
+        print( "line_search.base: initializing:", \
+            "step_count_max=%g step_len_max=%g"%(step_count_max,step_len_max))
+
         # prepare output log
         self.writer = Writer(path)
 

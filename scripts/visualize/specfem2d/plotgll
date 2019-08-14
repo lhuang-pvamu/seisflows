@@ -114,7 +114,7 @@ if __name__ == '__main__':
     else:
         vmsk = v
 
-    msg = '\n%s data length= %d range: (%f, %f)'
+    msg = '\n%s data length= %d range: (%g, %g)'
     print msg % (args.file, len(vmsk), minval, maxval)
 
     if vmag==0. :

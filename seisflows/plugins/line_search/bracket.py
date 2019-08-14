@@ -60,6 +60,7 @@ class Bracket(Base):
             # failed because step_count_max exceeded
             alpha = None
             status = -1
+            return alpha, status
 
         # apply optional step length safeguard
         if alpha > self.step_len_max and \

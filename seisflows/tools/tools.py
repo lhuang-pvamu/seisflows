@@ -179,7 +179,7 @@ def loadyaml(filename):
 def getset(arg):
     if not arg:
         return set()
-    elif isinstance(arg, basestring):
+    elif isinstance(arg, str):
         return set([arg])
     else:
         return set(arg)

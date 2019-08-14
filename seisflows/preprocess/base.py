@@ -259,13 +259,14 @@ class base(object):
         if not PAR.NORMALIZE:
             return traces
 
+        #TEC Event normalization compensated by number of traces
         if 'NormalizeEventsL1' in PAR.NORMALIZE:
             # normalize event by L1 norm of all traces
             w = 0.
             for tr in traces:
                 w += np.linalg.norm(tr.data, ord=1)
             for tr in traces:
-                tr.data /= w
+                tr.data *= len(traces) / w
 
         elif 'NormalizeEventsL2' in PAR.NORMALIZE:
             # normalize event by L2 norm of all traces
@@ -273,21 +274,21 @@ class base(object):
             for tr in traces:
                 w += np.linalg.norm(tr.data, ord=2)
             for tr in traces:
-                tr.data /= w
+                tr.data *= len(traces) / w
 
         if 'NormalizeTracesL1' in PAR.NORMALIZE:
             # normalize each trace by its L1 norm
             for tr in traces:
                 w = np.linalg.norm(tr.data, ord=1)
                 if w > 0:
-                    tr.data /= w
+                    tr.data *= 1./w
 
         elif 'NormalizeTracesL2' in PAR.NORMALIZE:
             # normalize each trace by its L2 norm
             for tr in traces:
                 w = np.linalg.norm(tr.data, ord=2)
                 if w > 0:
-                    tr.data /= w
+                    tr.data *= 1./w
 
         return traces
 
@@ -362,13 +363,7 @@ class base(object):
 
         if 'MuteLongOffsets' in PAR.MUTE:
             assert 'MUTE_LONG_OFFSETS_DIST' in PAR
-            assert 0 < PAR.MUTE_SHORT_OFFSETS_DIST
-
-        if 'MuteShortOffsets' not in PAR.MUTE:
-            setattr(PAR, 'MUTE_SHORT_OFFSETS_DIST', 0.)
-
-        if 'MuteLongOffsets' not in PAR.MUTE:
-            setattr(PAR, 'MUTE_LONG_OFFSETS_DIST', 0.)
+            assert 0 < PAR.MUTE_LONG_OFFSETS_DIST
 
 
     def check_normalize(self):

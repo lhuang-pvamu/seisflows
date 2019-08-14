@@ -18,6 +18,7 @@ PATH = sys.modules['seisflows_paths']
 
 class base(object):
     """ Nonlinear optimization abstract base class
+        This version limits model to (VPMIN,VPMAX)
     """
     """
 
@@ -56,6 +57,16 @@ class base(object):
         # algorithm.
 
         intro(__name__, base.__doc__)
+
+        pars = []
+        # Velocity constraints
+        pars += ['VPMIN','VPMAX']
+        if 'VPMIN' not in PAR:
+            setattr(PAR, 'VPMIN', 0.)
+        if 'VPMAX' not in PAR:
+            setattr(PAR, 'VPMAX', 1.e10)
+
+        pars += ['LINESEARCH','PRECOND','STEPCOUNTMAX','STEPLENINIT','STEPLENMAX']
         # line search algorithm
         if 'LINESEARCH' not in PAR:
             setattr(PAR, 'LINESEARCH', 'Bracket')
@@ -80,7 +91,7 @@ class base(object):
         if 'OPTIMIZE' not in PATH:
             setattr(PATH, 'OPTIMIZE', PATH.SCRATCH+'/'+'optimize')
 
-        parpt(PAR, ['LINESEARCH','PRECOND','STEPCOUNTMAX','STEPLENINIT','STEPLENMAX'])
+        parpt(PAR, pars)
         parpt(PATH, ['OPTIMIZE'])
 
         # assertions
@@ -90,6 +101,12 @@ class base(object):
         if PAR.OPTIMIZE in ['base']:
             print( msg.CompatibilityError1 )
             sys.exit(-1)
+
+        if PAR.VPMIN:
+            assert 0. <= PAR.VPMIN 
+
+        if PAR.VPMAX:
+            assert PAR.VPMIN < PAR.VPMAX
 
         if PAR.LINESEARCH:
             assert PAR.LINESEARCH in dir(line_search)
@@ -166,6 +183,8 @@ class base(object):
           if norm_p > 0. :
             self.line_search.step_len_max = \
                 PAR.STEPLENMAX*norm_m/norm_p
+            print( "optimize.base: using normalized", \
+                "max step length = %g"%self.line_search.step_len_max)
           else:
             print ("optimize.base: norm_p is zero, will use", \
                 "unnormalized STEPLENMAX = %g"%PAR.STEPLENMAX )
@@ -185,7 +204,8 @@ class base(object):
 
         # write model corresponding to chosen step length
         self.savetxt('alpha', alpha)
-        self.save('m_try', m + alpha*p)
+        #self.save('m_try', m + alpha*p)
+        self.save('m_try', np.clip(m + alpha*p, PAR.VPMIN,PAR.VPMAX) )
 
 
     def update_search(self):
@@ -205,7 +225,8 @@ class base(object):
             m = self.load('m_new')
             p = self.load('p_new')
             self.savetxt('alpha', alpha)
-            self.save('m_try', m + alpha*p)
+            #self.save('m_try', m + alpha*p)
+            self.save('m_try', np.clip(m + alpha*p, PAR.VPMIN,PAR.VPMAX) )
         return status
 
 

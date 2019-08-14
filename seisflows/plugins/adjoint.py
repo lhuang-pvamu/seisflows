@@ -56,13 +56,13 @@ def Traveltime(syn, obs, nt, dt):
     # (Tromp et al 2005, eq 45)
     wadj = _np.zeros(nt)
     wadj[1:-1] = (syn[2:] - syn[0:-2])/(2.*dt)
-    wadj *= 1./(sum(wadj*wadj)*dt)
+    wadj *= 1./(sum(wadj*wadj)*dt + 1.e-40)
     wadj *= misfit.Traveltime(syn,obs,nt,dt)
     return wadj
 
 
 def TraveltimeInexact(syn, obs, nt, dt):
-    # must faster but possibly inaccurate
+    # much faster but possibly inaccurate
     wadj = _np.zeros(nt)
     wadj[1:-1] = (syn[2:] - syn[0:-2])/(2.*dt)
     wadj *= 1./(sum(wadj*wadj)*dt)
