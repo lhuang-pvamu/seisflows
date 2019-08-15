@@ -183,8 +183,8 @@ class base(object):
           if norm_p > 0. :
             self.line_search.step_len_max = \
                 PAR.STEPLENMAX*norm_m/norm_p
-            print( "optimize.base: using normalized", \
-                "max step length = %g"%self.line_search.step_len_max)
+            # print( "optimize.base: using normalized", \
+            #    "max step length = %g"%self.line_search.step_len_max)
           else:
             print ("optimize.base: norm_p is zero, will use", \
                 "unnormalized STEPLENMAX = %g"%PAR.STEPLENMAX )
@@ -316,7 +316,7 @@ class base(object):
     def load(self, filename):
         # reads vectors from disk
         vector = loadnpy(PATH.OPTIMIZE+'/'+filename)
-        if PAR.VERBOSE > 3:
+        if PAR.VERBOSE > 4:
             print( " [Optimizer] loading vector from " + filename + ":" )
             print( "  " + str(vector) )
         return vector
@@ -324,7 +324,7 @@ class base(object):
 
     def save(self, filename, array):
         # writes vectors to disk
-        if PAR.VERBOSE > 3:
+        if PAR.VERBOSE > 4:
             print( " [Optimizer] writing vector to " + filename + ":" )
             print( "  " + str(array) )
         savenpy(PATH.OPTIMIZE+'/'+filename, array)

@@ -1,6 +1,6 @@
             
-import subprocess
 import sys
+import subprocess as subp
 import numpy as np
 import os
 
@@ -201,6 +201,12 @@ class base(object):
         self.import_model(path)
         self.forward()
 
+        # Capture the stability digest report
+        if PAR.VERBOSE>0:
+            rpt = subp.run(['grep','digest','fwd_solver.log'],check=True, \
+                stdout=subp.PIPE).stdout.decode('utf-8')
+            print( 'eval_func fwd: ',rpt )
+
         if write_residuals:
             preprocess.prepare_eval_grad(self.cwd)
             self.export_residuals(path)
@@ -216,6 +222,13 @@ class base(object):
         """
         unix.cd(self.cwd)
         self.adjoint()
+
+        # Capture the stability digest report
+        if PAR.VERBOSE>0:
+            rpt = subp.run(['grep','digest','adjoint.log'],check=True, \
+                stdout=subp.PIPE).stdout.decode('utf-8')
+            print( 'eval_grad adj: ',rpt )
+
         self.export_kernels(path)
         if export_traces:
             self.export_traces(path+'/'+'traces/syn', prefix='traces/syn')
