@@ -223,11 +223,11 @@ class base(object):
         unix.cd(self.cwd)
         self.adjoint()
 
-        # Capture the stability digest report
-        if PAR.VERBOSE>0 and self.source_name==self.first_source:
-            rpt = subp.run(['grep','digest','adjoint.log'],check=True, \
-                stdout=subp.PIPE).stdout.decode('utf-8')
-            print( 'eval_grad adj: ',rpt )
+        # Capture the stability digest report (not needed, same as forward)
+        #if PAR.VERBOSE>0 and self.source_name==self.first_source:
+        #    rpt = subp.run(['grep','digest','adjoint.log'],check=True, \
+        #        stdout=subp.PIPE).stdout.decode('utf-8')
+        #    print( 'eval_grad adj: ',rpt )
 
         self.export_kernels(path)
         if export_traces:
