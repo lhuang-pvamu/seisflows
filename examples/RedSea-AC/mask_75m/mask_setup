@@ -1,0 +1,6 @@
+[teclee@master mask_75m]$ createMask -n -190 0 -n -200 0 ../model_75m/*_z.bin proc000000_vp.bin
+Node depths:  [    0.  -190.  -200. -3825.]
+Node weights:  [0. 0. 0. 0.]
+DONE
+(base) [teclee@master mask_75m]$ ln -s proc000000_vp.bin proc000000_vs.bin
+(base) [teclee@master mask_75m]$ ln -s proc000000_vp.bin proc000000_rho.bin
