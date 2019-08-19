@@ -160,7 +160,7 @@ class specfem2d(custom_import('solver', 'base')):
         setpar('SIMULATION_TYPE', '1')
         setpar('SAVE_FORWARD', '.true.')
 
-        call_solver(system.mpiexec(), 'bin/xmeshfem2D')
+        call_solver(system.mpiexec(), 'bin/xmeshfem2D',output='mesh.log')
         call_solver(system.mpiexec(), 'bin/xspecfem2D', output='fwd_solver.log')
 
         #raw_input("forward calculation completed")
@@ -186,8 +186,8 @@ class specfem2d(custom_import('solver', 'base')):
 
         #raw_input("calling gradient")
 
-        call_solver(system.mpiexec(), 'bin/xmeshfem2D')
-        call_solver(system.mpiexec(), 'bin/xspecfem2D',output="adjoint.log")
+        call_solver(system.mpiexec(), 'bin/xmeshfem2D',output='mesh.log')
+        call_solver(system.mpiexec(), 'bin/xspecfem2D',output='adjoint.log')
 
         #raw_input("gradient calculated")
 

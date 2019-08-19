@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import re
 import sys
@@ -93,7 +93,7 @@ if __name__ == '__main__':
         raise IOError(
             "usage: quickplot DIR [ARGS]")
 
-    exe = 'python -W ignore ' + which('plotgll')
+    exe = 'python2 -W ignore ' + which('plotgll')
 
     dir = parse_args()
     if not exists(dir):
