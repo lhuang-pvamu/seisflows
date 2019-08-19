@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # __author__ = 'Ted Clee'
 
 import argparse
@@ -30,19 +30,22 @@ def parseArgs():
         help='directory for new mesh model files.')
     
     ap.add_argument('-X','--xdim', type=float,
-        help='Horizontal dimension of model (meters).')
+        help='Horizontal dimension of mesh model (meters).')
     
     ap.add_argument('-Z','--zdim', type=float,
-        help='Vertical dimension of model (meters).')
+        help='Vertical dimension of mesh model (meters).')
+
+    ap.add_argument('-g','--gridSpacing', type=float,
+        help='Actual size of input square grid cells.  Default grid cell dimensions are derived from supplied X and Z model dimensions.')
 
     ap.add_argument('-f','--freq', type=float, 
         help='Maximum source frequency (hz).')
 
+    ap.add_argument('-e','--elemSize', type=float,
+        help='Nominal mesh element size (m); default is determined from minimum wavelength.')
+
     ap.add_argument('-l','--limitStretch', type=float, default=2.,
         help='Maximum element stretch factor (default is 2., 1.=> no stretch).')
-
-    ap.add_argument('-e','--elemSize', type=float,
-        help='Nominal element size (m); default determined from minimum wavelength.')
 
     ap.add_argument('-b','--boundaryElements', type=int, default=0,
         help='Thickness (elements) of absorbing boundary layers on sides and bottom.')
@@ -398,8 +401,18 @@ if __name__ == '__main__':
     Vpgrid = np.load(args.pVel)
     nzg = Vpgrid.shape[0]
     nxg = Vpgrid.shape[1]
-    dzg = Z / (nzg-1)
-    dxg = X / (nxg-1)
+
+    if args.gridSpacing:
+        dzg = args.gridSpacing
+        dxg = dzg
+        Zg = dzg * (nzg-1)
+        Xg = dxg * (nxg-1)
+    else:
+        dzg = Z / (nzg-1)
+        dxg = X / (nxg-1)
+        Zg = Z
+        Xg = X
+
     '''
     # Test subset: some gridpoints each side of center
     wid = 300
@@ -413,7 +426,7 @@ if __name__ == '__main__':
     dxg = X / (nxg-1)
     '''
     print 'Vpgrid shape (nzg X nxg): %d X %d, size: %g X %g meters, cells (dzg X dxg): %g X %g'% \
-        (nzg,nxg, Z,X, dzg,dxg)
+        (nzg,nxg, Zg,Xg, dzg,dxg)
     xg = np.linspace(0,X,nxg)
     zg = np.linspace(0,-Z,nzg)
     grid_x, grid_z = np.meshgrid( xg, zg )
@@ -459,7 +472,7 @@ if __name__ == '__main__':
 
     (zmesh, xmesh) = qm.rectMesh(X, Z, Nex, Nez)
 
-    vmesh = _interp.interpn( (np.flipud(zg),xg), np.flipud(Vpsmooth), (zmesh,xmesh), method='linear' )
+    vmesh = _interp.interpn( (np.flipud(zg),xg), np.flipud(Vpsmooth), (zmesh,xmesh), method='linear', bounds_error=False, fill_value=None )
 
     dVp = qm.meshDerivZ(vmesh)
     SDmesh = qm.samplingDensityZ(vmesh)
