@@ -205,7 +205,8 @@ class base(object):
         if PAR.VERBOSE>0 and self.source_name==self.first_source:
             rpt = subp.run(['grep','digest','fwd_solver.log'],check=True, \
                 stdout=subp.PIPE).stdout.decode('utf-8')
-            print( 'eval_func fwd: ',rpt )
+            if len(rpt) > 0:
+                print( 'eval_func:',rpt )
 
         if write_residuals:
             preprocess.prepare_eval_grad(self.cwd)
