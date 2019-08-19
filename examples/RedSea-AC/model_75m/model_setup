@@ -1,0 +1,10 @@
+[teclee@master model_75m]$ adaptiveMesher -X 11850 -Z 3525 -g 1.25 -f 12.5 -l 1. -e 75 -b 4 -p vp_redsea_model.npy -d 2400 -m -r .
+Vpgrid shape (nzg X nxg): 2801 X 9441, size: 3500 X 11800 meters, cells (dzg X dxg): 1.25 X 1.25
+Rectangular mesh for Freq= 12.5 hz, Vptop= 1400 m/s: elements 47 X 158, elz= 75, elx= 75
+Quad mesh Gaussian smoother sigma= 60.0
+QuadMesh setup: frequency 12.5 Hz, stretch limit 1, 4 PML boundary elements
+Generating unadjusted plots ...
+GLL mesh Gaussian smoother sigma= 12.0
+Directory for adjusted model files:  .
+QuadMesh padded model elements 51 X 166
+QuadMesh padded model extents Z: (-3825, 0),  X: (-300, 12150)

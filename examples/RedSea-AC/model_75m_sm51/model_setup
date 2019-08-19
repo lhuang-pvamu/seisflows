@@ -1,0 +1,3 @@
+[teclee@master model_75m_sm51]$ createInitModel -k 200 -s 51 *_[xz].bin ../model_75m/proc000000_vp.bin proc000000_vp.bin
+Gauss span:  51
+Preserving to depth  200
