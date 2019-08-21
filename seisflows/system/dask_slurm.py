@@ -17,35 +17,6 @@ from seisflows.config import load
 from seisflows.system.dask_utils import submit_workflow_dask
 from seisflows.system.dask_utils import create_task_dask
 
-#def submit_workflow_dask(output_path):
-#
-#    print("workflow changing directories to " + output_path)
-#    unix.cd(output_path)
-#    load(output_path)
-#
-#    workflow = sys.modules['seisflows_workflow']
-#    systyem = sys.modules['seisflows_system']
-#    print("running workflow.main()")
-#
-#    workflow.main()
-#    return 42
-#
-#
-#def create_task_dask(mypath, myclass, myfunc, taskid):
-#    print("task_creation")
-#    # reload from last checkpoint
-#    load(mypath)
-#
-#    # load function arguments
-#    kwargspath = join(mypath, 'kwargs')
-#    kwargs = loadobj(join(kwargspath, myclass+'_'+myfunc + '.p'))
-#
-#    # call function
-#    func = getattr(sys.modules['seisflows_'+myclass], myfunc)
-#    func(**kwargs)
-#    sys.stdout.flush()
-#
-
 
 PAR = sys.modules['seisflows_parameters']
 PATH = sys.modules['seisflows_paths']
@@ -162,14 +133,15 @@ class dask_slurm(custom_import('system', 'base')):
 
         workflow.checkpoint()
 
-        self.cluster = SLURMCluster(cores=12, memory = '16GB', queue = 'compute')#, walltime = PAR.WALLTIME)
-        #cluster = SLURMCluster(cores=PAR.CORES, memory = PAR.MEMORY, queue = PAR.QUEUE)#, walltime = PAR.WALLTIME)
+        #self.cluster = SLURMCluster(cores=12, memory = '16GB', queue = 'compute')#, walltime = PAR.WALLTIME)
+        cluster = SLURMCluster(cores=PAR.CORES, memory = PAR.MEMORY, queue = PAR.QUEUE)#, walltime = PAR.WALLTIME)
         #print(PAR.CORES)
         #print(PAR.MEMORY)
         #print(PAR.QUEUE)
 
-        self.cluster.start_workers(PAR.NNODES)
-        print(self.cluster)
+        cluster.start_workers(1)
+        #cluster.start_workers(PAR.NNODES)
+        print(cluster)
         
         time.sleep(1)
 
@@ -177,10 +149,10 @@ class dask_slurm(custom_import('system', 'base')):
         #    print(cluster)
         #    time.sleep(1)
 
-        self.client = Client(self.cluster)
+        self.client = Client(cluster)
 
         print("submitting job")
-        print(self.cluster)
+        print(cluster)
         #TODO: Not sure if this works, might need to use the submit script
         main_workflow = self.client.submit(submit_workflow_dask, PATH.OUTPUT, pure=False)
 
@@ -196,11 +168,13 @@ class dask_slurm(custom_import('system', 'base')):
         futures = []
         client = get_client()
 
+        print("spawning " + str(PAR.NTASK) + " tasks")
         #for each task
-        for taskid in range(PAR.NTASK):
+        for taskid in range(int(PAR.NTASK)):
             futures.append(client.submit(create_task_dask, PATH.OUTPUT, classname, method, taskid, pure=False))
 
         wait(futures)
+        print("tasks complete")
 
 
     def run_single(self, classname, method, *args, **kwargs):
@@ -210,9 +184,11 @@ class dask_slurm(custom_import('system', 'base')):
 
         client = get_client()
 
+        print("running single task")
         future = client.submit(create_task_dask, PATH.OUTPUT, classname, method, 0, pure=False)
 
         wait(future)
+        print("single task done")
 
 
     def taskid(self):

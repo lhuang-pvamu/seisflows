@@ -12,7 +12,7 @@ from seisflows.config import ParameterError, custom_import, intro, parpt
 from seisflows.plugins import solver_io
 from seisflows.tools import msg, unix
 from seisflows.tools.seismic import Container, call_solver
-from seisflows.tools.tools import Struct, diff, exists
+from seisflows.tools.tools import Struct, diff, exists, call
 
 
 
@@ -203,8 +203,12 @@ class base(object):
 
         # Capture the stability digest report
         if PAR.VERBOSE>0 and self.source_name==self.first_source:
-            rpt = subp.run(['grep','digest','fwd_solver.log'],check=True, \
-                stdout=subp.PIPE).stdout.decode('utf-8')
+            try:
+                rpt = subprocess.check_output(['grep', 'digest fwd_solver.log'])
+            except:
+                rpt = ""
+            #rpt = subp.run(['grep','digest','fwd_solver.log'], \
+            #    stdout=subp.PIPE).stdout.decode('utf-8')
             if len(rpt) > 0:
                 print( 'eval_func:',rpt )
 
