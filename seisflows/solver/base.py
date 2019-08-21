@@ -297,6 +297,9 @@ class base(object):
             for key in parameters or self.parameters:
                 dict[key] += self.io.read_slice(
                     path, prefix+key+suffix, iproc)
+                if PAR.VERBOSE>3 and key=='vp':
+                    print( 'solver.base.load: iproc=',iproc,' dict[vp]=',dict[key])
+
         return dict
 
 
@@ -327,6 +330,8 @@ class base(object):
             for key in parameters:
                 self.io.write_slice(
                     dict[key][iproc], path, prefix+key+suffix, iproc)
+                if PAR.VERBOSE>3 and key=='vp':
+                    print( 'solver.base.save: iproc=',iproc,' dict[vp]=',dict[key][iproc])
 
 
     def merge(self, model, parameters=[]):
@@ -336,6 +341,8 @@ class base(object):
         for key in parameters or self.parameters:
             for iproc in range(self.mesh_properties.nproc):
                 m = np.append(m, model[key][iproc])
+            if PAR.VERBOSE>3 and key=='vp':
+                print( 'solver.base.merge: vp vector=',m)
         return m
 
 
@@ -351,6 +358,8 @@ class base(object):
                 imin = sum(ngll)*idim + sum(ngll[:iproc])
                 imax = sum(ngll)*idim + sum(ngll[:iproc+1])
                 model[key] += [m[imin:imax]]
+            if PAR.VERBOSE>3 and key=='vp':
+                print( 'solver.base.split: model[vp]=',model[key])
         return model
 
 
