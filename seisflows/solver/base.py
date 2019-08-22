@@ -1,6 +1,6 @@
             
 import sys
-import subprocess as subp
+import subprocess
 import numpy as np
 import os
 
@@ -12,7 +12,7 @@ from seisflows.config import ParameterError, custom_import, intro, parpt
 from seisflows.plugins import solver_io
 from seisflows.tools import msg, unix
 from seisflows.tools.seismic import Container, call_solver
-from seisflows.tools.tools import Struct, diff, exists, call
+from seisflows.tools.tools import Struct, diff, exists
 
 
 
@@ -207,8 +207,6 @@ class base(object):
                 rpt = subprocess.check_output(['grep', 'digest fwd_solver.log'])
             except:
                 rpt = ""
-            #rpt = subp.run(['grep','digest','fwd_solver.log'], \
-            #    stdout=subp.PIPE).stdout.decode('utf-8')
             if len(rpt) > 0:
                 print( 'eval_func:',rpt )
 
@@ -227,12 +225,6 @@ class base(object):
         """
         unix.cd(self.cwd)
         self.adjoint()
-
-        # Capture the stability digest report (not needed, same as forward)
-        #if PAR.VERBOSE>0 and self.source_name==self.first_source:
-        #    rpt = subp.run(['grep','digest','adjoint.log'],check=True, \
-        #        stdout=subp.PIPE).stdout.decode('utf-8')
-        #    print( 'eval_grad adj: ',rpt )
 
         self.export_kernels(path)
         if export_traces:
