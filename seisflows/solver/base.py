@@ -144,7 +144,7 @@ class base(object):
         # provided
 
         if PATH.DATA:
-            print( "copying user supplied data" )
+            print( " [solver.base.setup] copying user supplied data" )
             self.initialize_solver_directories()
 
             src = glob(PATH.DATA +'/'+ self.source_name +'/'+ '*')
@@ -153,7 +153,7 @@ class base(object):
 
         else:
             if PAR.VERBOSE > 3:
-                print( "generating data on the fly" )
+                print( " [solver.base.setup] generating data on the fly" )
             self.generate_data(
                 model_path=PATH.MODEL_TRUE,
                 model_name='model_true',
@@ -288,13 +288,14 @@ class base(object):
         """
         dict = Container()
         if PAR.VERBOSE > 3:
-            print( " [Solver] loading specfem model " + path + ": " )
+            print( " [solver.base.load] specfem model " + path + ": " )
         for iproc in range(self.mesh_properties.nproc):
             for key in parameters or self.parameters:
                 dict[key] += self.io.read_slice(
                     path, prefix+key+suffix, iproc)
                 if PAR.VERBOSE>3 and key=='vp':
-                    print( 'solver.base.load: iproc=',iproc,' dict[vp]=',dict[key])
+                    print( 'solver.base.load: iproc=',iproc,\
+                            ' dict[vp]=',dict[key])
 
         return dict
 
@@ -312,7 +313,7 @@ class base(object):
         """
         unix.mkdir(path)
         if PAR.VERBOSE > 3:
-            print( " [Solver] saving specfem model " + path + ": " )
+            print( " [solver.base.save] specfem model " + path + ": " )
 
         # fill in any missing parameters
         missing_keys = diff(parameters, dict.keys())
@@ -327,7 +328,8 @@ class base(object):
                 self.io.write_slice(
                     dict[key][iproc], path, prefix+key+suffix, iproc)
                 if PAR.VERBOSE>3 and key=='vp':
-                    print( 'solver.base.save: iproc=',iproc,' dict[vp]=',dict[key][iproc])
+                    print( 'solver.base.save: iproc=',iproc,\
+                            ' dict[vp]=',dict[key][iproc])
 
 
     def merge(self, model, parameters=[]):
@@ -337,8 +339,8 @@ class base(object):
         for key in parameters or self.parameters:
             for iproc in range(self.mesh_properties.nproc):
                 m = np.append(m, model[key][iproc])
-            if PAR.VERBOSE>3 and key=='vp':
-                print( 'solver.base.merge: vp vector=',m)
+            # if PAR.VERBOSE>3 and key=='vp':
+            #     print( 'solver.base.merge: vp vector=',m)
         return m
 
 
@@ -354,8 +356,8 @@ class base(object):
                 imin = sum(ngll)*idim + sum(ngll[:iproc])
                 imax = sum(ngll)*idim + sum(ngll[:iproc+1])
                 model[key] += [m[imin:imax]]
-            if PAR.VERBOSE>3 and key=='vp':
-                print( 'solver.base.split: model[vp]=',model[key])
+            # if PAR.VERBOSE>3 and key=='vp':
+            #     print( 'solver.base.split: model[vp]=',model[key])
         return model
 
 
@@ -379,7 +381,7 @@ class base(object):
 
         for name in parameters or self.parameters:
             if PAR.VERBOSE > 3:
-                print( "calling " + PATH.SPECFEM_BIN +'/xcombine_sem ' + name + '_kernel kernel_paths ' + output_path )
+                print( " [solver.base.combine] calling " + PATH.SPECFEM_BIN +'/xcombine_sem ' + name + '_kernel kernel_paths ' + output_path )
             call_solver(
                 system.mpiexec(),
                 PATH.SPECFEM_BIN +'/'+ 'xcombine_sem '
@@ -401,7 +403,7 @@ class base(object):
         # apply smoothing operator
         unix.cd(self.cwd)
         for name in parameters or self.parameters:
-            print( ' smoothing', name )
+            print( ' [solver.base.smooth] smoothing', name )
             call_solver(
                 system.mpiexec(),
                 PATH.SPECFEM_BIN +'/'+ 'xsmooth_sem '

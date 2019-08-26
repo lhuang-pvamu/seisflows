@@ -183,10 +183,10 @@ class base(object):
           if norm_p > 0. :
             self.line_search.step_len_max = \
                 PAR.STEPLENMAX*norm_m/norm_p
-            # print( "optimize.base: using normalized", \
-            #    "max step length = %g"%self.line_search.step_len_max)
+            print( " [optimize.base] using normalized", \
+               "max step length = %0.4g"%self.line_search.step_len_max)
           else:
-            print ("optimize.base: norm_p is zero, will use", \
+            print (" [optimize.base] norm_p is zero, will use", \
                 "unnormalized STEPLENMAX = %g"%PAR.STEPLENMAX )
             self.line_search.step_len_max = PAR.STEPLENMAX
 
@@ -198,12 +198,13 @@ class base(object):
           if norm_p > 0. :
             alpha = PAR.STEPLENINIT*norm_m/norm_p
           else:
-            print( "optimize.base: norm_p is zero, will use", \
+            print( " [optimize.base] norm_p is zero, will use", \
                 "unnormalized STEPLENINIT = %g"%PAR.STEPLENINIT )
             alpha = PAR.STEPLENINIT
 
         # write model corresponding to chosen step length
         self.savetxt('alpha', alpha)
+        #TEC Apply velocity bounds, works for acoustic case only!
         #self.save('m_try', m + alpha*p)
         self.save('m_try', np.clip(m + alpha*p, PAR.VPMIN,PAR.VPMAX) )
 
@@ -225,6 +226,7 @@ class base(object):
             m = self.load('m_new')
             p = self.load('p_new')
             self.savetxt('alpha', alpha)
+            #TEC Apply velocity bounds, works for acoustic case only!
             #self.save('m_try', m + alpha*p)
             self.save('m_try', np.clip(m + alpha*p, PAR.VPMIN,PAR.VPMAX) )
         return status
@@ -282,7 +284,7 @@ class base(object):
         theta = angle(p,-g)
 
         if PAR.VERBOSE >= 2:
-            print( ' theta: %6.3f' % theta )
+            print( ' [optimize.base.retry_status] theta: %6.3f' % theta )
 
         thresh = 1.e-3
         if abs(theta) < thresh:
@@ -316,16 +318,20 @@ class base(object):
     def load(self, filename):
         # reads vectors from disk
         vector = loadnpy(PATH.OPTIMIZE+'/'+filename)
-        if PAR.VERBOSE > 4:
-            print( " [Optimizer] loading vector from " + filename + ":" )
+        if PAR.VERBOSE > 3:
+            max = np.max(np.abs(vector))
+            avg = np.average(vector)
+            print( " [optimize.base.load] from %s, max|.|= %0.4g, avg(.)= %0.4g:"%(filename,max,avg) )
             print( "  " + str(vector) )
         return vector
         #return loadnpy(PATH.OPTIMIZE+'/'+filename)
 
     def save(self, filename, array):
         # writes vectors to disk
-        if PAR.VERBOSE > 4:
-            print( " [Optimizer] writing vector to " + filename + ":" )
+        if PAR.VERBOSE > 3:
+            max = np.max(np.abs(array))
+            avg = np.average(array)
+            print( " [optimize.base.save] to %s, max|.|= %0.4g, avg(.)= %0.4g:"%(filename,max,avg) )
             print( "  " + str(array) )
         savenpy(PATH.OPTIMIZE+'/'+filename, array)
 
