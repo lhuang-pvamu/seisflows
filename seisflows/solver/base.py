@@ -201,14 +201,17 @@ class base(object):
         self.import_model(path)
         self.forward()
 
+
         # Capture the stability digest report
         if PAR.VERBOSE>0 and self.source_name==self.first_source:
             try:
-                rpt = subprocess.check_output(['grep', 'digest fwd_solver.log'])
+                rpt = subprocess.check_output( \
+                    ['grep','digest','fwd_solver.log']) \
+                    .decode(sys.stdout.encoding)
             except:
                 rpt = ""
             if len(rpt) > 0:
-                print( 'eval_func:',rpt )
+                print( ' [eval_func]', rpt )
 
         if write_residuals:
             preprocess.prepare_eval_grad(self.cwd)
