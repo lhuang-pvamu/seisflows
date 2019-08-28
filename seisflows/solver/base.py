@@ -297,7 +297,7 @@ class base(object):
                 dict[key] += self.io.read_slice(
                     path, prefix+key+suffix, iproc)
                 if PAR.VERBOSE>3 and key=='vp':
-                    print( 'solver.base.load: iproc=',iproc,\
+                    print( '      iproc=',iproc,\
                             ' dict[vp]=',dict[key])
 
         return dict
@@ -331,7 +331,7 @@ class base(object):
                 self.io.write_slice(
                     dict[key][iproc], path, prefix+key+suffix, iproc)
                 if PAR.VERBOSE>3 and key=='vp':
-                    print( 'solver.base.save: iproc=',iproc,\
+                    print( '      iproc=',iproc,\
                             ' dict[vp]=',dict[key][iproc])
 
 

@@ -7,7 +7,7 @@ title = Red Sea (KAUST) -- binary true model
 
 # forward or adjoint simulation
 # 1 = forward, 2 = adjoint, 3 = both simultaneously ( 2 is UNUSED )
-SIMULATION_TYPE                 = 3
+SIMULATION_TYPE                 = 1
 # 0 = regular wave propagation simulation, 1/2/3 = noise simulation
 NOISE_TOMOGRAPHY                = 0
 # save the last frame, needed for adjoint simulation
@@ -18,12 +18,12 @@ NPROC                           = 1              # number of processes
 partitioning_method             = 3              # SCOTCH = 3
 
 # number of control nodes per element (4 or 9)
-ngnod                           = 9
+ngnod                           = 4
 
 # time step parameters (recording time 5 sec)
 # total number of time steps
-NSTEP                           = 3334  # number of time steps
-DT                              = .0015 # time step size
+NSTEP                           = 5000  # number of time steps
+DT                              = .001 # time step size
 
 # time stepping
 # 1 = Newmark (2nd order), 2 = LDDRK4-6 (4th-order 6-stage low storage Runge-Kutta), 3 = classical RK4 4th-order 4-stage Runge-Kutta
@@ -176,7 +176,7 @@ NSTEP_BETWEEN_COMPUTE_KERNELS   = 1
 # Perfectly Matched Layer (PML) boundaries
 # absorbing boundary active or not
 PML_BOUNDARY_CONDITIONS         = .true.
-NELEM_PML_THICKNESS             = 3
+NELEM_PML_THICKNESS             = 4
 ROTATE_PML_ACTIVATE             = .false.
 ROTATE_PML_ANGLE                = 30.
 # change the four parameters below only if you know what you are doing; they change the damping profiles inside the PMLs
@@ -278,8 +278,8 @@ interfacesfile                  = ./FlatTopBotInterfaces.txt
 
 # geometry of the model (origin lower-left corner = 0,0) and mesh description
 xmin                            = -300.0           # abscissa of left side of the model
-xmax                            = 12100.        # abscissa of right side of the model
-nx                              = 124             # number of elements along X
+xmax                            = 12150.        # abscissa of right side of the model
+nx                              = 166             # number of elements along X
 
 # absorbing boundary parameters (see absorbing_conditions above)
 absorbtop                       = .false.
@@ -290,7 +290,7 @@ absorbleft                      = .true.
 # define the different regions of the model in the (nx,nz) spectral-element mesh
 nbregions                       = 1               # then set below the different regions and model number for each region
 # format of each line: nxmin nxmax nzmin nzmax material_number
-1 124  1 38 1
+1 166  1 51 1
 
 #-----------------------------------------------------------------------------
 #
@@ -299,7 +299,7 @@ nbregions                       = 1               # then set below the different
 #-----------------------------------------------------------------------------
 
 # every how many time steps we display information about the simulation (costly, do not use a very small value)
-NSTEP_BETWEEN_OUTPUT_INFO       = 500
+NSTEP_BETWEEN_OUTPUT_INFO       = 1000
 
 # meshing output
 output_grid_Gnuplot             = .true.        # generate a GNUPLOT file containing the grid, and a script to plot it
@@ -310,7 +310,7 @@ output_grid_ASCII               = .false.        # dump the grid in an ASCII tex
 OUTPUT_ENERGY                   = .false.
 
 # every how many time steps we compute energy (which is a bit expensive to compute)
-NTSTEP_BETWEEN_OUTPUT_ENERGY    = 10
+NTSTEP_BETWEEN_OUTPUT_ENERGY    = 100
 
 # Compute the field int_0^t v^2 dt for a set of GLL points and write it to file. Use
 # the script utils/visualisation/plotIntegratedEnergyFile.py to watch. It is refreshed at the same time than the seismograms
@@ -324,7 +324,7 @@ COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
 
 # every how many time steps we draw JPEG or PostScript pictures of the simulation
 # and/or we dump results of the simulation as ASCII or binary files (costly, do not use a very small value)
-NSTEP_BETWEEN_OUTPUT_IMAGES     = 500
+NSTEP_BETWEEN_OUTPUT_IMAGES     = 1000
 
 # minimum amplitude kept in % for the JPEG and PostScript snapshots; amplitudes below that are muted
 cutsnaps                        = 1.

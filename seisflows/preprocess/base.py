@@ -1,4 +1,3 @@
-
 import sys
 import numpy as np
 import obspy
@@ -101,8 +100,8 @@ class base(object):
          :input path: directory containing observed and synthetic seismic data
         """
         solver = sys.modules['seisflows_solver']
-        if PAR.VERBOSE > 3:
-            print( " [preprocess.base.prepare_eval_grad] " )
+        #if PAR.VERBOSE > 3:
+        #    print( " [preprocess.base.prepare_eval_grad] " )
 
         for filename in solver.data_filenames:
             obs = self.reader(path+'/'+'traces/obs', filename)
