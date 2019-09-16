@@ -1,6 +1,6 @@
             
 import sys
-import subprocess as subp
+import subprocess
 import numpy as np
 import os
 
@@ -12,7 +12,7 @@ from seisflows.config import ParameterError, custom_import, intro, parpt
 from seisflows.plugins import solver_io
 from seisflows.tools import msg, unix
 from seisflows.tools.seismic import Container, call_solver
-from seisflows.tools.tools import Struct, diff, exists, call
+from seisflows.tools.tools import Struct, diff, exists
 
 
 
@@ -144,7 +144,7 @@ class base(object):
         # provided
 
         if PATH.DATA:
-            print( "copying user supplied data" )
+            print( " [solver.base.setup] copying user supplied data" )
             self.initialize_solver_directories()
 
             src = glob(PATH.DATA +'/'+ self.source_name +'/'+ '*')
@@ -153,7 +153,7 @@ class base(object):
 
         else:
             if PAR.VERBOSE > 3:
-                print( "generating data on the fly" )
+                print( " [solver.base.setup] generating data on the fly" )
             self.generate_data(
                 model_path=PATH.MODEL_TRUE,
                 model_name='model_true',
@@ -201,16 +201,17 @@ class base(object):
         self.import_model(path)
         self.forward()
 
+
         # Capture the stability digest report
         if PAR.VERBOSE>0 and self.source_name==self.first_source:
             try:
-                rpt = subprocess.check_output(['grep', 'digest fwd_solver.log'])
+                rpt = subprocess.check_output( \
+                    ['grep','digest','fwd_solver.log']) \
+                    .decode(sys.stdout.encoding)
             except:
                 rpt = ""
-            #rpt = subp.run(['grep','digest','fwd_solver.log'], \
-            #    stdout=subp.PIPE).stdout.decode('utf-8')
             if len(rpt) > 0:
-                print( 'eval_func:',rpt )
+                print( ' [eval_func]', rpt )
 
         if write_residuals:
             preprocess.prepare_eval_grad(self.cwd)
@@ -227,12 +228,6 @@ class base(object):
         """
         unix.cd(self.cwd)
         self.adjoint()
-
-        # Capture the stability digest report (not needed, same as forward)
-        #if PAR.VERBOSE>0 and self.source_name==self.first_source:
-        #    rpt = subp.run(['grep','digest','adjoint.log'],check=True, \
-        #        stdout=subp.PIPE).stdout.decode('utf-8')
-        #    print( 'eval_grad adj: ',rpt )
 
         self.export_kernels(path)
         if export_traces:
@@ -296,11 +291,15 @@ class base(object):
         """
         dict = Container()
         if PAR.VERBOSE > 3:
-            print( " [Solver] loading specfem model " + path + ": " )
+            print( " [solver.base.load] specfem model " + path + ": " )
         for iproc in range(self.mesh_properties.nproc):
             for key in parameters or self.parameters:
                 dict[key] += self.io.read_slice(
                     path, prefix+key+suffix, iproc)
+                if PAR.VERBOSE>3 and key=='vp':
+                    print( '      iproc=',iproc,\
+                            ' dict[vp]=',dict[key])
+
         return dict
 
 
@@ -317,7 +316,7 @@ class base(object):
         """
         unix.mkdir(path)
         if PAR.VERBOSE > 3:
-            print( " [Solver] saving specfem model " + path + ": " )
+            print( " [solver.base.save] specfem model " + path + ": " )
 
         # fill in any missing parameters
         missing_keys = diff(parameters, dict.keys())
@@ -331,6 +330,9 @@ class base(object):
             for key in parameters:
                 self.io.write_slice(
                     dict[key][iproc], path, prefix+key+suffix, iproc)
+                if PAR.VERBOSE>3 and key=='vp':
+                    print( '      iproc=',iproc,\
+                            ' dict[vp]=',dict[key][iproc])
 
 
     def merge(self, model, parameters=[]):
@@ -340,6 +342,8 @@ class base(object):
         for key in parameters or self.parameters:
             for iproc in range(self.mesh_properties.nproc):
                 m = np.append(m, model[key][iproc])
+            # if PAR.VERBOSE>3 and key=='vp':
+            #     print( 'solver.base.merge: vp vector=',m)
         return m
 
 
@@ -355,6 +359,8 @@ class base(object):
                 imin = sum(ngll)*idim + sum(ngll[:iproc])
                 imax = sum(ngll)*idim + sum(ngll[:iproc+1])
                 model[key] += [m[imin:imax]]
+            # if PAR.VERBOSE>3 and key=='vp':
+            #     print( 'solver.base.split: model[vp]=',model[key])
         return model
 
 
@@ -378,7 +384,7 @@ class base(object):
 
         for name in parameters or self.parameters:
             if PAR.VERBOSE > 3:
-                print( "calling " + PATH.SPECFEM_BIN +'/xcombine_sem ' + name + '_kernel kernel_paths ' + output_path )
+                print( " [solver.base.combine] calling " + PATH.SPECFEM_BIN +'/xcombine_sem ' + name + '_kernel kernel_paths ' + output_path )
             call_solver(
                 system.mpiexec(),
                 PATH.SPECFEM_BIN +'/'+ 'xcombine_sem '
@@ -400,7 +406,7 @@ class base(object):
         # apply smoothing operator
         unix.cd(self.cwd)
         for name in parameters or self.parameters:
-            print( ' smoothing', name )
+            print( ' [solver.base.smooth] smoothing', name )
             call_solver(
                 system.mpiexec(),
                 PATH.SPECFEM_BIN +'/'+ 'xsmooth_sem '

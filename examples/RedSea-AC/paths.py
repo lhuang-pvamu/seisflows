@@ -1,4 +1,4 @@
-CASE = 'RedSea-AC-obs'
+CASE = 'RedSea-AC-75mEnv'
 
 SF_TOP = '/home/teclee/DAC/FWI/SpecFEM/seisflows/'
 
@@ -14,11 +14,11 @@ WORKDIR = SF_SCRATCH+CASE
 
 #DATA = '/data/seis/RedSea/SEM/obs_5hz_dz100'
 
-MODEL_TRUE = './model_true_pml'
+MODEL_TRUE = './model_75m'
 
-MODEL_INIT = './model_init_smooth'
+MODEL_INIT = './model_75m_sm51'
 
-MASK = './mask'
+MASK = './mask_75m'
 
 PRECOND = ''
 

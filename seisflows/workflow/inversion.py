@@ -22,7 +22,7 @@ postprocess = sys.modules['seisflows_postprocess']
 
 
 class inversion(base):
-    """ Waveform inversion base class
+    """ Basic waveform inversion workflow class
     """
     """
 
@@ -138,7 +138,7 @@ class inversion(base):
         optimize.iter = PAR.BEGIN
         print( '' )
         print( "-------------------------" )
-        print( "main setup" )
+        print( "[workflow.inversion.main] setup" )
         sys.stdout.flush()
         python_time_start = time.clock()
         time_start = time.time()
@@ -192,6 +192,8 @@ class inversion(base):
         """ Lays groundwork for inversion
         """
         if optimize.iter == 1:
+            if PAR.VERBOSE > 2:
+                print( '[inversion.setup] Setting up inversion components' )
             preprocess.setup()
             postprocess.setup()
             optimize.setup()
@@ -211,15 +213,15 @@ class inversion(base):
         """ Prepares for next model update iteration
         """
         if PAR.VERBOSE > 3:
-            print( "[Initialize] write_model: " )
+            print( "[inversion.initialize] write_model: " )
         self.write_model(path=PATH.GRAD, suffix='new')
 
         if PAR.VERBOSE > 3:
-            print( '[Initialize] Generate synthetics (run forward model)' )
+            print( '[inversion.initialize] Run forward model' )
         system.run('solver', 'eval_func', path=PATH.GRAD)
 
         if PAR.VERBOSE > 3:
-            print( "[Initialize] write_misfit" )
+            print( "[inversion.initialize] write_misfit" )
         self.write_misfit(path=PATH.GRAD, suffix='new')
 
 
@@ -240,7 +242,7 @@ class inversion(base):
         optimize.initialize_search()
 
         while True:
-            print( "\n\t-- Trial step " + str( optimize.line_search.step_count + 1) + " --" )
+            print( "\n [inversion.line_search] -- Trial step " + str( optimize.line_search.step_count + 1) + " --" )
             sys.stdout.flush()
             self.evaluate_function()
             status = optimize.update_search()
@@ -267,15 +269,15 @@ class inversion(base):
         """ Performs forward simulation to evaluate objective function
         """
         if PAR.VERBOSE > 3:
-            print( "[evaluate_function] write_model" )
+            print( "[inversion.evaluate_function] write_model" )
         self.write_model(path=PATH.FUNC, suffix='try')
 
         if PAR.VERBOSE > 3:
-            print( "[evaluate_function] run eval_func" )
+            print( "[inversion.evaluate_function] run forward model" )
         system.run('solver', 'eval_func', path=PATH.FUNC)
 
         if PAR.VERBOSE > 3:
-            print( "[evaluate_function] write_misfit" )
+            print( "[inversion.evaluate_function] write_misfit" )
         self.write_misfit(path=PATH.FUNC, suffix='try')
 
 
@@ -283,16 +285,14 @@ class inversion(base):
         """ Performs adjoint simulation to evaluate gradient
         """
         if PAR.VERBOSE > 3:
-            print( "\neval_grad run" )
+            print( "\n[inversion.evaluate_gradient] run adjoint simulation" )
         system.run('solver', 'eval_grad',
                    path=PATH.GRAD,
                    export_traces=divides(optimize.iter, PAR.SAVETRACES))
 
         if PAR.VERBOSE > 3:
-            print( "eval_grad write" )
+            print( "[inversion.evaluate_gradient] write gradient" )
         self.write_gradient(path=PATH.GRAD, suffix='new')
-        if PAR.VERBOSE > 3:
-            print( "eval_grad done" )
 
 
     def finalize(self):
@@ -314,6 +314,9 @@ class inversion(base):
 
         if divides(optimize.iter, PAR.SAVERESIDUALS):
             self.save_residuals()
+
+        if PAR.VERBOSE > 3:
+            print( "[inversion.finalize] iteration results saved" )
 
 
     def clean(self):
@@ -337,33 +340,29 @@ class inversion(base):
         """ Writes model in format expected by solver
         """
         src = 'm_'+suffix
-        #print( " source = " + src )
-        if PAR.VERBOSE > 3:
-            print( " write_model " + path + "/" + src )
         dst = path +'/'+ 'model'
         if PAR.VERBOSE > 3:
+            print( " [inversion.write_model] from: " + path + "/" + src )
             print( "  to: " + dst  )
-            tmp_split = solver.split(optimize.load(src))
-            for entry in tmp_split:
-                print( "   " + str(entry) + ": " + str(tmp_split[entry]) )
 
         solver.save(solver.split(optimize.load(src)), dst)
 
 
     def write_gradient(self, path='', suffix=''):
-        """ Writes gradient in format expected by nonlinear optimization library
+        """ Writes gradient in format for nonlinear optimization library
         """
         src = join(path, 'gradient')
-        if PAR.VERBOSE > 3:
-            print( " writing gradient " + src  )
         dst = 'g_'+suffix
+        if PAR.VERBOSE > 3:
+            print( " [inversion.write_gradient] from: " + src  )
+            print( "  to: " + dst  )
         postprocess.write_gradient(path)
         parts = solver.load(src, suffix='_kernel')
         optimize.save(dst, solver.merge(parts))
 
 
     def write_misfit(self, path='', suffix=''):
-        """ Writes misfit in format expected by nonlinear optimization library
+        """ Writes misfit in format for nonlinear optimization library
         """
         src = glob(path +'/'+ 'residuals/*')
         dst = 'f_'+suffix
@@ -371,7 +370,7 @@ class inversion(base):
 #            print( " summing residuals from: " + str(src) )
         total_misfit = preprocess.sum_residuals(src)
         if PAR.VERBOSE > 3:
-            print( " saving total misfit " + str(total_misfit) + " to " + str(dst) )
+            print( " [inversion.write_misfit] total= %0.4g to %s"%(total_misfit,dst) )
         optimize.savetxt(dst, total_misfit)
 
 

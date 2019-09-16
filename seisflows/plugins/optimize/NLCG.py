@@ -36,12 +36,14 @@ class NLCG:
 
         unix.cd(self.path)
         g_new = self.load('g_new')
+        print( 'plugins/optimize/NLCG: iter=',self.iter,', g_new=',g_new)
 
         if self.iter == 1:
+            print( 'plugins/optimize/NLCG: [first iteration]' )
             return -g_new, 0
 
         elif self.iter > self.maxiter:
-            print( 'restarting NLCG... [periodic restart]' )
+            print( 'plugins/optimize/NLCG: [periodic restart]' )
             self.restart()
             return -g_new, 1
 
@@ -58,16 +60,17 @@ class NLCG:
 
         # check restart conditions
         if check_conjugacy(g_new, g_old) > self.thresh:
-            print( 'restarting NLCG... [loss of conjugacy]' )
+            print( 'plugins/optimize/NLCG: [loss of conjugacy]' )
             self.restart()
             return -g_new, 1
 
         elif check_descent(p_new, g_new) > 0.:
-            print( 'restarting NLCG... [not a descent direction]' )
+            print( 'plugins/optimize/NLCG: [not a descent direction]' )
             self.restart()
             return -g_new, 1
 
         else:
+            print( 'plugins/optimize/NLCG: New direction p_new=',p_new)
             return p_new, 0
 
 
