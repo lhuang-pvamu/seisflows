@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import argparse, os, sys
-
-from os.path import basename, join
-
+from os.path import join
 from seisflows.tools.tools import Struct, loadobj
 from seisflows.config import config, loadpy, names, tilde_expand, Dict
 from seisflows.tools import unix
@@ -34,7 +32,27 @@ if __name__ == "__main__":
 
     # register paths
     paths = tilde_expand(loadpy(args.path_file))
-    sys.modules['seisflows_paths'] = Dict(paths)
+
+    # convert relative path to absolute path
+    path_dict = {}
+    orig_dict = Dict(paths)
+
+    for key in orig_dict: 
+        if len(orig_dict[key]) == 0:
+            path_dict[key] = ''
+        else:
+            path_dict[key] = os.path.abspath(orig_dict[key])
+        #path = os.path.abspath(path)
+
+    if "WORKDIR" in path_dict:
+        args.workdir = path_dict["WORKDIR"]
+
+
+    for key in path_dict:
+        print key + ' - ' + path_dict[key]
+
+    #sys.modules['seisflows_paths'] = Dict(paths)
+    sys.modules['seisflows_paths'] = Dict(path_dict)
 
     unix.mkdir(args.workdir)
     unix.cd(args.workdir)
