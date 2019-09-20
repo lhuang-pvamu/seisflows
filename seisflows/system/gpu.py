@@ -41,8 +41,8 @@ class gpu(custom_import('system', 'serial')):
             raise ParameterError(PAR, 'NPROC')
 
         # number of available cores
-        if 'NPROCMAX' not in PAR:
-            setattr(PAR, 'NPROCMAX', nproc())
+        #if 'NPROCMAX' not in PAR:
+        #    setattr(PAR, 'NPROCMAX', nproc())
 
         # maximum number of concurrent tasks
         if 'NTASKMAX' not in PAR:
