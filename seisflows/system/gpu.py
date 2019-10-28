@@ -65,7 +65,7 @@ class gpu(custom_import('system', 'serial')):
         #running_tasks = dict()
         gpu0_tasks = dict()
         gpu1_tasks = dict()
-        queued_tasks = range(PAR.NTASK)
+        queued_tasks = list(range(PAR.NTASK))
 
         # implements "work queue" pattern
         while queued_tasks or gpu0_tasks or gpu1_tasks:
@@ -96,7 +96,7 @@ class gpu(custom_import('system', 'serial')):
             if gpu0_tasks or gpu1_tasks:
                 sleep(.01)
 
-        print ''
+        print('')
 
 
     def run_single(self, classname, method, *args, **kwargs):
@@ -110,9 +110,12 @@ class gpu(custom_import('system', 'serial')):
     ### private methods
 
     def _run_task(self, classname, method, taskid=0, gpuid=0):
-        env = os.environ.copy().items()
-        env += [['SEISFLOWS_TASKID', str(taskid)]]
-        env += [['CUDA_VISIBLE_DEVICES',str(gpuid)]]
+        env = os.environ.copy()
+        env['SEISFLOWS_TASKID'] = str(taskid)
+        env['CUDA_VISIBLE_DEVICES'] = str(gpuid)
+        #env = os.environ.copy().items()
+        #env += [['SEISFLOWS_TASKID', str(taskid)]]
+        #env += [['CUDA_VISIBLE_DEVICES',str(gpuid)]]
         self.progress(taskid)
 
         p = Popen(
